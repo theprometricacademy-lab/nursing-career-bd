@@ -124,7 +124,7 @@ export default function ImportPage() {
     const topicId = new Map((allTopics ?? []).map((t: { id: number; subject_id: number; name_en: string }) => [`${t.subject_id}|${t.name_en}`, t.id]));
     const examId = new Map(exams.flatMap((e) => [[e.name_en, e.id], [e.name_bn, e.id]] as [string, number][]));
 
-    const rows = good.map((p) => ({
+    const rows: Record<string, unknown>[] = good.map((p) => ({
       ...p.data!,
       topic_id: p.topic ? topicId.get(topicKey(p.topic)) ?? null : null,
       exam_id: p.examName ? examId.get(p.examName) ?? null : null,
