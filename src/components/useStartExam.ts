@@ -15,7 +15,7 @@ export function useStartExam() {
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState('');
 
-  async function start(a: StartArgs, key = a.mode) {
+  async function start(a: StartArgs, key: string = a.mode) {
     if (!user) { router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`); return; }
     setBusy(key); setErr('');
     const { data, error } = await supabaseBrowser().rpc('start_attempt', {

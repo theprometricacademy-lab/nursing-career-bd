@@ -33,7 +33,7 @@ export default function PaymentsAdmin() {
     if (ids.length) {
       const { data: profs } = await sb.from('profiles').select('id, full_name, phone').in('id', ids);
       const m = new Map((profs ?? []).map((p: { id: string; full_name: string | null; phone: string | null }) => [p.id, p]));
-      list.forEach((p) => { p.profiles = m.get(p.user_id) ?? null; });
+      list.forEach((p) => { p.profiles = (m.get(p.user_id) as P['profiles']) ?? null; });
     }
     setRows(list);
   }, [sb, status]);
