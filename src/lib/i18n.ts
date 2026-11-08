@@ -62,6 +62,8 @@ const en = {
   payFailed: 'Payment failed or was cancelled.', payPending: 'We are confirming your payment…', choosePlan: 'Choose a plan',
   // profile
   settings: 'Settings', profileSaved: 'Profile saved', accountInfo: 'Account information',
+  realExam: 'As in exam', questionLang: 'Question language', sections: 'Sections',
+  secBangla: 'Bangla', secEnglish: 'English', secGk: 'General Knowledge', secNursing: 'Nursing',
 } as const;
 
 export type DictKey = keyof typeof en;
@@ -118,6 +120,8 @@ const bn: Record<DictKey, string> = {
   pf5: 'পারফরম্যান্স বিশ্লেষণ', pf6: 'অ্যাডভান্সড অনুশীলন মোড', paySuccess: 'পেমেন্ট সফল! প্রিমিয়াম চালু হয়েছে।',
   payFailed: 'পেমেন্ট ব্যর্থ বা বাতিল হয়েছে।', payPending: 'আপনার পেমেন্ট যাচাই করা হচ্ছে…', choosePlan: 'প্ল্যান বেছে নিন',
   settings: 'সেটিংস', profileSaved: 'প্রোফাইল সংরক্ষিত হয়েছে', accountInfo: 'অ্যাকাউন্টের তথ্য',
+  realExam: 'পরীক্ষার মতো', questionLang: 'প্রশ্নের ভাষা', sections: 'অংশ',
+  secBangla: 'বাংলা', secEnglish: 'ইংরেজি', secGk: 'সাধারণ জ্ঞান', secNursing: 'নার্সিং',
 };
 
 export const dictionaries: Record<Lang, Record<DictKey, string>> = { en, bn };

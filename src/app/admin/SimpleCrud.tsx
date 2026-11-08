@@ -7,12 +7,14 @@ import { useL } from './AdminShell';
 
 export type Field = {
   key: string; label: string;
-  type?: 'text' | 'textarea' | 'number' | 'bool' | 'select' | 'datetime' | 'intlist';
+  type?: 'text' | 'textarea' | 'number' | 'bool' | 'select' | 'datetime' | 'intlist' | 'blueprint';
   options?: { value: string | number; label: string }[];
   required?: boolean; showInTable?: boolean;
 };
 
 type Row = Record<string, unknown> & { id: number | string };
+const BP_KEYS = ['bangla', 'english', 'gk', 'nursing'] as const;
+const BP_LABEL: Record<string, string> = { bangla: 'বাংলা', english: 'English', gk: 'GK', nursing: 'Nursing' };
 
 function display(v: unknown, f: Field) {
   if (v === null || v === undefined || v === '') return '—';
@@ -20,6 +22,7 @@ function display(v: unknown, f: Field) {
   if (f.type === 'select') return f.options?.find((o) => String(o.value) === String(v))?.label ?? String(v);
   if (f.type === 'datetime') return new Date(String(v)).toLocaleString();
   if (Array.isArray(v)) return v.join(', ');
+  if (f.type === 'blueprint' && typeof v === 'object') return Object.entries(v as Record<string, number>).map(([k, n]) => `${k} ${n}`).join(' · ');
   const s = String(v);
   return s.length > 60 ? s.slice(0, 60) + '…' : s;
 }
@@ -54,6 +57,11 @@ export function SimpleCrud({ table, fields, defaults, order = 'id', ascending = 
       if (f.type === 'number') v = v === '' || v === null || v === undefined ? null : Number(v);
       if (f.type === 'intlist') v = typeof v === 'string' ? (v.trim() ? v.split(',').map((x) => Number(x.trim())).filter(Number.isFinite) : null) : v;
       if (f.type === 'datetime') v = v ? new Date(String(v)).toISOString() : null;
+      if (f.type === 'blueprint') {
+        const b = (v ?? {}) as Record<string, number>;
+        const clean = Object.fromEntries(BP_KEYS.map((k) => [k, Math.max(0, Number(b[k]) || 0)]));
+        v = Object.values(clean).some((n) => n > 0) ? clean : null;
+      }
       if (f.type === 'select' && f.options && typeof f.options[0]?.value === 'number') v = v === '' || v === null ? null : Number(v);
       if (f.type === 'text' || f.type === 'textarea') v = typeof v === 'string' ? v.trim() || null : v;
       payload[f.key] = v;
@@ -126,6 +134,16 @@ export function SimpleCrud({ table, fields, defaults, order = 'id', ascending = 
                             {f.options?.map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
                           </select>
                         ) : f.type === 'datetime' ? <input type="datetime-local" className="input" value={dtLocal(v)} onChange={(e) => set(e.target.value)} />
+                        : f.type === 'blueprint' ? (
+                          <div className="grid grid-cols-4 gap-2">
+                            {BP_KEYS.map((k) => (
+                              <label key={k} className="text-xs text-ink-soft">{BP_LABEL[k]}
+                                <input className="input mt-1" type="number" min={0} value={String(((v ?? {}) as Record<string, number>)[k] ?? '')}
+                                  onChange={(e) => set({ ...((v ?? {}) as Record<string, number>), [k]: e.target.value === '' ? 0 : Number(e.target.value) })} />
+                              </label>
+                            ))}
+                          </div>
+                        )
                         : f.type === 'intlist' ? <input className="input" placeholder="1, 2, 3" value={Array.isArray(v) ? v.join(', ') : String(v ?? '')} onChange={(e) => set(e.target.value)} />
                         : <input className="input" type={f.type === 'number' ? 'number' : 'text'} step="any" value={String(v ?? '')} onChange={(e) => set(e.target.value)} required={f.required} />}
                     </>

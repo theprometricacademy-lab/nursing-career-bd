@@ -5,6 +5,7 @@ export type AttemptQuestion = {
   selected: number | null; marked: boolean;
   correct_option: number | null; is_correct: boolean | null;
   explanation_en: string | null; explanation_bn: string | null;
+  exam_lang: 'bn' | 'en'; translatable: boolean;
 };
 export type Attempt = {
   id: string; mode: string; title_en: string | null; title_bn: string | null; status: 'in_progress' | 'submitted';
@@ -15,3 +16,10 @@ export type Attempt = {
   subjects: { subject_id: number; name_en: string; name_bn: string; total: number; correct: number }[];
 };
 export const LETTERS = { en: ['A', 'B', 'C', 'D'], bn: ['ক', 'খ', 'গ', 'ঘ'] } as const;
+
+/** 'real' = the language the question appears in on the real exam paper */
+export type ViewMode = 'real' | 'bn' | 'en';
+export function displayLang(q: { exam_lang: 'bn' | 'en'; translatable: boolean }, mode: ViewMode): 'bn' | 'en' {
+  if (!q.translatable || mode === 'real') return q.exam_lang;
+  return mode;
+}

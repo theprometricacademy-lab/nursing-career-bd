@@ -10,6 +10,7 @@ export type BankQuestion = {
   id: number; code: string; subject_id: number; topic_id: number | null; exam_id: number | null; year: number | null;
   difficulty: 'easy' | 'medium' | 'hard'; is_premium: boolean; locked: boolean;
   question_en: string | null; question_bn: string | null; options_en: string[] | null; options_bn: string[] | null; bookmarked: boolean;
+  exam_lang: 'bn' | 'en'; translatable: boolean;
 };
 
 const LETTERS_EN = ['A', 'B', 'C', 'D'];
@@ -19,7 +20,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
   q: BankQuestion; index: number; subjectName?: string; onBookmarkChange?: (id: number, v: boolean) => void;
 }) {
   const { t, lang, num, user, errMsg } = useApp();
-  const [view, setView] = useState(lang);
+  const [view, setView] = useState<'bn' | 'en'>(q.translatable ? lang : q.exam_lang);
   const [selected, setSelected] = useState<number | null>(null);
   const [result, setResult] = useState<{ correct: boolean; correct_option: number; explanation_en: string | null; explanation_bn: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -29,6 +30,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
   const text = view === 'bn' ? q.question_bn : q.question_en;
   const options = view === 'bn' ? q.options_bn : q.options_en;
   const letters = view === 'bn' ? LETTERS_BN : LETTERS_EN;
+  const expl = q.translatable ? view : lang; // untranslated subjects: explain in the reader's language
   const diffTone = { easy: 'bg-mint-50 text-mint-700', medium: 'bg-brand-50 text-brand-700', hard: 'bg-blush-50 text-blush-700' }[q.difficulty];
 
   async function check() {
@@ -61,7 +63,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
         {q.year && <span className="chip bg-white text-ink-soft ring-1 ring-brand-100">{num(q.year)}</span>}
         {q.is_premium && <PremiumChip />}
         <div className="ml-auto flex items-center gap-1">
-          {!q.locked && (
+          {!q.locked && q.translatable && (
             <button onClick={() => setView(view === 'bn' ? 'en' : 'bn')} className="flex items-center gap-1 rounded-lg px-2 py-1 text-brand-700 hover:bg-brand-50" title={t('language')}>
               <Languages className="h-4 w-4" />{view === 'bn' ? 'EN' : 'বাং'}
             </button>
@@ -110,8 +112,8 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
                 {result.correct ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
                 {result.correct ? t('correct') : `${t('wrong')} — ${t('correctAnswer')}: ${letters[result.correct_option]}`}
               </div>
-              {(view === 'bn' ? result.explanation_bn : result.explanation_en) && (
-                <p className="mt-2 leading-relaxed text-ink"><b>{t('explanation')}:</b> {view === 'bn' ? result.explanation_bn : result.explanation_en}</p>
+              {(expl === 'bn' ? result.explanation_bn : result.explanation_en) && (
+                <p className="mt-2 leading-relaxed text-ink"><b>{t('explanation')}:</b> {expl === 'bn' ? result.explanation_bn : result.explanation_en}</p>
               )}
             </div>
           )}

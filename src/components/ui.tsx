@@ -5,7 +5,7 @@ import { Crown, Loader2, Inbox } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 
-export type Subject = { id: number; slug: string; name_en: string; name_bn: string; category: 'nursing' | 'general'; icon: string | null; sort_order: number };
+export type Subject = { id: number; slug: string; name_en: string; name_bn: string; category: 'nursing' | 'general'; icon: string | null; sort_order: number; exam_lang: 'bn' | 'en'; translatable: boolean };
 export type Exam = { id: number; name_en: string; name_bn: string; exam_type: string; year: number };
 export type Topic = { id: number; subject_id: number; name_en: string; name_bn: string };
 

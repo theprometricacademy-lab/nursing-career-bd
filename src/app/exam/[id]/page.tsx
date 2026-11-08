@@ -4,10 +4,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Flag, Eraser, Clock, Grid3x3, Send, X } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
-import { LangToggle } from '@/components/AppShell';
+import { ViewModeToggle } from '@/components/ViewModeToggle';
 import { LogoMark } from '@/components/Logo';
 import { Modal, Spinner } from '@/components/ui';
-import { LETTERS, type Attempt, type AttemptQuestion } from '@/components/examTypes';
+import { LETTERS, displayLang, type Attempt, type AttemptQuestion, type ViewMode } from '@/components/examTypes';
 
 export default function ExamPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +17,7 @@ export default function ExamPage() {
   const [att, setAtt] = useState<Attempt | null>(null);
   const [qs, setQs] = useState<AttemptQuestion[]>([]);
   const [cur, setCur] = useState(0);
+  const [mode, setMode] = useState<ViewMode>('real');
   const [left, setLeft] = useState<number | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [palette, setPalette] = useState(false);
@@ -110,7 +111,8 @@ export default function ExamPage() {
   const mm = Math.floor((left ?? 0) / 60), ss = (left ?? 0) % 60;
   const timeStr = `${num(String(mm).padStart(2, '0'))}:${num(String(ss).padStart(2, '0'))}`;
   const low = (left ?? 999) <= 60;
-  const letters = LETTERS[lang];
+  const ql = displayLang(q, mode);
+  const letters = LETTERS[ql];
 
   const Palette = (
     <div>
@@ -149,17 +151,18 @@ export default function ExamPage() {
             aria-label={t('timeLeft')}>
             <Clock className="h-4 w-4" />{timeStr}
           </div>
-          <span className="hidden sm:block"><LangToggle compact /></span>
+          <span className="hidden sm:block"><ViewModeToggle value={mode} onChange={setMode} /></span>
         </div>
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-4 px-4 py-4 lg:grid-cols-[1fr_280px]">
         <section className="card p-4 md:p-6">
+          <div className="mb-3 sm:hidden"><ViewModeToggle value={mode} onChange={setMode} /></div>
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-semibold text-brand-700">{lang === 'bn' ? 'প্রশ্ন' : 'Question'} {num(cur + 1)} / {num(qs.length)}</span>
             <span className="text-xs text-ink-soft">+{num(att.marks_per_question)}{Number(att.negative_mark) > 0 && <> / −{num(att.negative_mark)}</>}</span>
           </div>
-          <h2 className="mb-4 text-base font-medium leading-relaxed text-ink md:text-lg">{lang === 'bn' ? q.question_bn : q.question_en}</h2>
+          <h2 className="mb-4 text-base font-medium leading-relaxed text-ink md:text-lg">{ql === 'bn' ? q.question_bn : q.question_en}</h2>
           <div className="space-y-2">
             {q.options.map((o, i) => {
               const on = q.selected === o.idx;
@@ -167,7 +170,7 @@ export default function ExamPage() {
                 <button key={o.idx} onClick={() => choose(o.idx)}
                   className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left text-sm transition ${on ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-100' : 'border-brand-100 bg-white hover:border-brand-300'}`}>
                   <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold ${on ? 'bg-brand-600 text-white' : 'bg-brand-50 text-brand-700'}`}>{letters[i]}</span>
-                  <span className="pt-1">{lang === 'bn' ? o.bn : o.en}</span>
+                  <span className="pt-1">{ql === 'bn' ? o.bn : o.en}</span>
                 </button>
               );
             })}

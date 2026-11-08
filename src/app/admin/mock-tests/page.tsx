@@ -14,13 +14,15 @@ export default function MockTestsAdmin() {
       <PageHeader title={L('মক টেস্ট', 'Mock tests')}
         sub={L(`বিষয় আইডি: ${subjects.map((s) => `${s.id}=${s.name_bn}`).join(', ')}`, `Subject IDs: ${subjects.map((s) => `${s.id}=${s.name_en}`).join(', ')}`)} />
       <SimpleCrud table="mock_tests" defaults={{
-        question_count: 50, duration_minutes: 50, marks_per_question: 1, negative_mark: 0.25,
+        question_count: 100, duration_minutes: 60, marks_per_question: 1, negative_mark: 0.5,
+        blueprint: { bangla: 20, english: 20, gk: 20, nursing: 40 },
         is_premium: false, shuffle_questions: true, shuffle_options: true, is_published: true,
       }} fields={[
         { key: 'title_bn', label: 'শিরোনাম (বাংলা)', required: true },
         { key: 'title_en', label: 'Title (English)', required: true },
         { key: 'description_bn', label: 'বিবরণ (বাংলা)', type: 'textarea', showInTable: false },
         { key: 'description_en', label: 'Description (English)', type: 'textarea', showInTable: false },
+        { key: 'blueprint', label: L('মানবণ্টন (অংশভিত্তিক প্রশ্ন সংখ্যা) — খালি রাখলে নিচের প্রশ্ন সংখ্যা ও বিষয় অনুযায়ী', 'Sections (questions per part) — leave all 0 to use question count & subjects below'), type: 'blueprint' },
         { key: 'question_count', label: L('প্রশ্ন সংখ্যা', 'Questions'), type: 'number', required: true },
         { key: 'duration_minutes', label: L('সময় (মিনিট)', 'Duration (min)'), type: 'number', required: true },
         { key: 'marks_per_question', label: L('প্রতি প্রশ্নে নম্বর', 'Marks / question'), type: 'number' },

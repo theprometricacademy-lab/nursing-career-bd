@@ -56,8 +56,12 @@ export default function ImportPage() {
       const row = i + 2; // header is row 1
       const subj = findSubject(r.subject ?? '');
       if (!subj) return { row, error: `subject "${r.subject ?? ''}" not found` };
-      const oe = [r.option_a_en, r.option_b_en, r.option_c_en, r.option_d_en].map((x) => String(x ?? '').trim());
-      const ob = [r.option_a_bn, r.option_b_bn, r.option_c_bn, r.option_d_bn].map((x) => String(x ?? '').trim());
+      let oe = [r.option_a_en, r.option_b_en, r.option_c_en, r.option_d_en].map((x) => String(x ?? '').trim());
+      let ob = [r.option_a_bn, r.option_b_bn, r.option_c_bn, r.option_d_bn].map((x) => String(x ?? '').trim());
+      if (!subj.translatable) { // Bangla / English subjects: one language is enough
+        r.question_en = r.question_en?.trim() || r.question_bn; r.question_bn = r.question_bn?.trim() || r.question_en;
+        oe = oe.map((x, k) => x || ob[k]); ob = ob.map((x, k) => x || oe[k]);
+      }
       if (!r.question_en?.trim() || !r.question_bn?.trim()) return { row, error: 'question_en and question_bn are required' };
       if (oe.some((x) => !x) || ob.some((x) => !x)) return { row, error: 'all 8 options are required' };
       const c = String(r.correct ?? '').trim().toUpperCase();

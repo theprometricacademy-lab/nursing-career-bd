@@ -11,12 +11,12 @@ type QRow = {
   id?: number; code?: string; subject_id: number | ''; topic_id: number | '' | null; exam_id: number | '' | null;
   question_en: string; question_bn: string; options_en: string[]; options_bn: string[]; correct_option: number;
   explanation_en: string; explanation_bn: string; difficulty: 'easy' | 'medium' | 'hard'; is_premium: boolean;
-  source: string; year: number | '' | null; is_active: boolean;
+  source: string; year: number | '' | null; is_active: boolean; exam_lang: 'bn' | 'en' | '' | null;
 };
 
 const EMPTY: QRow = {
   subject_id: '', topic_id: '', exam_id: '', question_en: '', question_bn: '', options_en: ['', '', '', ''], options_bn: ['', '', '', ''],
-  correct_option: 0, explanation_en: '', explanation_bn: '', difficulty: 'medium', is_premium: false, source: '', year: '', is_active: true,
+  correct_option: 0, explanation_en: '', explanation_bn: '', difficulty: 'medium', is_premium: false, source: '', year: '', is_active: true, exam_lang: '',
 };
 const PAGE = 25;
 
@@ -54,6 +54,13 @@ export default function QuestionsAdmin() {
   async function save() {
     if (!edit) return;
     setErr('');
+    // Bangla / English subject questions are not translated: one language is enough, copy it to the other
+    const subj = subjects.find((x) => x.id === edit.subject_id);
+    if (subj && !subj.translatable) {
+      const fill = (a: string, b: string) => (a.trim() ? a : b);
+      edit.question_en = fill(edit.question_en, edit.question_bn); edit.question_bn = fill(edit.question_bn, edit.question_en);
+      edit.options_en = edit.options_en.map((o, i) => fill(o, edit.options_bn[i])); edit.options_bn = edit.options_bn.map((o, i) => fill(o, edit.options_en[i]));
+    }
     if (!edit.subject_id || !edit.question_en.trim() || !edit.question_bn.trim() || edit.options_en.some((o) => !o.trim()) || edit.options_bn.some((o) => !o.trim())) {
       setErr(L('বিষয়, দুই ভাষায় প্রশ্ন ও চারটি অপশন বাধ্যতামূলক।', 'Subject, question in both languages and all four options are required.'));
       return;
@@ -65,6 +72,7 @@ export default function QuestionsAdmin() {
       options_en: edit.options_en.map((o) => o.trim()), options_bn: edit.options_bn.map((o) => o.trim()),
       correct_option: Number(edit.correct_option), explanation_en: edit.explanation_en?.trim() || null, explanation_bn: edit.explanation_bn?.trim() || null,
       difficulty: edit.difficulty, is_premium: edit.is_premium, source: edit.source?.trim() || null, year: edit.year ? Number(edit.year) : null, is_active: edit.is_active,
+      exam_lang: edit.exam_lang || null,
     };
     const { error } = edit.id ? await sb.from('questions').update(payload).eq('id', edit.id) : await sb.from('questions').insert(payload);
     setBusy(false);
@@ -111,7 +119,7 @@ export default function QuestionsAdmin() {
                 <p className="line-clamp-2 text-ink">{r.question_bn}</p>
                 <p className="line-clamp-1 text-xs text-ink-soft">{r.question_en}</p>
               </div>
-              <button className="rounded-lg p-1.5 text-brand-700 hover:bg-brand-50" onClick={() => { setErr(''); setEdit({ ...EMPTY, ...r, topic_id: r.topic_id ?? '', exam_id: r.exam_id ?? '', year: r.year ?? '', explanation_en: r.explanation_en ?? '', explanation_bn: r.explanation_bn ?? '', source: r.source ?? '' }); }} aria-label="edit"><Pencil className="h-4 w-4" /></button>
+              <button className="rounded-lg p-1.5 text-brand-700 hover:bg-brand-50" onClick={() => { setErr(''); setEdit({ ...EMPTY, ...r, topic_id: r.topic_id ?? '', exam_id: r.exam_id ?? '', year: r.year ?? '', explanation_en: r.explanation_en ?? '', explanation_bn: r.explanation_bn ?? '', source: r.source ?? '', exam_lang: r.exam_lang ?? '' }); }} aria-label="edit"><Pencil className="h-4 w-4" /></button>
               <button className="rounded-lg p-1.5 text-red-600 hover:bg-red-50" onClick={() => remove(r.id!)} aria-label="delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           ))}
@@ -165,7 +173,14 @@ export default function QuestionsAdmin() {
                 </select></div>
               <div><label className="label">{L('সাল', 'Year')}</label><input className="input" type="number" value={edit.year ?? ''} onChange={(e) => setEdit({ ...edit, year: e.target.value ? Number(e.target.value) : '' })} /></div>
               <div><label className="label">{L('উৎস', 'Source')}</label><input className="input" value={edit.source} onChange={(e) => setEdit({ ...edit, source: e.target.value })} /></div>
+              <div className="col-span-2"><label className="label">{L('আসল পরীক্ষায় প্রশ্নের ভাষা', 'Language on the real exam')}</label>
+                <select className="input" value={edit.exam_lang ?? ''} onChange={(e) => setEdit({ ...edit, exam_lang: e.target.value as QRow['exam_lang'] })}>
+                  <option value="">{L('বিষয়ের ডিফল্ট', "Subject's default")}</option><option value="en">English</option><option value="bn">বাংলা</option>
+                </select></div>
             </div>
+            {subjects.find((x) => x.id === edit.subject_id)?.translatable === false && (
+              <p className="rounded-xl bg-blush-50 p-2 text-xs text-blush-700">{L('এই বিষয়ের প্রশ্ন অনুবাদ হয় না — একটি ভাষায় প্রশ্ন ও অপশন লিখলেই হবে। ব্যাখ্যা দুই ভাষায় দিন।', 'Questions in this subject are not translated — fill the question and options in one language. Give the explanation in both.')}</p>
+            )}
             <div className="flex gap-4 text-sm font-medium">
               <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4 accent-blush-600" checked={edit.is_premium} onChange={(e) => setEdit({ ...edit, is_premium: e.target.checked })} />{L('প্রিমিয়াম', 'Premium')}</label>
               <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4 accent-brand-600" checked={edit.is_active} onChange={(e) => setEdit({ ...edit, is_active: e.target.checked })} />{L('চালু', 'Active')}</label>

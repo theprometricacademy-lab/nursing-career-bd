@@ -22,11 +22,13 @@ export default function CatalogAdmin() {
         ))}
       </div>
       {tab === 'subjects' && (
-        <SimpleCrud table="subjects" order="sort_order" defaults={{ category: 'nursing', sort_order: 99, is_active: true }} fields={[
+        <SimpleCrud table="subjects" order="sort_order" defaults={{ category: 'nursing', sort_order: 99, is_active: true, exam_lang: 'en', translatable: true }} fields={[
           { key: 'name_bn', label: 'নাম (বাংলা)', required: true },
           { key: 'name_en', label: 'Name (English)', required: true },
           { key: 'slug', label: 'Slug', required: true },
           { key: 'category', label: L('ধরন', 'Category'), type: 'select', required: true, options: [{ value: 'nursing', label: 'Nursing' }, { value: 'general', label: 'General' }] },
+          { key: 'exam_lang', label: L('আসল পরীক্ষায় প্রশ্নের ভাষা', 'Language on the real exam'), type: 'select', required: true, options: [{ value: 'en', label: 'English' }, { value: 'bn', label: 'বাংলা' }] },
+          { key: 'translatable', label: L('অনুবাদযোগ্য (বাংলা/ইংরেজি বিষয়ের জন্য বন্ধ রাখুন)', 'Translatable (off for Bangla / English subjects)'), type: 'bool' },
           { key: 'sort_order', label: L('ক্রম', 'Order'), type: 'number' },
           { key: 'is_active', label: L('চালু', 'Active'), type: 'bool' },
         ]} />

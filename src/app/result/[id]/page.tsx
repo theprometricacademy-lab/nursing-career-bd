@@ -6,7 +6,8 @@ import { CheckCircle2, XCircle, MinusCircle, Trophy, AlarmClock, RotateCcw } fro
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Progress, Spinner, Stat } from '@/components/ui';
-import { LETTERS, type Attempt } from '@/components/examTypes';
+import { LETTERS, displayLang, type Attempt, type ViewMode } from '@/components/examTypes';
+import { ViewModeToggle } from '@/components/ViewModeToggle';
 
 export default function ResultPage() {
   return <Suspense><ResultView /></Suspense>;
@@ -19,6 +20,7 @@ function ResultView() {
   const [a, setA] = useState<Attempt | null>(null);
   const [err, setErr] = useState('');
   const [onlyWrong, setOnlyWrong] = useState(false);
+  const [mode, setMode] = useState<ViewMode>('real');
 
   useEffect(() => {
     supabaseBrowser().rpc('get_attempt', { p_attempt: id }).then(({ data, error }) => {
@@ -35,7 +37,6 @@ function ResultView() {
 
   const answered = (a.correct ?? 0) + (a.wrong ?? 0);
   const accuracy = answered ? Math.round(((a.correct ?? 0) / answered) * 100) : 0;
-  const letters = LETTERS[lang];
   const list = a.questions.filter((q) => !onlyWrong || q.is_correct !== true);
   const tone = percent >= 70 ? 'from-mint-400 to-mint-600' : percent >= 40 ? 'from-brand-400 to-brand-600' : 'from-blush-400 to-blush-600';
 
@@ -76,6 +77,7 @@ function ResultView() {
       <section>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold text-ink">{t('review')}</h2>
+          <ViewModeToggle value={mode} onChange={setMode} />
           <div className="inline-flex rounded-full border border-brand-200 bg-white p-0.5 text-xs font-semibold">
             <button onClick={() => setOnlyWrong(false)} className={`rounded-full px-3 py-1 ${!onlyWrong ? 'bg-brand-600 text-white' : 'text-brand-700'}`}>{t('allQuestions')}</button>
             <button onClick={() => setOnlyWrong(true)} className={`rounded-full px-3 py-1 ${onlyWrong ? 'bg-blush-600 text-white' : 'text-blush-700'}`}>{t('onlyWrong')}</button>
@@ -84,6 +86,9 @@ function ResultView() {
         <div className="space-y-3">
           {list.map((q) => {
             const pos = a.questions.indexOf(q) + 1;
+            const ql = displayLang(q, mode);
+            const letters = LETTERS[ql];
+            const el = q.translatable ? ql : lang;
             return (
               <article key={q.position} className="card p-4">
                 <div className="mb-2 flex items-center gap-2 text-xs">
@@ -93,7 +98,7 @@ function ResultView() {
                     {q.is_correct ? t('correct') : q.selected === null ? t('notAttempted') : t('wrong')}
                   </span>
                 </div>
-                <h3 className="mb-3 font-medium leading-relaxed text-ink">{lang === 'bn' ? q.question_bn : q.question_en}</h3>
+                <h3 className="mb-3 font-medium leading-relaxed text-ink">{ql === 'bn' ? q.question_bn : q.question_en}</h3>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {q.options.map((o, i) => {
                     const isCorrect = o.idx === q.correct_option;
@@ -102,14 +107,14 @@ function ResultView() {
                     return (
                       <div key={o.idx} className={`flex items-start gap-2 rounded-xl border p-2.5 text-sm ${cls}`}>
                         <b className="w-5 shrink-0">{letters[i]}</b>
-                        <span className="flex-1">{lang === 'bn' ? o.bn : o.en}</span>
+                        <span className="flex-1">{ql === 'bn' ? o.bn : o.en}</span>
                         {isMine && <span className="text-[11px] font-semibold">{t('yourAnswer')}</span>}
                       </div>
                     );
                   })}
                 </div>
-                {(lang === 'bn' ? q.explanation_bn : q.explanation_en) && (
-                  <p className="mt-3 rounded-xl bg-brand-50 p-3 text-sm leading-relaxed text-ink"><b>{t('explanation')}:</b> {lang === 'bn' ? q.explanation_bn : q.explanation_en}</p>
+                {(el === 'bn' ? q.explanation_bn : q.explanation_en) && (
+                  <p className="mt-3 rounded-xl bg-brand-50 p-3 text-sm leading-relaxed text-ink"><b>{t('explanation')}:</b> {el === 'bn' ? q.explanation_bn : q.explanation_en}</p>
                 )}
               </article>
             );
