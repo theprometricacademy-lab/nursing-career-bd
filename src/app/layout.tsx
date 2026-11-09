@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Hind_Siliguri } from 'next/font/google';
-import { cookies } from 'next/headers';
 import './globals.css';
 import { AppProvider } from '@/components/AppProvider';
 import { AppShell } from '@/components/AppShell';
-import type { Lang } from '@/lib/i18n';
 
 const hind = Hind_Siliguri({ subsets: ['bengali', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-hind' });
 
@@ -15,14 +14,14 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: '#1f7ad6', width: 'device-width', initialScale: 1, maximumScale: 1, viewportFit: 'cover' };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const c = await cookies();
-  const lang: Lang = c.get('lang')?.value === 'en' ? 'en' : 'bn';
+// No cookies()/headers() here: that would make every page server-rendered on each click.
+// Pages are static and prefetched, so moving between them is instant; the saved language is applied in the browser.
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={lang} className={hind.variable}>
+    <html lang="bn" className={hind.variable}>
       <body className="font-sans antialiased">
-        <AppProvider initialLang={lang}>
-          <AppShell>{children}</AppShell>
+        <AppProvider initialLang="bn">
+          <AppShell><Suspense fallback={null}>{children}</Suspense></AppShell>
         </AppProvider>
       </body>
     </html>

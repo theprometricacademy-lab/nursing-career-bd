@@ -63,6 +63,12 @@ export function AppProvider({ initialLang, children }: { initialLang: Lang; chil
   }, [sb, load]);
 
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  // apply the language saved in the browser (layout is static, so the server can't read it)
+  useEffect(() => {
+    const m = document.cookie.match(/(?:^|; )lang=(bn|en)/);
+    if (m && m[1] !== lang) setLangState(m[1] as Lang);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);

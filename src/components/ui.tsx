@@ -22,11 +22,13 @@ export function useSubjects() {
   return subjects;
 }
 
+let examCache: Exam[] | null = null;
 export function useExams() {
-  const [exams, setExams] = useState<Exam[]>([]);
+  const [exams, setExams] = useState<Exam[]>(examCache ?? []);
   useEffect(() => {
+    if (examCache) return;
     supabaseBrowser().from('exams').select('*').eq('is_active', true).order('year', { ascending: false })
-      .then(({ data }) => setExams((data as Exam[]) ?? []));
+      .then(({ data }) => { examCache = (data as Exam[]) ?? []; setExams(examCache); });
   }, []);
   return exams;
 }
