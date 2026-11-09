@@ -5,6 +5,7 @@ import { Check, Crown, Ticket, ShieldCheck } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
+import { SendMoneyBox, type ManualCfg } from '@/components/SendMoneyBox';
 
 type Gateways = { bkash?: boolean; nagad?: boolean; sslcommerz?: boolean };
 type Quote = { base: number; discount: number; amount: number; coupon_valid: boolean };
@@ -24,6 +25,7 @@ function PremiumView() {
   const testId = params.get('test') ? Number(params.get('test')) : null;
   const [prices, setPrices] = useState<{ lifetime: number; single: number } | null>(null);
   const [gateways, setGateways] = useState<Gateways>({});
+  const [manual, setManual] = useState<ManualCfg | null>(null);
   const [test, setTest] = useState<{ id: number; title_en: string; title_bn: string; price: number | null } | null>(null);
   const [plan, setPlan] = useState<'lifetime' | 'single_test'>(testId ? 'single_test' : 'lifetime');
   const [coupon, setCoupon] = useState('');
@@ -34,10 +36,11 @@ function PremiumView() {
 
   useEffect(() => {
     const sb = supabaseBrowser();
-    sb.from('app_settings').select('key, value').in('key', ['price_lifetime', 'price_single_test', 'payment_gateways']).then(({ data }) => {
+    sb.from('app_settings').select('key, value').in('key', ['price_lifetime', 'price_single_test', 'payment_gateways', 'manual_payment']).then(({ data }) => {
       const m = Object.fromEntries((data ?? []).map((r: { key: string; value: unknown }) => [r.key, r.value]));
       setPrices({ lifetime: Number(m.price_lifetime ?? 799), single: Number(m.price_single_test ?? 99) });
       setGateways((m.payment_gateways as Gateways) ?? {});
+      setManual((m.manual_payment as ManualCfg) ?? null);
     });
     if (testId) {
       sb.from('mock_tests').select('id, title_en, title_bn, price').eq('id', testId).eq('is_premium', true).maybeSingle()
@@ -129,7 +132,8 @@ function PremiumView() {
         {!(premium && plan === 'lifetime') && (
           <div className="space-y-2">
             <p className="text-sm font-semibold text-ink">{t('payWith')}</p>
-            {enabled.length === 0 && <p className="text-sm text-ink-soft">{lang === 'bn' ? 'এই মুহূর্তে অনলাইন পেমেন্ট বন্ধ আছে।' : 'Online payment is currently unavailable.'}</p>}
+            {manual && <SendMoneyBox cfg={manual} plan={plan} testId={plan === 'single_test' ? testId : null} coupon={quote?.coupon_valid ? coupon.trim() : null} amount={Number(payable ?? 0)} />}
+            {enabled.length === 0 && !(manual?.enabled && (manual.bkash || manual.nagad)) && <p className="text-sm text-ink-soft">{lang === 'bn' ? 'এই মুহূর্তে অনলাইন পেমেন্ট বন্ধ আছে।' : 'Online payment is currently unavailable.'}</p>}
             <div className="grid gap-2 sm:grid-cols-3">
               {enabled.map((g) => (
                 <button key={g} className={`btn ${GW_STYLE[g]}`} disabled={!!busy} onClick={() => pay(g)}>

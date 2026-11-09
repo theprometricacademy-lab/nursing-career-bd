@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
-const PROTECTED = ['/dashboard', '/exam', '/result', '/results', '/bookmarks', '/wrong-answers', '/profile', '/daily-quiz', '/admin', '/payment'];
-
+// Runs ONLY on pages that need a logged-in user (see matcher below), so public pages
+// load without waiting for an auth round-trip.
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next({ request: req });
   const sb = createServerClient(
@@ -19,18 +19,23 @@ export async function middleware(req: NextRequest) {
       },
     },
   );
-  const { data: { user } } = await sb.auth.getUser();
+  // getSession reads the cookie locally (refreshing only when expired) — no network call per page.
+  // This is only a redirect convenience: data is protected by Row Level Security,
+  // and /admin re-checks the user server-side.
+  const { data: { session } } = await sb.auth.getSession();
 
-  const path = req.nextUrl.pathname;
-  if (!user && PROTECTED.some((p) => path === p || path.startsWith(p + '/'))) {
+  if (!session) {
     const url = req.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('next', path);
+    url.searchParams.set('next', req.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
   return res;
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg|api/payments/.*/callback|api/payments/sslcommerz/.*).*)'],
+  matcher: [
+    '/dashboard/:path*', '/exam/:path*', '/result/:path*', '/results/:path*', '/bookmarks/:path*',
+    '/wrong-answers/:path*', '/profile/:path*', '/daily-quiz/:path*', '/admin/:path*', '/payment/:path*',
+  ],
 };

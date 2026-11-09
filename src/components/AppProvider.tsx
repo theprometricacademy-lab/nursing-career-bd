@@ -33,8 +33,9 @@ export function AppProvider({ initialLang, children }: { initialLang: Lang; chil
   const [ready, setReady] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await sb.auth.getUser();
-    const u = data.user ?? null;
+    // getSession is local (no network round-trip); RLS still protects all data on the server.
+    const { data } = await sb.auth.getSession();
+    const u = data.session?.user ?? null;
     setUser(u);
     if (u) {
       const [{ data: p }, { data: subs }] = await Promise.all([

@@ -7,6 +7,7 @@ import { useL } from '../AdminShell';
 type S = {
   price_lifetime: number; price_single_test: number; default_negative_mark: number; default_duration_minutes: number;
   payment_gateways: { bkash: boolean; nagad: boolean; sslcommerz: boolean }; support_phone: string;
+  manual_payment: { enabled: boolean; bkash: string; nagad: string; account_type: string };
 };
 
 export default function SettingsAdmin() {
@@ -24,6 +25,7 @@ export default function SettingsAdmin() {
         default_negative_mark: Number(m.default_negative_mark ?? 0.25), default_duration_minutes: Number(m.default_duration_minutes ?? 50),
         payment_gateways: { bkash: false, nagad: false, sslcommerz: false, ...(m.payment_gateways as object) },
         support_phone: String(m.support_phone ?? ''),
+        manual_payment: { enabled: true, bkash: '', nagad: '', account_type: 'Personal', ...(m.manual_payment as object) },
       });
     });
   }, [sb]);
@@ -52,7 +54,24 @@ export default function SettingsAdmin() {
         <div className="sm:col-span-2"><label className="label">{L('সাপোর্ট ফোন', 'Support phone')}</label><input className="input" value={s.support_phone} onChange={(e) => setS({ ...s, support_phone: e.target.value })} /></div>
       </section>
       <section className="card space-y-3 p-5">
-        <h2 className="font-semibold text-ink">{L('পেমেন্ট গেটওয়ে', 'Payment gateways')}</h2>
+        <h2 className="font-semibold text-ink">{L('bKash / Nagad Send Money (হাতে যাচাই)', 'bKash / Nagad Send Money (manual verification)')}</h2>
+        <label className="flex items-center gap-3 text-sm font-medium">
+          <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={s.manual_payment.enabled}
+            onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, enabled: e.target.checked } })} />
+          {L('Send Money পেমেন্ট চালু', 'Enable Send Money payments')}
+        </label>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div><label className="label">{L('bKash নম্বর', 'bKash number')}</label><input className="input" inputMode="tel" placeholder="01XXXXXXXXX" value={s.manual_payment.bkash} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, bkash: e.target.value.trim() } })} /></div>
+          <div><label className="label">{L('Nagad নম্বর', 'Nagad number')}</label><input className="input" inputMode="tel" placeholder="01XXXXXXXXX" value={s.manual_payment.nagad} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, nagad: e.target.value.trim() } })} /></div>
+          <div><label className="label">{L('অ্যাকাউন্টের ধরন', 'Account type')}</label>
+            <select className="input" value={s.manual_payment.account_type} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, account_type: e.target.value } })}>
+              <option>Personal</option><option>Agent</option><option>Merchant</option>
+            </select></div>
+        </div>
+        <p className="rounded-xl bg-brand-50 p-3 text-xs text-ink-soft">{L('নম্বর খালি রাখলে সেই মাধ্যমটি শিক্ষার্থীরা দেখবে না। জমা পড়া পেমেন্ট "পেমেন্ট" পাতায় অনুমোদন দিন।', 'Leave a number empty to hide that method. Approve submitted payments on the Payments page.')}</p>
+      </section>
+      <section className="card space-y-3 p-5">
+        <h2 className="font-semibold text-ink">{L('অনলাইন পেমেন্ট গেটওয়ে (মার্চেন্ট অ্যাকাউন্ট লাগবে)', 'Online payment gateways (merchant account required)')}</h2>
         {(['bkash', 'nagad', 'sslcommerz'] as const).map((g) => (
           <label key={g} className="flex items-center gap-3 text-sm font-medium">
             <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={s.payment_gateways[g]}

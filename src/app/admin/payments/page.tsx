@@ -8,6 +8,7 @@ import { useL } from '../AdminShell';
 type P = {
   id: string; user_id: string; plan: string; mock_test_id: number | null; amount: number; original_amount: number; gateway: string;
   status: string; gateway_ref: string | null; gateway_txn_id: string | null; created_at: string; verified_at: string | null;
+  gateway_payload?: { method?: string; sender?: string; paid_to?: string } | null;
   profiles?: { full_name: string | null; phone: string | null } | null;
 };
 const TONE: Record<string, string> = {
@@ -46,6 +47,16 @@ export default function PaymentsAdmin() {
     setErr(e1?.message || e2?.message || ''); load();
   }
 
+  async function review(p: P, approve: boolean) {
+    const ok = approve
+      ? confirm(L(`TrxID ${p.gateway_txn_id} আপনার ${p.gateway_payload?.method === 'nagad' ? 'Nagad' : 'bKash'} অ্যাপে ৳${p.amount} হিসেবে মিলেছে? অনুমোদন দিলে সাথে সাথে প্রিমিয়াম চালু হবে।`, `Did TrxID ${p.gateway_txn_id} match ৳${p.amount} in your app? Approving activates premium immediately.`))
+      : confirm(L('এই পেমেন্ট বাতিল করবেন?', 'Reject this payment?'));
+    if (!ok) return;
+    const { error } = await sb.rpc('admin_review_payment', { p_payment: p.id, p_approve: approve, p_note: null });
+    setErr(error ? error.message : ''); load();
+  }
+
+  const pendingManual = (rows ?? []).filter((r) => r.gateway === 'manual' && r.status === 'pending');
   const total = (rows ?? []).filter((r) => r.status === 'paid').reduce((s, r) => s + Number(r.amount), 0);
 
   return (
@@ -56,6 +67,28 @@ export default function PaymentsAdmin() {
           {Object.keys(TONE).map((s) => <option key={s} value={s}>{s}</option>)}
         </select>} />
       {err && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p>}
+      {pendingManual.length > 0 && (
+        <section className="card border-blush-200 p-4">
+          <h2 className="mb-1 font-semibold text-ink">{L('যাচাইয়ের অপেক্ষায় Send Money পেমেন্ট', 'Send Money payments awaiting verification')} ({num(pendingManual.length)})</h2>
+          <p className="mb-3 text-xs text-ink-soft">{L('আপনার bKash/Nagad অ্যাপের লেনদেন তালিকায় TrxID ও টাকার পরিমাণ মিলিয়ে তারপর অনুমোদন দিন।', 'Match the TrxID and amount in your bKash/Nagad app before approving.')}</p>
+          <div className="space-y-2">
+            {pendingManual.map((p) => (
+              <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-blush-50/50 p-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold">{p.profiles?.full_name || '—'} <span className="text-xs font-normal text-ink-soft">{p.profiles?.phone}</span></div>
+                  <div className="text-xs text-ink-soft">
+                    {p.gateway_payload?.method === 'nagad' ? 'Nagad' : 'bKash'} · {L('পাঠিয়েছেন', 'from')} {p.gateway_payload?.sender} · {p.plan}{p.mock_test_id ? ` #${p.mock_test_id}` : ''} · {new Date(p.created_at).toLocaleString()}
+                  </div>
+                </div>
+                <span className="font-mono font-bold">{p.gateway_txn_id}</span>
+                <span className="font-bold">৳{num(p.amount)}</span>
+                <button className="btn-success !px-3 !py-1.5" onClick={() => review(p, true)}>{L('অনুমোদন', 'Approve')}</button>
+                <button className="btn-ghost !px-3 !py-1.5 text-red-600" onClick={() => review(p, false)}>{L('বাতিল', 'Reject')}</button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {!rows ? <Spinner /> : (
         <div className="card overflow-x-auto">
           <table className="w-full text-sm">
