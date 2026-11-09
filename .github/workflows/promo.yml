@@ -29,7 +29,7 @@ jobs:
           echo "::warning::files $(ls -la out | tr '\n' ' ')"
           echo "::warning::tail $(tail -c 600 promo/build.log | tr '\n' ' ')"
           git config user.name "promo-bot"; git config user.email "promo-bot@users.noreply.github.com"
-          git add out; out=$(git commit -m "Rendered promo video [skip ci]" 2>&1); echo "::warning::commit $(echo $out | tail -c 300)"
+          git add -f out; out=$(git commit -m "Rendered promo video [skip ci]" 2>&1); echo "::warning::commit $(echo $out | tail -c 300)"
           out=$(git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/promo-video 2>&1); rc=$?
           echo "::warning::push rc=$rc $(echo $out | tail -c 400)"
           exit $rc
