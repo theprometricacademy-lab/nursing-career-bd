@@ -7,3 +7,8 @@ out
 .vercel
 *.tsbuildinfo
 .DS_Store
+
+# Cloudflare / OpenNext
+.open-next
+.wrangler
+.dev.vars
