@@ -67,6 +67,43 @@ export default function ImportPage() {
     a.click();
   }
 
+  // Full backup in the same format as the import template, so it can be re-imported or opened in Google Sheets.
+  const [exporting, setExporting] = useState(false);
+  async function exportAll() {
+    setExporting(true);
+    try {
+      const sb = supabaseBrowser();
+      const slugById = new Map(subjects.map((s) => [s.id, s.slug]));
+      const { data: tps } = await sb.from('topics').select('id, name_bn, name_en');
+      const topicById = new Map((tps ?? []).map((t: { id: number; name_bn: string | null; name_en: string }) => [t.id, t.name_bn || t.name_en]));
+      type Q = { code: string; subject_id: number; topic_id: number | null; question_bn: string; options_bn: string[]; correct_option: number;
+        explanation_bn: string | null; difficulty: string; is_premium: boolean; year: number | null; source: string | null };
+      const all: Q[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await sb.from('questions')
+          .select('code, subject_id, topic_id, question_bn, options_bn, correct_option, explanation_bn, difficulty, is_premium, year, source')
+          .order('id').range(from, from + 999);
+        if (error) throw error;
+        all.push(...((data as Q[]) ?? []));
+        if (!data || data.length < 1000) break;
+      }
+      const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const head = ['code', 'subject', 'topic', 'question', 'A', 'B', 'C', 'D', 'answer', 'explanation', 'difficulty', 'is_premium', 'year', 'source'];
+      const lines = all.map((q) => [q.code, slugById.get(q.subject_id) ?? q.subject_id, q.topic_id ? topicById.get(q.topic_id) ?? '' : '',
+        q.question_bn, ...(q.options_bn ?? []).slice(0, 4), 'ABCD'[q.correct_option] ?? '', q.explanation_bn ?? '', q.difficulty,
+        q.is_premium ? 'yes' : 'no', q.year ?? '', q.source ?? ''].map(esc).join(','));
+      const csv = '\uFEFF' + [head.join(','), ...lines].join('\n') + '\n';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      a.download = `nursing-career-bd-questions-backup-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    } catch (e) {
+      setFileErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setExporting(false);
+    }
+  }
+
   function findSubject(v: string) {
     const s = v.trim().toLowerCase();
     return subjects.find((x) => String(x.id) === s || x.slug === s || x.name_en.toLowerCase() === s || x.name_bn === v.trim());
@@ -199,7 +236,10 @@ export default function ImportPage() {
     <div className="space-y-4">
       <PageHeader title={L('বাল্ক প্রশ্ন ইমপোর্ট', 'Bulk import questions')}
         sub={L('CSV বা Excel (.xlsx) ফাইল থেকে একসাথে হাজার হাজার প্রশ্ন যোগ করুন। একই "code" থাকলে প্রশ্নটি আপডেট হবে।', 'Add thousands of questions at once from CSV or Excel (.xlsx). Rows with an existing "code" are updated.')}
-        right={<button className="btn-ghost" onClick={downloadTemplate}><Download className="h-4 w-4" />{L('টেমপ্লেট ডাউনলোড', 'Download template')}</button>} />
+        right={<div className="flex flex-wrap gap-2">
+          <button className="btn-ghost" onClick={downloadTemplate}><Download className="h-4 w-4" />{L('টেমপ্লেট ডাউনলোড', 'Download template')}</button>
+          <button className="btn-primary" disabled={exporting} onClick={exportAll}><Download className="h-4 w-4" />{exporting ? '…' : L('সব প্রশ্নের ব্যাকআপ (CSV)', 'Backup all questions (CSV)')}</button>
+        </div>} />
 
       <div className="card p-4 text-sm text-ink-soft">
         <p className="mb-1 font-semibold text-ink">{L('কলাম (প্রথম সারিতে লিখুন)', 'Columns (first row)')}:</p>
