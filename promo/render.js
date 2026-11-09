@@ -3,11 +3,11 @@ const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
 const S = require('./script.json');
 const A = JSON.parse(fs.readFileSync('durs.json'));
-const LEAD = 0.25, PAD = 0.4;
-const D = A.map((a, i) => +(LEAD + a + (i === A.length - 1 ? 1.5 : PAD)).toFixed(3));
+const LEAD = 0.25, PAD = 0.45;
+const D = A.map((a, i) => +(LEAD + a + (i === A.length - 1 ? 0.9 : PAD)).toFixed(3));
 const total = D.reduce((x, y) => x + y, 0);
 console.log('scenes', D, 'total', total);
-if (total > 89) { console.error('TOO_LONG'); process.exit(3); }
+if (total > 59.2) { console.error('TOO_LONG'); process.exit(3); }
 const FPS = 30, N = Math.ceil(total * FPS);
 (async () => {
   const b = await chromium.launch();

@@ -2,167 +2,155 @@
 <html lang="bn"><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=block" rel="stylesheet">
 <style>
-:root{--b50:#eff8ff;--b100:#dbeefe;--b200:#bfe2fd;--b500:#3a98ee;--b600:#1f7ad6;--b700:#1a63b0;--b800:#1b528f;--ink:#0f2a4a;--soft:#4b6584;--m50:#ecfdf5;--m100:#d1fae5;--m300:#6ee7b7;--m500:#10b981;--m600:#059669;--p50:#fdf2f8;--p100:#fce7f3;--p400:#f472b6;--p500:#ec4899;--p600:#db2777;--y:#fde047}
+:root{--b50:#eff8ff;--b100:#dbeefe;--b200:#bfe2fd;--b400:#5fb4f6;--b500:#3a98ee;--b600:#1f7ad6;--b700:#1a63b0;--b800:#1b528f;--ink:#0f2a4a;--soft:#4b6584;--m50:#ecfdf5;--m100:#d1fae5;--m300:#6ee7b7;--m500:#10b981;--m600:#059669;--p50:#fdf2f8;--p100:#fce7f3;--p500:#ec4899;--p600:#db2777}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:1080px;height:1920px;overflow:hidden;font-family:'Hind Siliguri',sans-serif;color:var(--ink)}
-#bg{position:absolute;inset:0;background:linear-gradient(160deg,#3a98ee 0%,#1f7ad6 45%,#1b528f 100%)}
-#dark{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,#16365e 0%,#0a1a30 75%);opacity:0}
-.blob{position:absolute;border-radius:50%;filter:blur(80px)}
-.dot{position:absolute;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.35)}
-#prog{position:absolute;top:0;left:0;height:12px;background:linear-gradient(90deg,#6ee7b7,#fde047,#f472b6);z-index:5}
-#top{position:absolute;top:56px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:16px;color:#fff;font-size:40px;font-weight:700;z-index:4}
+body{background:linear-gradient(160deg,#3a98ee 0%,#1f7ad6 45%,#1b528f 100%);position:relative}
+.blob{position:absolute;border-radius:50%;filter:blur(70px)}
+#top{position:absolute;top:70px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:18px;color:#fff;font-size:44px;font-weight:700}
 .scene{position:absolute;inset:0;opacity:0}
-.c{position:absolute;left:0;right:0;text-align:center;color:#fff}
-.h1{font-size:104px;font-weight:700;line-height:1.12}
-.h2{font-size:72px;font-weight:700;line-height:1.18}
-.hl{color:var(--y)}
-.pk{color:#fbcfe8}
-.phone{position:absolute;left:170px;top:470px;width:740px;height:1040px;background:#f7fbff;border-radius:60px;border:15px solid #0f2a4a;box-shadow:0 40px 90px rgba(0,0,0,.35);overflow:hidden}
-.bar{height:92px;background:#fff;border-bottom:2px solid var(--b100);display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 32px;font-weight:700;font-size:31px}
-.pad{padding:30px}
-.card{background:#fff;border:2px solid var(--b100);border-radius:26px;box-shadow:0 6px 20px rgba(31,122,214,.08);padding:26px}
-.chip{display:inline-block;border-radius:999px;padding:6px 20px;font-size:27px;font-weight:600;margin:6px 6px 0 0}
-.opt{border:2px solid var(--b200);border-radius:20px;padding:15px 22px;font-size:30px;margin-top:13px;display:flex;gap:16px;align-items:center;background:#fff}
-.opt b{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--b50);color:var(--b700);flex:none}
+.step{position:absolute;top:170px;left:0;right:0;text-align:center;color:#fff}
+.step .n{display:inline-block;background:#6ee7b7;color:var(--ink);font-weight:700;font-size:38px;padding:6px 30px;border-radius:999px}
+.step h2{font-size:74px;font-weight:700;margin-top:14px;line-height:1.15}
+.phone{position:absolute;left:150px;top:420px;width:780px;height:1100px;background:#f7fbff;border-radius:64px;border:16px solid #0f2a4a;box-shadow:0 40px 90px rgba(0,0,0,.35);overflow:hidden}
+.bar{height:96px;background:#fff;border-bottom:2px solid var(--b100);display:flex;align-items:center;gap:14px;padding:0 34px;font-weight:700;font-size:32px}
+.pad{padding:34px}
+.card{background:#fff;border:2px solid var(--b100);border-radius:28px;box-shadow:0 6px 20px rgba(31,122,214,.08);padding:30px}
+.lbl{font-size:28px;font-weight:600;margin:18px 0 8px}
+.inp{height:78px;border:2px solid var(--b200);border-radius:20px;padding:0 24px;display:flex;align-items:center;font-size:32px;background:#fff}
+.inp.focus{border-color:var(--b500);box-shadow:0 0 0 6px var(--b100)}
+.btn{height:88px;border-radius:22px;background:var(--b600);color:#fff;font-size:36px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:30px}
+.caret{display:inline-block;width:3px;height:34px;background:var(--b600);margin-left:2px}
+.toast{position:absolute;left:60px;right:60px;bottom:60px;background:var(--m600);color:#fff;border-radius:24px;padding:26px;font-size:34px;font-weight:700;text-align:center}
+.chip{display:inline-block;border-radius:999px;padding:8px 22px;font-size:28px;font-weight:600;margin:6px 6px 0 0}
+.opt{border:2px solid var(--b200);border-radius:20px;padding:16px 24px;font-size:31px;margin-top:14px;display:flex;gap:16px;align-items:center;background:#fff}
+.opt b{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--b50);color:var(--b700);flex:none}
 .opt.sel{border-color:var(--b500);background:var(--b50)}
-.opt.ok{border-color:var(--m500);background:var(--m50)}.opt.ok b{background:var(--m500);color:#fff}
-.opt.bad{border-color:var(--p500);background:var(--p50)}.opt.bad b{background:var(--p500);color:#fff}
-.tap{position:absolute;width:104px;height:104px;border-radius:50%;background:rgba(236,72,153,.35);border:6px solid #ec4899;opacity:0}
-#cap{position:absolute;left:60px;right:60px;bottom:110px;background:rgba(255,255,255,.97);border-radius:30px;padding:26px 34px;font-size:42px;font-weight:600;line-height:1.4;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25);min-height:150px;display:flex;align-items:center;justify-content:center;z-index:4}
-.prob{display:flex;align-items:center;gap:26px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.25);border-radius:30px;padding:30px 40px;margin:0 90px 30px;color:#fff;font-size:52px;font-weight:600;text-align:left}
-.prob i{font-style:normal;display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:#ef4444;font-size:50px;flex:none}
-.stat{background:#fff;border-radius:34px;padding:34px 30px;margin:0 100px 28px;display:flex;align-items:center;gap:30px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
-.stat .n{font-size:96px;font-weight:700;color:var(--b700);min-width:330px;text-align:center;line-height:1}
-.stat .t{font-size:44px;font-weight:600;text-align:left;line-height:1.25}
-.sec{display:flex;height:70px;border-radius:18px;overflow:hidden;margin-top:16px;font-size:24px;font-weight:700;color:#fff}
-.sec div{display:grid;place-items:center}
-.stepc{display:flex;align-items:center;gap:30px;background:#fff;border-radius:34px;padding:30px 36px;margin:0 90px 30px;box-shadow:0 20px 50px rgba(0,0,0,.2);text-align:left}
-.stepc .k{display:grid;place-items:center;width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#5fb4f6,#1f7ad6);color:#fff;font-size:54px;font-weight:700;flex:none}
-.stepc .t{font-size:46px;font-weight:700;line-height:1.2}.stepc .s{font-size:32px;color:var(--soft);font-weight:500}
-.pill{display:inline-block;background:#fff;color:var(--b700);font-weight:700;border-radius:999px;padding:20px 60px;font-size:72px;box-shadow:0 0 0 0 rgba(255,255,255,.5),0 20px 50px rgba(0,0,0,.25)}
-.person{display:inline-block;width:52px;height:68px;margin:7px;position:relative}
-.person:before{content:'';position:absolute;left:14px;top:0;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.55)}
-.person:after{content:'';position:absolute;left:4px;top:28px;width:44px;height:40px;border-radius:22px 22px 8px 8px;background:rgba(255,255,255,.55)}
-.person.me:before,.person.me:after{background:var(--y)}
+.opt.ok{border-color:var(--m500);background:var(--m50)}
+.opt.ok b{background:var(--m500);color:#fff}
+#cap{position:absolute;left:70px;right:70px;bottom:120px;background:rgba(255,255,255,.97);border-radius:32px;padding:30px 36px;font-size:44px;font-weight:600;line-height:1.4;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25);min-height:170px;display:flex;align-items:center;justify-content:center}
+.tap{position:absolute;width:110px;height:110px;border-radius:50%;background:rgba(236,72,153,.35);border:6px solid #ec4899;opacity:0}
+.big{position:absolute;left:0;right:0;text-align:center;color:#fff}
+.pill{display:inline-block;background:#fff;color:var(--b700);font-weight:700;border-radius:999px;padding:18px 54px;font-size:68px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.stat{display:inline-block;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:14px 34px;font-size:40px;font-weight:600;margin:12px}
 </style></head><body>
-<div id="bg"></div><div id="dark"></div>
-<div class="blob" id="bl1" style="width:540px;height:540px;right:-170px;top:-130px;background:rgba(244,114,182,.38)"></div>
-<div class="blob" id="bl2" style="width:580px;height:580px;left:-190px;bottom:300px;background:rgba(110,231,183,.30)"></div>
-<div id="dots"></div>
-<div id="prog"></div>
-<div id="top"><svg width="66" height="66" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="44" rx="13" fill="#1f7ad6" stroke="#fff" stroke-width="2"/><path d="M24 37s-11-6.6-11-14.3A6.2 6.2 0 0 1 24 19a6.2 6.2 0 0 1 11 3.7C35 30.4 24 37 24 37z" fill="#fff"/><rect x="21.6" y="22" width="4.8" height="11" rx="1.2" fill="#ec4899"/><rect x="18.5" y="25.1" width="11" height="4.8" rx="1.2" fill="#ec4899"/><circle cx="36" cy="12" r="4" fill="#6ee7b7"/></svg>Nursing Career BD</div>
+<div class="blob" style="width:520px;height:520px;right:-160px;top:-120px;background:rgba(244,114,182,.35)"></div>
+<div class="blob" style="width:560px;height:560px;left:-180px;bottom:280px;background:rgba(110,231,183,.30)"></div>
+<div id="top"><svg width="72" height="72" viewBox="0 0 48 48"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5fb4f6"/><stop offset="1" stop-color="#1f7ad6"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="13" fill="url(#g)" stroke="#fff" stroke-width="2"/><path d="M24 37s-11-6.6-11-14.3A6.2 6.2 0 0 1 24 19a6.2 6.2 0 0 1 11 3.7C35 30.4 24 37 24 37z" fill="#fff"/><rect x="21.6" y="22" width="4.8" height="11" rx="1.2" fill="#ec4899"/><rect x="18.5" y="25.1" width="11" height="4.8" rx="1.2" fill="#ec4899"/><circle cx="36" cy="12" r="4" fill="#6ee7b7"/></svg>Nursing Career BD</div>
 
-<!-- 0 hook -->
+<!-- 0 intro -->
 <div class="scene" id="s0">
-  <div class="c h2" style="top:250px" id="s0a">একটি সরকারি নার্সিং পদ…</div>
-  <div class="c" style="top:420px;padding:0 80px" id="crowd"></div>
-  <div class="c h1" style="top:1130px" id="s0b">আপনার প্রস্তুতি কি<br><span class="hl">যথেষ্ট?</span></div>
+  <div class="big" style="top:330px" id="s0logo"><svg width="300" height="300" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="44" rx="13" fill="#fff"/><path d="M24 37s-11-6.6-11-14.3A6.2 6.2 0 0 1 24 19a6.2 6.2 0 0 1 11 3.7C35 30.4 24 37 24 37z" fill="#1f7ad6"/><rect x="21.6" y="22" width="4.8" height="11" rx="1.2" fill="#ec4899"/><rect x="18.5" y="25.1" width="11" height="4.8" rx="1.2" fill="#ec4899"/><circle cx="36" cy="12" r="4" fill="#6ee7b7"/></svg></div>
+  <div class="big" style="top:690px" id="s0t"><div style="font-size:96px;font-weight:700;line-height:1.15">নার্সিং চাকরির<br>স্মার্ট প্রস্তুতি</div><div style="font-size:46px;margin-top:22px;opacity:.9">সিনিয়র স্টাফ নার্স · BSc · ডিপ্লোমা</div></div>
+  <div class="big" style="top:1080px;padding:0 60px" id="s0c"><span class="stat">৪,৩০০+ প্রশ্ন</span><span class="stat">মক টেস্ট</span><span class="stat">বিগত সালের প্রশ্ন</span><span class="stat">ব্যাখ্যাসহ উত্তর</span></div>
 </div>
-<!-- 1 problems -->
+
+<!-- 1 signup -->
 <div class="scene" id="s1">
-  <div class="c h2" style="top:300px" id="s1h">এই সমস্যাগুলো কি<br>আপনারও হয়?</div>
-  <div style="position:absolute;top:640px;left:0;right:0">
-    <div class="prob" id="pr0"><i>✕</i>মোটা মোটা গাইড বই</div>
-    <div class="prob" id="pr1"><i>✕</i>এলোমেলো প্রশ্ন, ব্যাখ্যা নেই</div>
-    <div class="prob" id="pr2"><i>✕</i>কোথায় দুর্বলতা — জানা নেই</div>
-  </div>
-</div>
-<!-- 2 solution -->
-<div class="scene" id="s2">
-  <div class="c" style="top:360px" id="s2logo"><svg width="330" height="330" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="44" rx="13" fill="#fff"/><path d="M24 37s-11-6.6-11-14.3A6.2 6.2 0 0 1 24 19a6.2 6.2 0 0 1 11 3.7C35 30.4 24 37 24 37z" fill="#1f7ad6"/><rect x="21.6" y="22" width="4.8" height="11" rx="1.2" fill="#ec4899"/><rect x="18.5" y="25.1" width="11" height="4.8" rx="1.2" fill="#ec4899"/><circle cx="36" cy="12" r="4" fill="#6ee7b7"/></svg></div>
-  <div class="c" style="top:770px" id="s2t"><div style="font-size:50px;font-weight:600;opacity:.9">সমাধান এখন হাতের মুঠোয়</div><div style="font-size:112px;font-weight:700;line-height:1.1;margin-top:10px">Nursing<br>Career BD</div></div>
-  <div class="c" style="top:1180px" id="s2u"><span style="display:inline-block;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.4);border-radius:999px;padding:12px 40px;font-size:46px;font-weight:600">nursingjob.online</span></div>
-</div>
-<!-- 3 stats -->
-<div class="scene" id="s3">
-  <div class="c h2" style="top:220px" id="s3h">এক জায়গায় <span class="hl">সব প্রস্তুতি</span></div>
-  <div style="position:absolute;top:470px;left:0;right:0">
-    <div class="stat" id="st0"><div class="n" id="n0">০</div><div class="t">প্রশ্ন, প্রতিটির<br>সাথে ব্যাখ্যা</div></div>
-    <div class="stat" id="st1"><div class="n" id="n1" style="color:var(--m600)">০</div><div class="t">বিষয় — নার্সিং থেকে<br>সাধারণ জ্ঞান</div></div>
-    <div class="stat" id="st2"><div class="n" style="color:var(--p600);font-size:74px">বিগত</div><div class="t">সালের আসল<br>পরীক্ষার প্রশ্ন</div></div>
-  </div>
-</div>
-<!-- 4 mock -->
-<div class="scene" id="s4">
-  <div class="c h2" style="top:190px">আসল পরীক্ষার মতো<br><span class="hl">মক টেস্ট</span></div>
-  <div class="phone"><div class="bar"><span>প্রশ্ন ৫৪/১০০</span><span id="timer" style="background:var(--p50);color:var(--p600);border-radius:16px;padding:4px 18px">⏱ ৩৮:২০</span></div>
-    <div class="pad">
-      <div style="font-size:29px;font-weight:700">সিনিয়র স্টাফ নার্স মডেল টেস্ট</div>
-      <div class="sec" id="secbar"><div style="flex:20;background:#1f7ad6">বাংলা ২০</div><div style="flex:20;background:#10b981">ইংরেজি ২০</div><div style="flex:20;background:#ec4899">সা. জ্ঞান ২০</div><div style="flex:40;background:#1b528f">নার্সিং ৪০</div></div>
-      <div><span class="chip" style="background:var(--p100);color:var(--p600)">নেগেটিভ ০.৫</span><span class="chip" style="background:var(--b100);color:var(--b800)">মিডিয়াম + হার্ড</span></div>
-      <div class="card" style="margin-top:18px">
-        <div style="font-size:32px;font-weight:600;line-height:1.45">Hyperkalaemia-তে ECG-তে কোন পরিবর্তন সাধারণত প্রথমে দেখা যায়?</div>
-        <div class="opt" id="o0"><b>ক</b>Tall peaked T wave</div>
-        <div class="opt" id="o1"><b>খ</b>ST depression</div>
-        <div class="opt" id="o2"><b>গ</b>U wave</div>
-        <div class="opt" id="o3"><b>ঘ</b>Q wave</div>
-      </div>
-    </div>
-    <div class="pad" id="res" style="position:absolute;top:92px;left:0;right:0;bottom:0;background:#f7fbff;opacity:0">
-      <div class="card" style="text-align:center;background:linear-gradient(135deg,#ecfdf5,#fff);border-color:var(--m300)">
-        <div style="font-size:34px;font-weight:700">আপনার স্কোর</div>
-        <div style="font-size:124px;font-weight:700;color:var(--m600);line-height:1.12" id="score">০</div>
-        <div style="font-size:30px;color:var(--soft)">১০০ নম্বরের মধ্যে</div>
-      </div>
-      <div class="card" style="margin-top:20px;font-size:30px;line-height:1.75" id="secres">
-        বাংলা <b>১৮/২০</b> · ইংরেজি <b>১৭/২০</b><br>সাধারণ জ্ঞান <b>১৬/২০</b> · নার্সিং <b>৩৪/৪০</b>
-      </div>
-    </div>
-    <div class="tap" id="t4" style="left:320px;top:600px"></div>
-  </div>
-</div>
-<!-- 5 practice -->
-<div class="scene" id="s5">
-  <div class="c h2" style="top:190px">ভুল থেকেই শিখুন —<br><span class="hl">ব্যাখ্যাসহ উত্তর</span></div>
-  <div class="phone"><div class="bar"><span>📚 প্রশ্নব্যাংক · Pharmacology</span></div>
+  <div class="step"><span class="n">ধাপ ১</span><h2>অ্যাকাউন্ট খুলুন ও লগইন</h2></div>
+  <div class="phone"><div class="bar">🔒 nursingjob.online/signup</div>
     <div class="pad"><div class="card">
-      <div style="font-size:32px;font-weight:600;line-height:1.45">Heparin-এর অতিমাত্রার প্রতিষেধক কোনটি?</div>
-      <div class="opt" id="q0"><b>ক</b>Vitamin K</div>
-      <div class="opt" id="q1"><b>খ</b>Naloxone</div>
-      <div class="opt" id="q2"><b>গ</b>Protamine sulphate</div>
-      <div class="opt" id="q3"><b>ঘ</b>Atropine</div>
-      <div id="expl" style="margin-top:18px;background:var(--m50);border:2px solid var(--m300);border-radius:20px;padding:18px;font-size:28px;line-height:1.5;opacity:0"><b>ব্যাখ্যা:</b> Protamine sulphate Heparin-কে নিষ্ক্রিয় করে। Vitamin K হলো Warfarin-এর প্রতিষেধক।</div>
-    </div>
-    <div style="display:flex;gap:16px;margin-top:20px" id="s5b"><div style="flex:1;background:var(--p600);color:#fff;border-radius:20px;padding:20px;text-align:center;font-size:30px;font-weight:700">↻ ভুলগুলো রিভিশন</div><div style="flex:1;background:var(--b600);color:#fff;border-radius:20px;padding:20px;text-align:center;font-size:30px;font-weight:700">★ বুকমার্ক</div></div>
-    </div>
-    <div class="tap" id="t5" style="left:300px;top:500px"></div>
+      <div style="font-size:42px;font-weight:700">সাইন আপ</div>
+      <div class="lbl">নাম</div><div class="inp" id="f0"></div>
+      <div class="lbl">মোবাইল নম্বর</div><div class="inp" id="f1"></div>
+      <div class="lbl">ইমেইল</div><div class="inp" id="f2"></div>
+      <div class="lbl">পাসওয়ার্ড</div><div class="inp" id="f3"></div>
+      <div class="btn" id="s1btn">অ্যাকাউন্ট খুলুন</div>
+    </div></div>
+    <div class="tap" id="s1tap" style="left:335px;top:900px"></div>
+    <div class="toast" id="s1toast">✓ স্বাগতম! আপনি লগইন করেছেন</div>
   </div>
 </div>
-<!-- 6 offer -->
-<div class="scene" id="s6">
-  <div class="c h2" style="top:230px" id="s6h">সব সুবিধা পেতে</div>
-  <div class="c" style="top:400px" id="s6card"><div style="display:inline-block;background:#fff;border-radius:48px;padding:44px 80px;box-shadow:0 30px 80px rgba(0,0,0,.3);color:var(--ink)">
-    <div style="display:inline-block;background:var(--p100);color:var(--p600);border-radius:999px;padding:8px 30px;font-size:36px;font-weight:700">লাইফটাইম প্রিমিয়াম</div>
-    <div style="position:relative;height:250px;width:600px;margin:0 auto">
-      <div id="pOld" style="position:absolute;left:0;right:0;top:0;font-size:220px;font-weight:700;color:var(--b700);line-height:1.1">৳৫৯৯<div id="strike" style="position:absolute;left:60px;top:125px;height:14px;background:#ef4444;border-radius:7px;width:0"></div></div>
-      <div id="pNew" style="position:absolute;left:0;right:0;top:0;font-size:220px;font-weight:700;color:var(--m600);line-height:1.1;opacity:0">৳৫৩৯</div>
+
+<!-- 2 premium -->
+<div class="scene" id="s2">
+  <div class="step"><span class="n">ধাপ ২</span><h2>প্রিমিয়াম নিন</h2></div>
+  <div class="phone"><div class="bar">🔒 nursingjob.online/premium</div>
+    <div class="pad">
+      <div class="card" style="background:linear-gradient(135deg,#eff8ff,#fff);border-color:var(--b200)">
+        <div class="chip" style="background:var(--p100);color:var(--p600)">সবচেয়ে জনপ্রিয়</div>
+        <div style="font-size:38px;font-weight:700;margin-top:10px">লাইফটাইম প্রিমিয়াম</div>
+        <div style="font-size:84px;font-weight:700;color:var(--b700);line-height:1.1">৳৫৯৯</div>
+        <div style="font-size:28px;color:var(--soft)">সব মক টেস্ট · সব প্রশ্ন · একবার পেমেন্ট</div>
+      </div>
+      <div class="card" style="margin-top:24px" id="s2pay">
+        <div style="font-size:32px;font-weight:700">bKash / Nagad Send Money দিয়ে পেমেন্ট</div>
+        <div style="margin-top:12px"><span class="chip" style="background:#e2136e;color:#fff">bKash</span><span class="chip" style="background:#f6921e;color:#fff">Nagad</span></div>
+        <div style="font-size:29px;margin-top:14px;line-height:1.55">১. পেজে দেওয়া নম্বরে Send Money করুন<br>২. টাকার পরিমাণ: <b>৳৫৯৯</b><br>৩. Transaction ID (TrxID) লিখুন</div>
+        <div class="inp" id="trx" style="margin-top:14px"></div>
+        <div class="btn" id="s2btn" style="background:var(--m600);margin-top:20px">জমা দিন</div>
+      </div>
     </div>
-    <div style="font-size:46px;font-weight:700">একবার পেমেন্ট · আজীবন</div>
-    <div style="font-size:33px;color:var(--soft);margin-top:8px">সব মক টেস্ট · সব প্রশ্ন · সব ব্যাখ্যা</div></div></div>
-  <div class="c" style="top:1080px" id="s6d"><div style="display:inline-block;background:var(--y);color:var(--ink);border-radius:30px;padding:22px 50px;border:5px dashed var(--ink)">
-    <div style="font-size:38px;font-weight:600">কুপন কোড দিন, পান <b>১০% ছাড়</b></div>
-    <div style="font-size:84px;font-weight:700;letter-spacing:4px;line-height:1.15;font-family:'Hind Siliguri',monospace">SONIYASONI</div></div></div>
-</div>
-<!-- 7 steps -->
-<div class="scene" id="s7">
-  <div class="c h2" style="top:230px">শুরু করুন <span class="hl">৩ ধাপে</span></div>
-  <div style="position:absolute;top:480px;left:0;right:0">
-    <div class="stepc" id="sp0"><div class="k">১</div><div><div class="t">ফ্রি অ্যাকাউন্ট খুলুন</div><div class="s">নাম, মোবাইল, ইমেইল ও পাসওয়ার্ড দিয়ে</div><div id="nm" style="margin-top:10px;border:2px solid var(--b200);border-radius:16px;padding:8px 18px;font-size:32px;min-height:58px"></div></div></div>
-    <div class="stepc" id="sp1"><div class="k">২</div><div><div class="t">কুপন দিয়ে পেমেন্ট করুন</div><div class="s">SONIYASONI দিন, bKash/Nagad-এ ৳৫৩৯ পাঠিয়ে TrxID দিন</div></div></div>
-    <div class="stepc" id="sp2"><div class="k">৩</div><div><div class="t">প্রস্তুতি শুরু!</div><div class="s">যাচাইয়ের পর প্রিমিয়াম চালু</div></div></div>
+    <div class="tap" id="s2tap" style="left:335px;top:960px"></div>
+    <div class="toast" id="s2toast">✓ অনুমোদিত — প্রিমিয়াম চালু হয়েছে</div>
   </div>
 </div>
-<!-- 8 CTA -->
-<div class="scene" id="s8">
-  <div class="c" style="top:330px" id="s8a"><div style="font-size:64px;font-weight:600;opacity:.95">স্বপ্নের নার্সিং চাকরির পথে</div><div class="h1" style="margin-top:14px">প্রথম পদক্ষেপ<br><span class="hl">আজই নিন</span></div></div>
-  <div class="c" style="top:880px" id="s8b"><span class="pill" id="pill">nursingjob.online</span></div>
-  <div class="c" style="top:1110px" id="s8c"><span style="font-size:46px;font-weight:600">অ্যাকাউন্ট খোলা সম্পূর্ণ ফ্রি</span></div>
+
+<!-- 3 mock test -->
+<div class="scene" id="s3">
+  <div class="step"><span class="n">ধাপ ৩</span><h2>মক টেস্ট দিন</h2></div>
+  <div class="phone"><div class="bar" style="justify-content:space-between"><span>প্রশ্ন ২৩/১০০</span><span id="timer" style="background:var(--p50);color:var(--p600);border-radius:16px;padding:4px 18px">⏱ ৫৯:৪০</span></div>
+    <div class="pad" id="s3q">
+      <div style="font-size:30px;font-weight:700">সিনিয়র স্টাফ নার্স মডেল টেস্ট ১</div>
+      <div><span class="chip" style="background:var(--b100);color:var(--b800)">১০০ প্রশ্ন</span><span class="chip" style="background:var(--m100);color:var(--m600)">৬০ মিনিট</span><span class="chip" style="background:var(--p100);color:var(--p600)">নেগেটিভ ০.৫</span></div>
+      <div class="card" style="margin-top:22px">
+        <div style="font-size:34px;font-weight:600;line-height:1.45">Myocardial infarction নির্ণয়ে কোন রক্ত পরীক্ষা সবচেয়ে নির্দিষ্ট?</div>
+        <div class="opt" id="o0"><b>ক</b>Serum creatinine</div>
+        <div class="opt" id="o1"><b>খ</b>Troponin</div>
+        <div class="opt" id="o2"><b>গ</b>Blood sugar</div>
+        <div class="opt" id="o3"><b>ঘ</b>Haemoglobin</div>
+      </div>
+    </div>
+    <div class="pad" id="s3r" style="position:absolute;top:96px;left:0;right:0;bottom:0;background:#f7fbff;opacity:0">
+      <div class="card" style="text-align:center;background:linear-gradient(135deg,#ecfdf5,#fff);border-color:var(--m300)">
+        <div style="font-size:36px;font-weight:700">ফলাফল</div>
+        <div style="font-size:120px;font-weight:700;color:var(--m600);line-height:1.15" id="score">০</div>
+        <div style="font-size:32px;color:var(--soft)">১০০ নম্বরের মধ্যে</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:22px">
+        <div class="card" style="flex:1;text-align:center;padding:22px"><div style="font-size:54px;font-weight:700;color:var(--m600)">৮৫</div><div style="font-size:27px">সঠিক</div></div>
+        <div class="card" style="flex:1;text-align:center;padding:22px"><div style="font-size:54px;font-weight:700;color:var(--p600)">৫</div><div style="font-size:27px">ভুল</div></div>
+        <div class="card" style="flex:1;text-align:center;padding:22px"><div style="font-size:54px;font-weight:700;color:var(--soft)">১০</div><div style="font-size:27px">বাদ</div></div>
+      </div>
+      <div class="card" style="margin-top:22px;font-size:29px;line-height:1.6">বাংলা ১৮/২০ · ইংরেজি ১৭/২০<br>সাধারণ জ্ঞান ১৬/২০ · নার্সিং ৩৪/৪০</div>
+    </div>
+    <div class="tap" id="s3tap" style="left:330px;top:620px"></div>
+  </div>
+</div>
+
+<!-- 4 practice -->
+<div class="scene" id="s4">
+  <div class="step"><span class="n">ধাপ ৪</span><h2>প্রশ্ন প্র্যাকটিস করুন</h2></div>
+  <div class="phone"><div class="bar">📚 প্রশ্নব্যাংক</div>
+    <div class="pad">
+      <div id="s4chips"><span class="chip" style="background:var(--b600);color:#fff">Medical-Surgical</span><span class="chip" style="background:var(--b100);color:var(--b800)">Pharmacology</span><span class="chip" style="background:var(--m100);color:var(--m600)">Anatomy</span><span class="chip" style="background:var(--p100);color:var(--p600)">Community Health</span></div>
+      <div class="card" style="margin-top:18px;padding:24px 30px">
+        <div style="font-size:26px;color:var(--soft)">Medical-Surgical · Medium</div>
+        <div style="font-size:34px;font-weight:600;line-height:1.45;margin-top:6px">The Kernig's sign is positive in case of-</div>
+        <div class="opt" id="p0"><b>ক</b>Appendicitis</div>
+        <div class="opt" id="p1"><b>খ</b>Bronchitis</div>
+        <div class="opt" id="p2"><b>গ</b>Cholecystitis</div>
+        <div class="opt" id="p3"><b>ঘ</b>Meningitis</div>
+        <div id="expl" style="margin-top:20px;background:var(--m50);border:2px solid var(--m300);border-radius:20px;padding:20px;font-size:28px;line-height:1.5;opacity:0"><b>ব্যাখ্যা:</b> Meninges-এর প্রদাহে হাঁটু সোজা করতে ব্যথা ও বাধা হয় — এটাই Kernig sign।</div>
+      </div>
+      <div class="btn" id="s4btn" style="background:var(--p600);opacity:0;margin-top:18px">↻ ভুল উত্তর রিভিশন</div>
+    </div>
+    <div class="tap" id="s4tap" style="left:330px;top:780px"></div>
+  </div>
+</div>
+
+<!-- 5 CTA -->
+<div class="scene" id="s5">
+  <div class="big" style="top:420px" id="s5a"><div style="font-size:110px;font-weight:700;line-height:1.15">আজই শুরু করুন</div><div style="font-size:50px;margin-top:20px;opacity:.92">অ্যাকাউন্ট খোলা সম্পূর্ণ ফ্রি</div></div>
+  <div class="big" style="top:820px" id="s5b"><span class="pill">nursingjob.online</span></div>
+  <div class="big" style="top:1060px;padding:0 60px" id="s5c"><span class="stat">✓ মক টেস্ট</span><span class="stat">✓ প্রশ্নব্যাংক</span><span class="stat">✓ বিগত প্রশ্ন</span></div>
 </div>
 
 <div id="cap"></div>
+
 <script>
 const Q = new URLSearchParams(location.search);
-const D = JSON.parse(Q.get('d') || '[6,6,5,8,10,8,8,9,6]');
+const D = JSON.parse(Q.get('d') || '[3,5,9,6,6,3]');   // scene lengths (s)
 const CAPS = JSON.parse(decodeURIComponent(Q.get('c') || '[]'));
 const starts = []; let acc = 0; for (const d of D) { starts.push(acc); acc += d; }
 window.TOTAL = acc;
@@ -170,96 +158,69 @@ const seg = new Intl.Segmenter('bn', {granularity: 'grapheme'});
 const G = s => Array.from(seg.segment(s), x => x.segment);
 const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const ease = x => 1 - Math.pow(1 - cl(x), 3);
-const back = x => { x = cl(x); const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
 const prog = (lt, a, d) => ease((lt - a) / d);
 const $ = id => document.getElementById(id);
-const bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-function enter(el, p, dy = 60) { el.style.opacity = cl(p); el.style.transform = `translateY(${(1 - p) * dy}px)`; }
-function pop(el, lt, a, d = 0.5) { const x = (lt - a) / d; el.style.opacity = cl(x * 2); el.style.transform = `scale(${0.6 + 0.4 * back(x)})`; }
-function slideX(el, lt, a, d = 0.5, dx = -400) { const p = prog(lt, a, d); el.style.opacity = p; el.style.transform = `translateX(${(1 - p) * dx}px)`; }
+const bnNum = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+function typed(el, text, lt, a, d, focusTill) {
+  const g = G(text); const k = Math.round(cl((lt - a) / d) * g.length);
+  const on = lt >= a && lt < (focusTill ?? a + d + 0.3);
+  el.innerHTML = g.slice(0, k).join('') + (on ? '<span class="caret"></span>' : '');
+  el.classList.toggle('focus', on);
+}
+function enter(el, p, dy = 60) { el.style.opacity = p; el.style.transform = `translateY(${(1 - p) * dy}px)`; }
 function tap(el, lt, at) { const x = (lt - at) / 0.5; el.style.opacity = x > 0 && x < 1 ? 1 - x : 0; el.style.transform = `scale(${0.6 + x * 0.8})`; }
-// crowd + floating dots
-let h = ''; for (let i = 0; i < 60; i++) h += `<span class="person${i === 33 ? ' me' : ''}"></span>`; $('crowd').innerHTML = h;
-const persons = [...document.querySelectorAll('.person')];
-let dh = ''; for (let i = 0; i < 22; i++) dh += `<div class="dot" style="left:${(i * 137) % 1080}px;top:${(i * 263) % 1920}px"></div>`; $('dots').innerHTML = dh;
-const dots = [...document.querySelectorAll('.dot')];
+function press(el, lt, at) { const x = (lt - at); el.style.transform = x > 0 && x < 0.25 ? 'scale(.96)' : 'scale(1)'; }
 
 window.render = function (t) {
   let i = starts.length - 1; while (i > 0 && t < starts[i]) i--;
-  const lt = t - starts[i], d = D[i], last = i === D.length - 1;
+  const lt = t - starts[i], d = D[i];
   for (let k = 0; k < D.length; k++) {
     const el = $('s' + k);
     if (k !== i) { el.style.opacity = 0; continue; }
-    const fi = cl(lt / 0.3), fo = last ? 1 : cl((d - lt) / 0.3);
+    const fi = cl(lt / 0.35), fo = i === D.length - 1 ? 1 : cl((d - lt) / 0.35);
     el.style.opacity = Math.min(fi, fo);
-    el.style.transform = `scale(${1 + 0.04 * (1 - fi)})`;
   }
-  $('prog').style.width = (t / TOTAL * 1080) + 'px';
-  const dark = i <= 1 ? 1 : 0; $('dark').style.opacity = i === 2 ? cl(1 - lt / 0.6) : dark;
-  $('bl1').style.transform = `translate(${Math.sin(t / 3) * 60}px,${Math.cos(t / 4) * 50}px)`;
-  $('bl2').style.transform = `translate(${Math.cos(t / 3.5) * 70}px,${Math.sin(t / 2.8) * 40}px)`;
-  dots.forEach((el, k) => { el.style.transform = `translateY(${-((t * (20 + k % 5 * 8)) % 1920)}px)`; el.style.opacity = 0.25 + 0.2 * Math.sin(t + k); });
-  $('top').style.opacity = (i >= 3 && i <= 7) ? 1 : 0;
+  $('top').style.opacity = (i === 0 || i === D.length - 1) ? 0 : 1;
   const cap = $('cap'); cap.textContent = CAPS[i] || '';
-  cap.style.opacity = Math.min(cl(lt / 0.3), last ? 1 : cl((d - lt) / 0.3));
+  cap.style.opacity = Math.min(cl(lt / 0.3), i === D.length - 1 ? 1 : cl((d - lt) / 0.3));
   const ph = document.querySelector('#s' + i + ' .phone');
-  if (ph) { const p = prog(lt, 0.05, 0.6); ph.style.transform = `translateY(${(1 - p) * 160}px) rotate(${(1 - p) * 4}deg)`; }
+  if (ph) { const p = prog(lt, 0.05, 0.6); ph.style.transform = `translateY(${(1 - p) * 140}px)`; }
 
   if (i === 0) {
-    enter($('s0a'), prog(lt, 0.1, 0.5));
-    persons.forEach((el, k) => { const a = 0.4 + k * 0.035; const x = (lt - a) / 0.3; el.style.opacity = cl(x); el.style.transform = `scale(${0.3 + 0.7 * back(x)})`; });
-    const me = persons[33]; const pulse = lt > d * 0.55 ? 1 + 0.25 * Math.abs(Math.sin((lt - d * 0.55) * 5)) : 1; me.style.transform = `scale(${pulse})`;
-    pop($('s0b'), lt, d * 0.55, 0.6);
+    const p = prog(lt, 0, 0.7); $('s0logo').style.transform = `scale(${0.5 + 0.5 * p}) rotate(${(1 - p) * -12}deg)`; $('s0logo').style.opacity = p;
+    enter($('s0t'), prog(lt, 0.4, 0.7)); enter($('s0c'), prog(lt, 1.0, 0.7));
   }
   if (i === 1) {
-    enter($('s1h'), prog(lt, 0.1, 0.5));
-    const g = (d - 1) / 3; ['pr0', 'pr1', 'pr2'].forEach((id, k) => slideX($(id), lt, 0.6 + k * g, 0.5, k % 2 ? 500 : -500));
+    const u = d - 1.6;
+    typed($('f0'), 'সোনিয়া আক্তার', lt, 0.6, u * 0.22);
+    typed($('f1'), '01XXXXXXXXX', lt, 0.7 + u * 0.24, u * 0.18);
+    typed($('f2'), 'soniya@email.com', lt, 0.8 + u * 0.44, u * 0.2);
+    typed($('f3'), '••••••••', lt, 0.9 + u * 0.66, u * 0.12);
+    const at = d - 1.5; tap($('s1tap'), lt, at); press($('s1btn'), lt, at);
+    enter($('s1toast'), prog(lt, at + 0.35, 0.4), 40);
   }
   if (i === 2) {
-    const x = (lt - 0.1) / 0.8; $('s2logo').style.opacity = cl(x * 2); $('s2logo').style.transform = `scale(${0.3 + 0.7 * back(x)}) rotate(${(1 - cl(x)) * -20}deg)`;
-    enter($('s2t'), prog(lt, 0.6, 0.6)); enter($('s2u'), prog(lt, 1.1, 0.6));
+    enter($('s2pay'), prog(lt, d * 0.3, 0.6));
+    typed($('trx'), '8N7A6XK2LM', lt, d * 0.52, d * 0.2);
+    const at = d * 0.78; tap($('s2tap'), lt, at); press($('s2btn'), lt, at);
+    enter($('s2toast'), prog(lt, at + 0.4, 0.4), 40);
   }
   if (i === 3) {
-    enter($('s3h'), prog(lt, 0.05, 0.5));
-    const g = (d - 1.2) / 3;
-    ['st0', 'st1', 'st2'].forEach((id, k) => slideX($(id), lt, 0.4 + k * g, 0.5, k % 2 ? 500 : -500));
-    $('n0').textContent = bn(Math.round(prog(lt, 0.5, 1.6) * 4300).toLocaleString('en-US')) + '+';
-    $('n1').textContent = bn(Math.round(prog(lt, 0.5 + g, 1.0) * 20)) + 'টি';
+    const secs = Math.max(0, 3580 - Math.floor(lt * 37));
+    $('timer').textContent = '⏱ ' + bnNum(String(Math.floor(secs / 60)).padStart(2, '0')) + ':' + bnNum(String(secs % 60).padStart(2, '0'));
+    const at = d * 0.38; tap($('s3tap'), lt, at);
+    $('o1').classList.toggle('sel', lt > at + 0.1);
+    const r = prog(lt, d * 0.58, 0.3); $('s3r').style.opacity = r; $('s3r').style.transform = `translateY(${(1 - r) * 80}px)`;
+    const sc = Math.min(82.5, Math.round(prog(lt, d * 0.62, 1.2) * 165) / 2);
+    $('score').textContent = bnNum(sc.toFixed(1)).replace('.০', '') ;
   }
   if (i === 4) {
-    const secs = Math.max(0, 2300 - Math.floor(lt * 31));
-    $('timer').textContent = '⏱ ' + bn(String(Math.floor(secs / 60)).padStart(2, '0')) + ':' + bn(String(secs % 60).padStart(2, '0'));
-    const sb = prog(lt, 0.5, 0.8); $('secbar').style.clipPath = `inset(0 ${(1 - sb) * 100}% 0 0)`;
-    const at = d * 0.36; tap($('t4'), lt, at); $('o0').classList.toggle('sel', lt > at + 0.1);
-    const r = prog(lt, d * 0.55, 0.35); $('res').style.opacity = r; $('res').style.transform = `translateY(${(1 - r) * 80}px)`;
-    const sc = Math.min(82.5, Math.round(prog(lt, d * 0.6, 1.4) * 165) / 2);
-    $('score').textContent = bn(sc.toFixed(1)).replace('.০', '');
-    enter($('secres'), prog(lt, d * 0.75, 0.5), 30);
+    const at = d * 0.3; tap($('s4tap'), lt, at);
+    $('p3').classList.toggle('ok', lt > at + 0.1);
+    enter($('expl'), prog(lt, at + 0.4, 0.5), 30);
+    enter($('s4btn'), prog(lt, d * 0.7, 0.5), 30);
   }
-  if (i === 5) {
-    const a1 = d * 0.2; tap($('t5'), lt, a1);
-    $('q0').classList.toggle('bad', lt > a1 + 0.1);
-    $('q2').classList.toggle('ok', lt > a1 + 0.6);
-    enter($('expl'), prog(lt, a1 + 0.9, 0.5), 30);
-    enter($('s5b'), prog(lt, d * 0.65, 0.5), 30);
-    $('t5').style.top = '500px';
-  }
-  if (i === 6) {
-    enter($('s6h'), prog(lt, 0.05, 0.5)); pop($('s6card'), lt, 0.3, 0.7);
-    pop($('s6d'), lt, d * 0.35, 0.6);
-    const sx = prog(lt, d * 0.5, 0.5); $('strike').style.width = (sx * 480) + 'px';
-    const nx = prog(lt, d * 0.62, 0.5); $('pOld').style.opacity = 1 - nx; $('pOld').style.transform = `translateY(${-nx * 60}px)`;
-    $('pNew').style.opacity = nx; $('pNew').style.transform = `translateY(${(1 - nx) * 60}px) scale(${lt > d * 0.62 + 0.5 ? 1 + 0.04 * Math.sin((lt - d * 0.62) * 6) : 1})`;
-  }
-  if (i === 7) {
-    const g = (d - 1) / 3;
-    ['sp0', 'sp1', 'sp2'].forEach((id, k) => slideX($(id), lt, 0.3 + k * g, 0.5, k % 2 ? 500 : -500));
-    const nm = G('সোনিয়া আক্তার'); const k = Math.round(cl((lt - 0.8) / 1.2) * nm.length); $('nm').textContent = nm.slice(0, k).join('');
-  }
-  if (i === 8) {
-    enter($('s8a'), prog(lt, 0.05, 0.6)); pop($('s8b'), lt, 0.5, 0.6); enter($('s8c'), prog(lt, 1.0, 0.5));
-    const ring = (lt % 1.2) / 1.2; $('pill').style.boxShadow = `0 0 0 ${ring * 40}px rgba(255,255,255,${0.5 * (1 - ring)}),0 20px 50px rgba(0,0,0,.25)`;
-  }
+  if (i === 5) { enter($('s5a'), prog(lt, 0, 0.6)); const p = prog(lt, 0.4, 0.6); $('s5b').style.opacity = p; $('s5b').style.transform = `scale(${0.7 + 0.3 * p})`; enter($('s5c'), prog(lt, 0.9, 0.6)); }
 };
 render(0);
 </script></body></html>
