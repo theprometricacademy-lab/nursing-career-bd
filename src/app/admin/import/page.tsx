@@ -15,15 +15,6 @@ const COLS = [
 type Raw = Record<string, string>;
 type Parsed = { row: number; data?: Record<string, unknown>; topic?: { subject_id: number; en: string; bn: string }; examName?: string; error?: string };
 
-const SAMPLE: Raw = {
-  code: '', subject: 'pharmacology', topic_en: 'Antidotes', topic_bn: 'প্রতিষেধক',
-  question_en: '', question_bn: 'Warfarin-এর অতিমাত্রার প্রতিষেধক কোনটি?',
-  option_a_en: '', option_b_en: '', option_c_en: '', option_d_en: '',
-  option_a_bn: 'Vitamin K', option_b_bn: 'Protamine sulphate', option_c_bn: 'Naloxone', option_d_bn: 'Atropine',
-  correct: 'ক', explanation_en: '', explanation_bn: 'Vitamin K, Warfarin-এর প্রভাব দূর করে।',
-  difficulty: 'medium', is_premium: 'yes', source: 'Nursing Career BD', year: '', exam: '',
-};
-
 // Accept many header spellings (English / Bangla / with spaces) so any reasonable sheet works.
 const ALIASES: Record<string, string> = {
   question: 'question_bn', prosno: 'question_bn', 'প্রশ্ন': 'question_bn', q: 'question_bn',
@@ -63,7 +54,13 @@ export default function ImportPage() {
 
   function downloadTemplate() {
     const esc = (s: string) => `"${s.replace(/"/g, '""')}"`;
-    const csv = '﻿' + COLS.join(',') + '\n' + COLS.map((c) => esc(SAMPLE[c] ?? '')).join(',') + '\n';
+    // Simple Bangla template matching the real exam style (Bangla text, English medical terms inside)
+    const head = ['subject', 'topic', 'question', 'A', 'B', 'C', 'D', 'answer', 'explanation', 'year'];
+    const rows = [
+      ['anatomy-physiology', 'মানবদেহ', 'মানবদেহের Largest Artery কোনটি?', 'Carotid', 'Aorta', 'Femoral', 'Renal', 'খ', 'Aorta সবচেয়ে বড় ধমনি।', ''],
+      ['english', 'Synonyms', 'The synonym of "remedy" is:', 'Disease', 'Cure', 'Pain', 'Symptom', 'B', 'Remedy = cure.', ''],
+    ];
+    const csv = '\uFEFF' + [head, ...rows].map((r) => r.map(esc).join(',')).join('\n') + '\n';
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     a.download = 'nursing-career-bd-questions-template.csv';
@@ -205,13 +202,16 @@ export default function ImportPage() {
         right={<button className="btn-ghost" onClick={downloadTemplate}><Download className="h-4 w-4" />{L('টেমপ্লেট ডাউনলোড', 'Download template')}</button>} />
 
       <div className="card p-4 text-sm text-ink-soft">
-        <p className="mb-1 font-semibold text-ink">{L('কলাম', 'Columns')}:</p>
-        <code className="block whitespace-pre-wrap break-words rounded-lg bg-brand-50 p-2 text-xs text-ink">{COLS.join(', ')}</code>
+        <p className="mb-1 font-semibold text-ink">{L('কলাম (প্রথম সারিতে লিখুন)', 'Columns (first row)')}:</p>
+        <code className="block whitespace-pre-wrap break-words rounded-lg bg-brand-50 p-2 text-xs text-ink">subject, topic, question, A, B, C, D, answer, explanation, year</code>
+        <p className="mt-1 text-xs">{L('প্রশ্ন বাংলায় লিখুন, ডাক্তারি শব্দ ইংরেজিতে রাখতে পারেন (যেমন "মানবদেহের Largest Artery কোনটি?")। English বিষয়ের প্রশ্ন ইংরেজিতে। শুধু question, A, B, C, D, answer দিলেই চলবে।', 'Write questions in Bangla (medical terms may stay in English); English-subject questions in English. Only question, A, B, C, D, answer are required.')}</p>
+        <details className="mt-1 text-xs"><summary className="cursor-pointer">{L('সব কলাম (অ্যাডভান্সড)', 'All columns (advanced)')}</summary>
+          <code className="mt-1 block whitespace-pre-wrap break-words rounded-lg bg-brand-50 p-2 text-ink">{COLS.join(', ')}</code></details>
         <ul className="ml-5 mt-2 list-disc space-y-0.5">
-          <li>{L('সবচেয়ে সহজ ফাইল: শুধু question, A, B, C, D, answer — এই ৬টি কলাম (বাংলায়)। উপরে বিষয় বেছে নিন।', 'Simplest file: just question, A, B, C, D, answer — 6 columns. Pick the subject above.')}</li>
+          <li>{L('subject কলাম না থাকলে নিচে একটি বিষয় বেছে নিন', 'No subject column? Pick a subject below')}</li>
           <li>{L('subject: slug (যেমন pharmacology), ইংরেজি নাম বা আইডি', 'subject: slug (e.g. pharmacology), English name or ID')}</li>
           <li>{L('answer/correct: A/B/C/D, 1-4, ক/খ/গ/ঘ বা সঠিক অপশনের লেখা', 'answer/correct: A/B/C/D, 1-4, ক/খ/গ/ঘ or the option text')}</li>
-          <li>{L('is_premium: yes/no (খালি থাকলে প্রিমিয়াম) · difficulty: easy/medium/hard · নতুন টপিক নিজে থেকে তৈরি হবে', 'is_premium: yes/no · difficulty: easy/medium/hard · new topics are created automatically')}</li>
+          <li>{L('সব প্রশ্ন নিজে থেকে প্রিমিয়াম হবে · নতুন টপিক নিজে থেকে তৈরি হবে', 'All questions become premium automatically · new topics are created automatically')}</li>
           <li>{L('Excel থেকে CSV সেভ করলে "CSV UTF-8" বেছে নিন, যাতে বাংলা ঠিক থাকে', 'When saving CSV from Excel choose "CSV UTF-8" so Bangla text is preserved')}</li>
         </ul>
       </div>
