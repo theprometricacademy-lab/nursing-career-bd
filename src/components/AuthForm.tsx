@@ -17,6 +17,21 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const sb = supabaseBrowser();
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const friendly = (m: string) => {
+    const bn = lang === 'bn';
+    if (/email not confirmed/i.test(m)) return bn ? 'ইমেইল এখনো ভেরিফাই হয়নি। ইমেইলে পাঠানো লিংকে চাপুন (Spam/Promotions ফোল্ডারও দেখুন), অথবা নিচের বাটনে চাপ দিয়ে লিংক আবার নিন।' : 'Email not verified yet. Click the link we emailed you (check Spam/Promotions), or resend it below.';
+    if (/invalid login credentials/i.test(m)) return bn ? 'ইমেইল বা পাসওয়ার্ড ভুল।' : 'Wrong email or password.';
+    if (/already registered/i.test(m)) return bn ? 'এই ইমেইলে আগেই অ্যাকাউন্ট আছে। লগইন করুন।' : 'This email is already registered. Please log in.';
+    if (/rate limit|too many/i.test(m)) return bn ? 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।' : 'Too many attempts. Please try again in a while.';
+    return m;
+  };
+  async function resend() {
+    setBusy(true);
+    const { error } = await sb.auth.resend({ type: 'signup', email: form.email.trim(), options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard` } });
+    setBusy(false);
+    setMsg(error ? { ok: false, text: friendly(error.message) } : { ok: true, text: lang === 'bn' ? 'ভেরিফিকেশন লিংক আবার পাঠানো হয়েছে। ইমেইল দেখুন।' : 'Verification link sent again. Check your email.' });
+  }
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
 
   async function onSubmit(e: React.FormEvent) {
@@ -52,7 +67,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
         router.replace('/dashboard');
       }
     } catch (err) {
-      setMsg({ ok: false, text: (err as Error).message });
+      const m = (err as Error).message || '';
+      if (/email not confirmed/i.test(m)) setNeedsConfirm(true);
+      setMsg({ ok: false, text: friendly(m) });
     } finally {
       setBusy(false);
     }
@@ -86,6 +103,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
             </div>
           )}
           {msg && <p className={`rounded-xl p-3 text-sm ${msg.ok ? 'bg-mint-50 text-mint-700' : 'bg-red-50 text-red-700'}`}>{msg.text}</p>}
+          {needsConfirm && mode === 'login' && (
+            <button type="button" className="btn-ghost w-full" disabled={busy || !form.email} onClick={resend}>
+              {lang === 'bn' ? 'ভেরিফিকেশন লিংক আবার পাঠান' : 'Resend verification link'}
+            </button>
+          )}
           <button className="btn-primary w-full" disabled={busy}>
             {busy ? t('loading') : mode === 'forgot' ? t('sendReset') : mode === 'reset' ? t('updatePassword') : title}
           </button>
