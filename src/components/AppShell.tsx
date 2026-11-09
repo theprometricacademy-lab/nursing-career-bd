@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh] overflow-x-clip">
       <header className="sticky top-0 z-30 border-b border-brand-100 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
           <button className="rounded-lg p-1.5 text-ink lg:hidden" onClick={() => setOpen(true)} aria-label={t('menu')}>
@@ -109,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
           )}
         </aside>
-        <main className="min-w-0 flex-1 animate-rise">{children}</main>
+        <main className="min-w-0 flex-1">{children}</main>
       </div>
 
       {/* mobile drawer */}

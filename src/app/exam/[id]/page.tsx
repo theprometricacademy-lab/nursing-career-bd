@@ -139,7 +139,7 @@ export default function ExamPage() {
   );
 
   return (
-    <div className="min-h-screen bg-brand-50/50">
+    <div className="min-h-[100dvh] overflow-x-clip bg-brand-50/50">
       <header className="sticky top-0 z-20 border-b border-brand-100 bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
           <LogoMark size={28} />

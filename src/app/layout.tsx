@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: 'Smart Preparation for Nursing Jobs in Bangladesh — বাংলাদেশে নার্সিং চাকরির স্মার্ট প্রস্তুতি',
   appleWebApp: { capable: true, title: 'Nursing Career BD', statusBarStyle: 'default' },
 };
-export const viewport: Viewport = { themeColor: '#1f7ad6', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
+export const viewport: Viewport = { themeColor: '#1f7ad6', width: 'device-width', initialScale: 1, maximumScale: 1, viewportFit: 'cover' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const c = await cookies();

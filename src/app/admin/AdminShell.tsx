@@ -45,7 +45,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     </nav>
   );
   return (
-    <div className="min-h-screen bg-brand-50/40">
+    <div className="min-h-[100dvh] overflow-x-clip bg-brand-50/40">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-brand-100 bg-white px-4">
         <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="menu"><Menu className="h-5 w-5" /></button>
         <LogoMark size={28} />
