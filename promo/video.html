@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="bn"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+:root{--b50:#eff8ff;--b100:#dbeefe;--b200:#bfe2fd;--b400:#5fb4f6;--b500:#3a98ee;--b600:#1f7ad6;--b700:#1a63b0;--b800:#1b528f;--ink:#0f2a4a;--soft:#4b6584;--m50:#ecfdf5;--m100:#d1fae5;--m300:#6ee7b7;--m500:#10b981;--m600:#059669;--p50:#fdf2f8;--p100:#fce7f3;--p500:#ec4899;--p600:#db2777}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;font-family:'Hind Siliguri',sans-serif;color:var(--ink)}
+body{background:linear-gradient(160deg,#3a98ee 0%,#1f7ad6 45%,#1b528f 100%);position:relative}
+.blob{position:absolute;border-radius:50%;filter:blur(70px)}
+#top{position:absolute;top:70px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:18px;color:#fff;font-size:44px;font-weight:700}
+.scene{position:absolute;inset:0;opacity:0}
+.step{position:absolute;top:170px;left:0;right:0;text-align:center;color:#fff}
+.step .n{display:inline-block;background:#6ee7b7;color:var(--ink);font-weight:700;font-size:38px;padding:6px 30px;border-radius:999px}
+.step h2{font-size:74px;font-weight:700;margin-top:14px;line-height:1.15}
+.phone{position:absolute;left:150px;top:420px;width:780px;height:1100px;background:#f7fbff;border-radius:64px;border:16px solid #0f2a4a;box-shadow:0 40px 90px rgba(0,0,0,.35);overflow:hidden}
+.bar{height:96px;background:#fff;border-bottom:2px solid var(--b100);display:flex;align-items:center;gap:14px;padding:0 34px;font-weight:700;font-size:32px}
+.pad{padding:34px}
+.card{background:#fff;border:2px solid var(--b100);border-radius:28px;box-shadow:0 6px 20px rgba(31,122,214,.08);padding:30px}
+.lbl{font-size:28px;font-weight:600;margin:18px 0 8px}
+.inp{height:78px;border:2px solid var(--b200);border-radius:20px;padding:0 24px;display:flex;align-items:center;font-size:32px;background:#fff}
+.inp.focus{border-color:var(--b500);box-shadow:0 0 0 6px var(--b100)}
+.btn{height:88px;border-radius:22px;background:var(--b600);color:#fff;font-size:36px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:30px}
+.caret{display:inline-block;width:3px;height:34px;background:var(--b600);margin-left:2px}
+.toast{position:absolute;left:60px;right:60px;bottom:60px;background:var(--m600);color:#fff;border-radius:24px;padding:26px;font-size:34px;font-weight:700;text-align:center}
+.chip{display:inline-block;border-radius:999px;padding:8px 22px;font-size:28px;font-weight:600;margin:6px 6px 0 0}
+.opt{border:2px solid var(--b200);border-radius:20px;padding:16px 24px;font-size:31px;margin-top:14px;display:flex;gap:16px;align-items:center;background:#fff}
+.opt b{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--b50);color:var(--b700);flex:none}
+.opt.sel{border-color:var(--b500);background:var(--b50)}
+.opt.ok{border-color:var(--m500);background:var(--m50)}
+.opt.ok b{background:var(--m500);color:#fff}
+#cap{position:absolute;left:70px;right:70px;bottom:120px;background:rgba(255,255,255,.97);border-radius:32px;padding:30px 36px;font-size:44px;font-weight:600;line-height:1.4;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25);min-height:170px;display:flex;align-items:center;justify-content:center}
+.tap{position:absolute;width:110px;height:110px;border-radius:50%;background:rgba(236,72,153,.35);border:6px solid #ec4899;opacity:0}
+.big{position:absolute;left:0;right:0;text-align:center;color:#fff}
+.pill{display:inline-block;background:#fff;color:var(--b700);font-weight:700;border-radius:999px;padding:18px 54px;font-size:68px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.stat{display:inline-block;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:14px 34px;font-size:40px;font-weight:600;margin:12px}
+</style></head><body>
+<div class="blob" style="width:520px;height:520px;right:-160px;top:-120px;background:rgba(244,114,182,.35)"></div>
+<div class="blob" style="width:560px;height:560px;left:-180px;bottom:280px;background:rgba(110,231,183,.30)"></div>
+<div id="top"><svg width="72" height="72" viewBox="0 0 48 48"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5fb4f6"/><stop offset="1" stop-color="#1f7ad6"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="13" fill="url(#g)" stroke="#fff" stroke-width="2"/><path d="M24 37s-11-6.6-11-14.3A6.2 6.2 0 0 1 24 19a6.2 6.2 0 0 1 11 3.7C35 30.4 24 37 24 37z" fill="#fff"/><rect x="21.6" y="22" width="4.8" height="11" rx="1.2" fill="#ec4899"/><rect x="18.5" y="25.1" width="11" height="4.8" rx="1.2" fill="#ec4899"/><circle cx="36" cy="12" r="4" fill="#6ee7b7"/></svg>Nursing Career BD</div>
+
+<!-- 0 intro -->
+<div class="scene" id="s0">
+  <div class="big" style="top:330px" id="s0logo"><svg width="300" height="300" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="44" rx="13" fill="#fff"/><path d="M24 37s-11-6.6-11-14.3A6.2 6.2 0 0 1 24 19a6.2 6.2 0 0 1 11 3.7C35 30.4 24 37 24 37z" fill="#1f7ad6"/><rect x="21.6" y="22" width="4.8" height="11" rx="1.2" fill="#ec4899"/><rect x="18.5" y="25.1" width="11" height="4.8" rx="1.2" fill="#ec4899"/><circle cx="36" cy="12" r="4" fill="#6ee7b7"/></svg></div>
+  <div class="big" style="top:690px" id="s0t"><div style="font-size:96px;font-weight:700;line-height:1.15">নার্সিং চাকরির<br>স্মার্ট প্রস্তুতি</div><div style="font-size:46px;margin-top:22px;opacity:.9">সিনিয়র স্টাফ নার্স · BSc · ডিপ্লোমা</div></div>
+  <div class="big" style="top:1080px;padding:0 60px" id="s0c"><span class="stat">৪,৩০০+ প্রশ্ন</span><span class="stat">মক টেস্ট</span><span class="stat">বিগত সালের প্রশ্ন</span><span class="stat">ব্যাখ্যাসহ উত্তর</span></div>
+</div>
+
+<!-- 1 signup -->
+<div class="scene" id="s1">
+  <div class="step"><span class="n">ধাপ ১</span><h2>অ্যাকাউন্ট খুলুন ও লগইন</h2></div>
+  <div class="phone"><div class="bar">🔒 nursingjob.online/signup</div>
+    <div class="pad"><div class="card">
+      <div style="font-size:42px;font-weight:700">সাইন আপ</div>
+      <div class="lbl">নাম</div><div class="inp" id="f0"></div>
+      <div class="lbl">মোবাইল নম্বর</div><div class="inp" id="f1"></div>
+      <div class="lbl">ইমেইল</div><div class="inp" id="f2"></div>
+      <div class="lbl">পাসওয়ার্ড</div><div class="inp" id="f3"></div>
+      <div class="btn" id="s1btn">অ্যাকাউন্ট খুলুন</div>
+    </div></div>
+    <div class="tap" id="s1tap" style="left:335px;top:900px"></div>
+    <div class="toast" id="s1toast">✓ স্বাগতম! আপনি লগইন করেছেন</div>
+  </div>
+</div>
+
+<!-- 2 premium -->
+<div class="scene" id="s2">
+  <div class="step"><span class="n">ধাপ ২</span><h2>প্রিমিয়াম নিন</h2></div>
+  <div class="phone"><div class="bar">🔒 nursingjob.online/premium</div>
+    <div class="pad">
+      <div class="card" style="background:linear-gradient(135deg,#eff8ff,#fff);border-color:var(--b200)">
+        <div class="chip" style="background:var(--p100);color:var(--p600)">সবচেয়ে জনপ্রিয়</div>
+        <div style="font-size:38px;font-weight:700;margin-top:10px">লাইফটাইম প্রিমিয়াম</div>
+        <div style="font-size:84px;font-weight:700;color:var(--b700);line-height:1.1">৳৫৯৯</div>
+        <div style="font-size:28px;color:var(--soft)">সব মক টেস্ট · সব প্রশ্ন · একবার পেমেন্ট</div>
+      </div>
+      <div class="card" style="margin-top:24px" id="s2pay">
+        <div style="font-size:32px;font-weight:700">bKash / Nagad Send Money দিয়ে পেমেন্ট</div>
+        <div style="margin-top:12px"><span class="chip" style="background:#e2136e;color:#fff">bKash</span><span class="chip" style="background:#f6921e;color:#fff">Nagad</span></div>
+        <div style="font-size:29px;margin-top:14px;line-height:1.55">১. পেজে দেওয়া নম্বরে Send Money করুন<br>২. টাকার পরিমাণ: <b>৳৫৯৯</b><br>৩. Transaction ID (TrxID) লিখুন</div>
+        <div class="inp" id="trx" style="margin-top:14px"></div>
+        <div class="btn" id="s2btn" style="background:var(--m600);margin-top:20px">জমা দিন</div>
+      </div>
+    </div>
+    <div class="tap" id="s2tap" style="left:335px;top:960px"></div>
+    <div class="toast" id="s2toast">✓ অনুমোদিত — প্রিমিয়াম চালু হয়েছে</div>
+  </div>
+</div>
+
+<!-- 3 mock test -->
+<div class="scene" id="s3">
+  <div class="step"><span class="n">ধাপ ৩</span><h2>মক টেস্ট দিন</h2></div>
+  <div class="phone"><div class="bar" style="justify-content:space-between"><span>প্রশ্ন ২৩/১০০</span><span id="timer" style="background:var(--p50);color:var(--p600);border-radius:16px;padding:4px 18px">⏱ ৫৯:৪০</span></div>
+    <div class="pad" id="s3q">
+      <div style="font-size:30px;font-weight:700">সিনিয়র স্টাফ নার্স মডেল টেস্ট ১</div>
+      <div><span class="chip" style="background:var(--b100);color:var(--b800)">১০০ প্রশ্ন</span><span class="chip" style="background:var(--m100);color:var(--m600)">৬০ মিনিট</span><span class="chip" style="background:var(--p100);color:var(--p600)">নেগেটিভ ০.৫</span></div>
+      <div class="card" style="margin-top:22px">
+        <div style="font-size:34px;font-weight:600;line-height:1.45">Myocardial infarction নির্ণয়ে কোন রক্ত পরীক্ষা সবচেয়ে নির্দিষ্ট?</div>
+        <div class="opt" id="o0"><b>ক</b>Serum creatinine</div>
+        <div class="opt" id="o1"><b>খ</b>Troponin</div>
+        <div class="opt" id="o2"><b>গ</b>Blood sugar</div>
+        <div class="opt" id="o3"><b>ঘ</b>Haemoglobin</div>
+      </div>
+    </div>
+    <div class="pad" id="s3r" style="position:absolute;top:96px;left:0;right:0;bottom:0;background:#f7fbff;opacity:0">
+      <div class="card" style="text-align:center;background:linear-gradient(135deg,#ecfdf5,#fff);border-color:var(--m300)">
+        <div style="font-size:36px;font-weight:700">ফলাফল</div>
+        <div style="font-size:120px;font-weight:700;color:var(--m600);line-height:1.15" id="score">০</div>
+        <div style="font-size:32px;color:var(--soft)">১০০ নম্বরের মধ্যে</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:22px">
+        <div class="card" style="flex:1;text-align:center;padding:22px"><div style="font-size:54px;font-weight:700;color:var(--m600)">৮৫</div><div style="font-size:27px">সঠিক</div></div>
+        <div class="card" style="flex:1;text-align:center;padding:22px"><div style="font-size:54px;font-weight:700;color:var(--p600)">৫</div><div style="font-size:27px">ভুল</div></div>
+        <div class="card" style="flex:1;text-align:center;padding:22px"><div style="font-size:54px;font-weight:700;color:var(--soft)">১০</div><div style="font-size:27px">বাদ</div></div>
+      </div>
+      <div class="card" style="margin-top:22px;font-size:29px;line-height:1.6">বাংলা ১৮/২০ · ইংরেজি ১৭/২০<br>সাধারণ জ্ঞান ১৬/২০ · নার্সিং ৩৪/৪০</div>
+    </div>
+    <div class="tap" id="s3tap" style="left:330px;top:620px"></div>
+  </div>
+</div>
+
+<!-- 4 practice -->
+<div class="scene" id="s4">
+  <div class="step"><span class="n">ধাপ ৪</span><h2>প্রশ্ন প্র্যাকটিস করুন</h2></div>
+  <div class="phone"><div class="bar">📚 প্রশ্নব্যাংক</div>
+    <div class="pad">
+      <div id="s4chips"><span class="chip" style="background:var(--b600);color:#fff">Medical-Surgical</span><span class="chip" style="background:var(--b100);color:var(--b800)">Pharmacology</span><span class="chip" style="background:var(--m100);color:var(--m600)">Anatomy</span><span class="chip" style="background:var(--p100);color:var(--p600)">Community Health</span></div>
+      <div class="card" style="margin-top:18px;padding:24px 30px">
+        <div style="font-size:26px;color:var(--soft)">Medical-Surgical · Medium</div>
+        <div style="font-size:34px;font-weight:600;line-height:1.45;margin-top:6px">The Kernig's sign is positive in case of-</div>
+        <div class="opt" id="p0"><b>ক</b>Appendicitis</div>
+        <div class="opt" id="p1"><b>খ</b>Bronchitis</div>
+        <div class="opt" id="p2"><b>গ</b>Cholecystitis</div>
+        <div class="opt" id="p3"><b>ঘ</b>Meningitis</div>
+        <div id="expl" style="margin-top:20px;background:var(--m50);border:2px solid var(--m300);border-radius:20px;padding:20px;font-size:28px;line-height:1.5;opacity:0"><b>ব্যাখ্যা:</b> Meninges-এর প্রদাহে হাঁটু সোজা করতে ব্যথা ও বাধা হয় — এটাই Kernig sign।</div>
+      </div>
+      <div class="btn" id="s4btn" style="background:var(--p600);opacity:0;margin-top:18px">↻ ভুল উত্তর রিভিশন</div>
+    </div>
+    <div class="tap" id="s4tap" style="left:330px;top:780px"></div>
+  </div>
+</div>
+
+<!-- 5 CTA -->
+<div class="scene" id="s5">
+  <div class="big" style="top:420px" id="s5a"><div style="font-size:110px;font-weight:700;line-height:1.15">আজই শুরু করুন</div><div style="font-size:50px;margin-top:20px;opacity:.92">অ্যাকাউন্ট খোলা সম্পূর্ণ ফ্রি</div></div>
+  <div class="big" style="top:820px" id="s5b"><span class="pill">nursingjob.online</span></div>
+  <div class="big" style="top:1060px;padding:0 60px" id="s5c"><span class="stat">✓ মক টেস্ট</span><span class="stat">✓ প্রশ্নব্যাংক</span><span class="stat">✓ বিগত প্রশ্ন</span></div>
+</div>
+
+<div id="cap"></div>
+
+<script>
+const Q = new URLSearchParams(location.search);
+const D = JSON.parse(Q.get('d') || '[3,5,9,6,6,3]');   // scene lengths (s)
+const CAPS = JSON.parse(decodeURIComponent(Q.get('c') || '[]'));
+const starts = []; let acc = 0; for (const d of D) { starts.push(acc); acc += d; }
+window.TOTAL = acc;
+const seg = new Intl.Segmenter('bn', {granularity: 'grapheme'});
+const G = s => Array.from(seg.segment(s), x => x.segment);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = x => 1 - Math.pow(1 - cl(x), 3);
+const prog = (lt, a, d) => ease((lt - a) / d);
+const $ = id => document.getElementById(id);
+const bnNum = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+function typed(el, text, lt, a, d, focusTill) {
+  const g = G(text); const k = Math.round(cl((lt - a) / d) * g.length);
+  const on = lt >= a && lt < (focusTill ?? a + d + 0.3);
+  el.innerHTML = g.slice(0, k).join('') + (on ? '<span class="caret"></span>' : '');
+  el.classList.toggle('focus', on);
+}
+function enter(el, p, dy = 60) { el.style.opacity = p; el.style.transform = `translateY(${(1 - p) * dy}px)`; }
+function tap(el, lt, at) { const x = (lt - at) / 0.5; el.style.opacity = x > 0 && x < 1 ? 1 - x : 0; el.style.transform = `scale(${0.6 + x * 0.8})`; }
+function press(el, lt, at) { const x = (lt - at); el.style.transform = x > 0 && x < 0.25 ? 'scale(.96)' : 'scale(1)'; }
+
+window.render = function (t) {
+  let i = starts.length - 1; while (i > 0 && t < starts[i]) i--;
+  const lt = t - starts[i], d = D[i];
+  for (let k = 0; k < D.length; k++) {
+    const el = $('s' + k);
+    if (k !== i) { el.style.opacity = 0; continue; }
+    const fi = cl(lt / 0.35), fo = i === D.length - 1 ? 1 : cl((d - lt) / 0.35);
+    el.style.opacity = Math.min(fi, fo);
+  }
+  $('top').style.opacity = (i === 0 || i === D.length - 1) ? 0 : 1;
+  const cap = $('cap'); cap.textContent = CAPS[i] || '';
+  cap.style.opacity = Math.min(cl(lt / 0.3), i === D.length - 1 ? 1 : cl((d - lt) / 0.3));
+  const ph = document.querySelector('#s' + i + ' .phone');
+  if (ph) { const p = prog(lt, 0.05, 0.6); ph.style.transform = `translateY(${(1 - p) * 140}px)`; }
+
+  if (i === 0) {
+    const p = prog(lt, 0, 0.7); $('s0logo').style.transform = `scale(${0.5 + 0.5 * p}) rotate(${(1 - p) * -12}deg)`; $('s0logo').style.opacity = p;
+    enter($('s0t'), prog(lt, 0.4, 0.7)); enter($('s0c'), prog(lt, 1.0, 0.7));
+  }
+  if (i === 1) {
+    const u = d - 1.6;
+    typed($('f0'), 'সুমাইয়া আক্তার', lt, 0.6, u * 0.22);
+    typed($('f1'), '01XXXXXXXXX', lt, 0.7 + u * 0.24, u * 0.18);
+    typed($('f2'), 'sumaiya@email.com', lt, 0.8 + u * 0.44, u * 0.2);
+    typed($('f3'), '••••••••', lt, 0.9 + u * 0.66, u * 0.12);
+    const at = d - 1.5; tap($('s1tap'), lt, at); press($('s1btn'), lt, at);
+    enter($('s1toast'), prog(lt, at + 0.35, 0.4), 40);
+  }
+  if (i === 2) {
+    enter($('s2pay'), prog(lt, d * 0.3, 0.6));
+    typed($('trx'), '8N7A6XK2LM', lt, d * 0.52, d * 0.2);
+    const at = d * 0.78; tap($('s2tap'), lt, at); press($('s2btn'), lt, at);
+    enter($('s2toast'), prog(lt, at + 0.4, 0.4), 40);
+  }
+  if (i === 3) {
+    const secs = Math.max(0, 3580 - Math.floor(lt * 37));
+    $('timer').textContent = '⏱ ' + bnNum(String(Math.floor(secs / 60)).padStart(2, '0')) + ':' + bnNum(String(secs % 60).padStart(2, '0'));
+    const at = d * 0.38; tap($('s3tap'), lt, at);
+    $('o1').classList.toggle('sel', lt > at + 0.1);
+    const r = prog(lt, d * 0.58, 0.3); $('s3r').style.opacity = r; $('s3r').style.transform = `translateY(${(1 - r) * 80}px)`;
+    const sc = Math.min(82.5, Math.round(prog(lt, d * 0.62, 1.2) * 165) / 2);
+    $('score').textContent = bnNum(sc.toFixed(1)).replace('.০', '') ;
+  }
+  if (i === 4) {
+    const at = d * 0.3; tap($('s4tap'), lt, at);
+    $('p3').classList.toggle('ok', lt > at + 0.1);
+    enter($('expl'), prog(lt, at + 0.4, 0.5), 30);
+    enter($('s4btn'), prog(lt, d * 0.7, 0.5), 30);
+  }
+  if (i === 5) { enter($('s5a'), prog(lt, 0, 0.6)); const p = prog(lt, 0.4, 0.6); $('s5b').style.opacity = p; $('s5b').style.transform = `scale(${0.7 + 0.3 * p})`; enter($('s5c'), prog(lt, 0.9, 0.6)); }
+};
+render(0);
+</script></body></html>
