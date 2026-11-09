@@ -5,9 +5,10 @@
 :root { color-scheme: light; }
 html, body { background: #f7fbff; color: #0f2a4a; }
 /* Mobile stability: no sideways drift, no font inflation, no bounce, long words wrap */
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; }
-body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; width: 100%; max-width: 100vw;
-  overscroll-behavior-y: none; touch-action: manipulation; overflow-wrap: break-word; }
+/* Note: never put overflow-x:hidden on html AND body — on phones that turns body into its own
+   scroll box and one-finger scrolling stops working. "clip" hides sideways overflow without that. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: clip; }
+body { -webkit-tap-highlight-color: transparent; overflow-wrap: break-word; }
 img, svg, video, table { max-width: 100%; }
 /* iOS zooms the page when a field under 16px gets focus — keep form fields at 16px on phones */
 @media (max-width: 767px) { input, select, textarea { font-size: 16px !important; } }
