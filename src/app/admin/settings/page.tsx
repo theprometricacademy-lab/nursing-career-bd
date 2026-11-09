@@ -72,6 +72,7 @@ export default function SettingsAdmin() {
       </section>
       <section className="card space-y-3 p-5">
         <h2 className="font-semibold text-ink">{L('অনলাইন পেমেন্ট গেটওয়ে (মার্চেন্ট অ্যাকাউন্ট লাগবে)', 'Online payment gateways (merchant account required)')}</h2>
+        <p className="rounded-xl bg-red-50 p-3 text-xs font-medium text-red-700">{L('⚠️ Send Money-র জন্য এগুলো চালু করবেন না। bKash/Nagad মার্চেন্ট অ্যাকাউন্টের key Vercel-এ বসানোর পরেই শুধু চালু করবেন — নইলে শিক্ষার্থীরা পেমেন্টে ত্রুটি দেখবে।', '⚠️ Do not switch these on for Send Money. Only enable after bKash/Nagad merchant keys are added in Vercel — otherwise students see an error.')}</p>
         {(['bkash', 'nagad', 'sslcommerz'] as const).map((g) => (
           <label key={g} className="flex items-center gap-3 text-sm font-medium">
             <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={s.payment_gateways[g]}

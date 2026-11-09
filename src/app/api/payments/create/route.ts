@@ -31,6 +31,12 @@ export async function POST(req: NextRequest) {
 
   const { data: gw } = await svc.from('app_settings').select('value').eq('key', 'payment_gateways').maybeSingle();
   if (!(gw?.value as Record<string, boolean> | undefined)?.[gateway]) return NextResponse.json({ error: 'This payment method is disabled' }, { status: 400 });
+  // Gateway switched on in admin but merchant keys never added in Vercel → fail clearly instead of crashing
+  const e = process.env;
+  const hasKeys = gateway === 'bkash' ? !!(e.BKASH_APP_KEY && e.BKASH_APP_SECRET && e.BKASH_USERNAME && e.BKASH_PASSWORD)
+    : gateway === 'nagad' ? !!(e.NAGAD_MERCHANT_ID && e.NAGAD_MERCHANT_PRIVATE_KEY && e.NAGAD_PG_PUBLIC_KEY)
+    : !!(e.SSLCZ_STORE_ID && e.SSLCZ_STORE_PASSWORD);
+  if (!hasKeys) return NextResponse.json({ error: 'অনলাইন পেমেন্ট এখনো সেটআপ হয়নি। bKash/Nagad Send Money ব্যবহার করুন। (Online gateway not configured)' }, { status: 503 });
 
   // already entitled?
   const { data: subs } = await svc.from('subscriptions').select('plan, mock_test_id').eq('user_id', user.id).eq('status', 'active');

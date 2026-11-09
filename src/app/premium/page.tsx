@@ -67,8 +67,10 @@ function PremiumView() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan, testId: plan === 'single_test' ? testId : null, coupon: quote?.coupon_valid ? coupon.trim() : null, gateway }),
       });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error || t('error'));
+      const j = await res.json().catch(() => ({} as Record<string, string>));
+      if (!res.ok || !j) throw new Error(j?.error || (lang === 'bn'
+        ? 'অনলাইন পেমেন্ট এখন চালু নেই। উপরের bKash/Nagad Send Money ব্যবহার করুন।'
+        : 'Online payment is not available right now. Please use bKash/Nagad Send Money above.'));
       if (j.free) { router.push(`/payment/result?status=success&id=${j.paymentId}`); return; }
       window.location.href = j.url;
     } catch (e) {
