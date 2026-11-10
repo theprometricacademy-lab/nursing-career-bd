@@ -8,7 +8,7 @@ model = ParlerTTSForConditionalGeneration.from_pretrained(name)
 tok = AutoTokenizer.from_pretrained(name)
 dtok = AutoTokenizer.from_pretrained(model.config.text_encoder._name_or_path)
 voices = {
-  "female": "Aditi speaks in a clear, confident and energetic tone at a slightly fast pace, with very clear audio, close-sounding recording and no background noise.",
+  "female": "Aditi speaks in a soft, warm, emotional and heartfelt tone at a moderate pace, with very clear audio, close-sounding recording and no background noise.",
 }
 lines = json.load(open("tts/lines.json", encoding="utf-8"))
 os.makedirs("out", exist_ok=True)
