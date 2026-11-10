@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bookmark, BookmarkCheck, CheckCircle2, XCircle, Lock, Languages } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
@@ -26,6 +26,16 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [marked, setMarked] = useState(q.bookmarked);
+  // Show the options in a fresh random order every time the card mounts, so the right answer is not always in the
+  // same slot. `order[pos]` is the original option index shown at display position `pos`; answers are still checked
+  // by original index. Shuffled after mount (not during render) so server and browser markup match.
+  const optCount = Math.max(q.options_bn?.length ?? 0, q.options_en?.length ?? 0);
+  const [order, setOrder] = useState<number[]>(() => Array.from({ length: optCount }, (_, i) => i));
+  useEffect(() => {
+    const a = Array.from({ length: optCount }, (_, i) => i);
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    setOrder(a);
+  }, [q.id, optCount]);
 
   const text = view === 'bn' ? q.question_bn : q.question_en;
   const options = view === 'bn' ? q.options_bn : q.options_en;
@@ -84,7 +94,9 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
         <>
           <h3 className="mb-3 font-medium leading-relaxed text-ink">{text}</h3>
           <div className="grid gap-2 sm:grid-cols-2">
-            {options?.map((opt, i) => {
+            {options && order.map((i, pos) => {
+              const opt = options[i];
+              if (opt == null) return null;
               let cls = 'border-brand-100 hover:border-brand-300 hover:bg-brand-50';
               if (result) {
                 if (i === result.correct_option) cls = 'border-mint-400 bg-mint-50 text-mint-700';
@@ -94,7 +106,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
               return (
                 <button key={i} disabled={!!result} onClick={() => setSelected(i)}
                   className={`flex items-start gap-2 rounded-xl border p-3 text-left text-sm transition ${cls}`}>
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white text-xs font-bold ring-1 ring-current/20">{letters[i]}</span>
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white text-xs font-bold ring-1 ring-current/20">{letters[pos]}</span>
                   <span className="pt-0.5">{opt}</span>
                 </button>
               );
@@ -110,7 +122,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
             <div className={`mt-3 rounded-xl p-3 text-sm ${result.correct ? 'bg-mint-50' : 'bg-red-50'}`}>
               <div className={`flex items-center gap-2 font-semibold ${result.correct ? 'text-mint-700' : 'text-red-700'}`}>
                 {result.correct ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
-                {result.correct ? t('correct') : `${t('wrong')} — ${t('correctAnswer')}: ${letters[result.correct_option]}`}
+                {result.correct ? t('correct') : `${t('wrong')} — ${t('correctAnswer')}: ${letters[Math.max(0, order.indexOf(result.correct_option))]}`}
               </div>
               {(expl === 'bn' ? result.explanation_bn : result.explanation_en) && (
                 <p className="mt-2 leading-relaxed text-ink"><b>{t('explanation')}:</b> {expl === 'bn' ? result.explanation_bn : result.explanation_en}</p>

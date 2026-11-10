@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
-import { Hind_Siliguri } from 'next/font/google';
+import { Noto_Sans_Bengali } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/components/AppProvider';
 import { AppShell } from '@/components/AppShell';
 
-const hind = Hind_Siliguri({ subsets: ['bengali', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-hind' });
+// Noto Sans Bengali: clear, standard-shaped Bangla digits (Hind Siliguri's ১, ৭ were hard to read on phones)
+const bnFont = Noto_Sans_Bengali({ subsets: ['bengali', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-bn', display: 'swap' });
 
 export const metadata: Metadata = {
   title: { default: 'Nursing Career BD', template: '%s · Nursing Career BD' },
@@ -18,7 +19,7 @@ export const viewport: Viewport = { themeColor: '#1f7ad6', width: 'device-width'
 // Pages are static and prefetched, so moving between them is instant; the saved language is applied in the browser.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="bn" className={hind.variable}>
+    <html lang="bn" className={bnFont.variable}>
       <body className="font-sans antialiased">
         <AppProvider initialLang="bn">
           <AppShell><Suspense fallback={null}>{children}</Suspense></AppShell>

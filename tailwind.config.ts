@@ -20,7 +20,7 @@ const config: Config = {
         },
         ink: { DEFAULT: '#0f2a4a', soft: '#4a6380' },
       },
-      fontFamily: { sans: ['var(--font-hind)', 'system-ui', 'sans-serif'] },
+      fontFamily: { sans: ['var(--font-bn)', 'system-ui', 'sans-serif'] },
       boxShadow: { card: '0 1px 2px rgba(15,42,74,.06), 0 4px 16px rgba(15,42,74,.06)' },
       keyframes: {
         rise: { '0%': { opacity: '0', transform: 'translateY(6px)' }, '100%': { opacity: '1', transform: 'none' } },
