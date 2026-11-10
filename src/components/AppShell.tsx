@@ -1,10 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
-  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing,
+  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft,
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
@@ -51,10 +51,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
+  const visited = useRef(0);
+  useEffect(() => { visited.current += 1; }, [path]);
+
   // Exam runner and admin have their own chrome
   if (path.startsWith('/exam/') || path.startsWith('/admin')) return <>{children}</>;
 
   const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+  // Go to the previous page; if the visitor landed here directly (e.g. from Google), go home instead
+  const goBack = () => { if (visited.current > 1) router.back(); else router.push('/'); };
   const logout = async () => { await supabaseBrowser().auth.signOut(); setOpen(false); router.push('/'); router.refresh(); };
 
   const navList = (
@@ -113,6 +118,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         </aside>
         <main className="min-w-0 flex-1">
+          {path !== '/' && (
+            <button onClick={goBack} className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
+              <ArrowLeft className="h-4 w-4" />{t('back')}
+            </button>
+          )}
           <CircularStrip />
           {children}
           <footer className="mt-10 border-t border-brand-100 pt-4">

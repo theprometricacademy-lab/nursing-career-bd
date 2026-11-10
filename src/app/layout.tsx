@@ -4,6 +4,7 @@ import { Noto_Sans_Bengali } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/components/AppProvider';
 import { AppShell } from '@/components/AppShell';
+import { Tracker } from '@/components/Tracker';
 
 // Noto Sans Bengali: clear, standard-shaped Bangla digits (Hind Siliguri's ১, ৭ were hard to read on phones)
 const bnFont = Noto_Sans_Bengali({ subsets: ['bengali', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-bn', display: 'swap' });
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />
         <AppProvider initialLang="bn">
+          <Suspense fallback={null}><Tracker /></Suspense>
           <AppShell><Suspense fallback={null}>{children}</Suspense></AppShell>
         </AppProvider>
       </body>

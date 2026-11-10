@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard, FileQuestion, Upload, FolderTree, Timer, Users, CreditCard, Ticket, Megaphone, Settings, ArrowLeft, Menu, X,
-  BellRing,
+  BellRing, Activity,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { LangToggle } from '@/components/AppShell';
@@ -30,6 +30,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     { href: '/admin/coupons', icon: Ticket, label: L('কুপন', 'Coupons') },
     { href: '/admin/notices', icon: Megaphone, label: L('নোটিশ', 'Notices') },
     { href: '/admin/circulars', icon: BellRing, label: L('চাকরির সার্কুলার', 'Job circulars') },
+    { href: '/admin/visitors', icon: Activity, label: L('লাইভ ভিজিটর', 'Live visitors') },
     { href: '/admin/settings', icon: Settings, label: L('সেটিংস ও মূল্য', 'Settings & prices') },
   ];
   const isActive = (h: string) => (h === '/admin' ? path === h : path.startsWith(h));
@@ -56,7 +57,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </header>
       <div className="flex">
         <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 overflow-y-auto bg-ink p-3 lg:block">{nav}</aside>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">
+          <div className="mb-3 flex flex-wrap gap-2">
+            {path !== '/admin' && (
+              <Link href="/admin" className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-brand-700 hover:bg-brand-50">
+                <ArrowLeft className="h-4 w-4" />{L('অ্যাডমিন হোম', 'Admin home')}
+              </Link>
+            )}
+            <Link href="/" className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-brand-700 hover:bg-brand-50">
+              <ArrowLeft className="h-4 w-4" />{L('সাইটে ফিরুন', 'Back to site')}
+            </Link>
+          </div>
+          {children}
+        </main>
       </div>
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">

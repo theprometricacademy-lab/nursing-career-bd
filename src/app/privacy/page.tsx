@@ -5,6 +5,7 @@ const S: LegalSection[] = [
   { h: ['১. আমরা যে তথ্য সংগ্রহ করি', '1. Information we collect'], p: [
     ['অ্যাকাউন্ট তথ্য: নাম, ইমেইল, মোবাইল নম্বর এবং Google দিয়ে লগইন করলে Google অ্যাকাউন্টের নাম ও ইমেইল।', 'Account details: name, email, mobile number, and your Google name and email if you sign in with Google.'],
     ['ব্যবহারের তথ্য: কোন প্রশ্নের উত্তর দিয়েছেন, পরীক্ষার ফলাফল, বুকমার্ক ও ভুল উত্তরের তালিকা।', 'Usage data: questions answered, test results, bookmarks and wrong-answer lists.'],
+    ['সাইট ব্যবহারের পরিসংখ্যান: কোন পেজ দেখা হয়েছে, কতক্ষণ, কোন ধরনের ডিভাইস থেকে এবং কোন সাইট থেকে এসেছেন। এর জন্য ব্রাউজারে একটি এলোমেলো আইডি রাখা হয়; আপনার IP ঠিকানা আমরা সংরক্ষণ করি না। এই তথ্য শুধু সাইট উন্নত করতে ব্যবহার হয়।', 'Site usage statistics: which pages were viewed, for how long, from what type of device and which site you came from. A random ID is kept in your browser for this; we do not store your IP address. This is used only to improve the site.'],
     ['পেমেন্ট তথ্য: পরিমাণ, পেমেন্টের মাধ্যম, ট্রানজেকশন আইডি ও যে নম্বর থেকে টাকা পাঠিয়েছেন। আপনার bKash/Nagad PIN, OTP বা কার্ডের তথ্য আমরা কখনো দেখি না বা সংরক্ষণ করি না।', 'Payment data: amount, method, transaction ID and the sending number. We never see or store your bKash/Nagad PIN, OTP or card details.'],
   ] },
   { h: ['২. তথ্য যে কাজে ব্যবহার হয়', '2. How we use it'], p: [[
