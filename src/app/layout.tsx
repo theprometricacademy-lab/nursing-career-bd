@@ -11,12 +11,12 @@ const bnFont = Noto_Sans_Bengali({ subsets: ['bengali', 'latin'], weight: ['400'
 
 const DESC = 'সিনিয়র স্টাফ নার্স ও সরকারি নার্সিং চাকরির প্রস্তুতি: ১০,০০০+ প্রশ্নব্যাংক, PSC প্যাটার্নে মডেল টেস্ট, বিষয়ভিত্তিক অনুশীলন ও ফলাফল বিশ্লেষণ।';
 export const metadata: Metadata = {
-  metadataBase: new URL('https://nursingjob.online'),
+  metadataBase: new URL('https://nursingcareerbd.com'),
   title: { default: 'Nursing Career BD — নার্সিং চাকরির প্রস্তুতি', template: '%s · Nursing Career BD' },
   description: DESC,
   keywords: ['সিনিয়র স্টাফ নার্স', 'নার্সিং চাকরি', 'Senior Staff Nurse', 'PSC nursing exam', 'nursing MCQ', 'মডেল টেস্ট', 'Bangladesh nursing job'],
   openGraph: {
-    type: 'website', url: 'https://nursingjob.online', siteName: 'Nursing Career BD', locale: 'bn_BD',
+    type: 'website', url: 'https://nursingcareerbd.com', siteName: 'Nursing Career BD', locale: 'bn_BD',
     title: 'Nursing Career BD — নার্সিং চাকরির স্মার্ট প্রস্তুতি', description: DESC,
     images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'Nursing Career BD — নার্সিং চাকরির স্মার্ট প্রস্তুতি' }],
   },
@@ -31,12 +31,12 @@ const SITE_LD = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'EducationalOrganization', '@id': 'https://nursingjob.online/#org', name: 'Nursing Career BD',
-      url: 'https://nursingjob.online', logo: 'https://nursingjob.online/icon.svg', image: 'https://nursingjob.online/og.jpg',
+      '@type': 'EducationalOrganization', '@id': 'https://nursingcareerbd.com/#org', name: 'Nursing Career BD',
+      url: 'https://nursingcareerbd.com', logo: 'https://nursingcareerbd.com/icon.svg', image: 'https://nursingcareerbd.com/og.jpg',
       description: DESC, areaServed: 'BD',
       contactPoint: { '@type': 'ContactPoint', telephone: '+8801710921994', contactType: 'customer support', availableLanguage: ['Bengali', 'English'] },
     },
-    { '@type': 'WebSite', '@id': 'https://nursingjob.online/#website', url: 'https://nursingjob.online', name: 'Nursing Career BD', inLanguage: 'bn-BD', publisher: { '@id': 'https://nursingjob.online/#org' } },
+    { '@type': 'WebSite', '@id': 'https://nursingcareerbd.com/#website', url: 'https://nursingcareerbd.com', name: 'Nursing Career BD', inLanguage: 'bn-BD', publisher: { '@id': 'https://nursingcareerbd.com/#org' } },
   ],
 };
 

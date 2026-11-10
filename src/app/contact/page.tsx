@@ -11,7 +11,7 @@ export default function ContactPage() {
   const rows = [
     { icon: Phone, label: bn ? 'ফোন' : 'Phone', value: SUPPORT_PHONE, href: `tel:${SUPPORT_PHONE_INTL}` },
     { icon: MessageCircle, label: 'WhatsApp', value: SUPPORT_PHONE, href: `https://wa.me/${SUPPORT_PHONE_INTL.replace('+', '')}` },
-    { icon: Globe, label: bn ? 'ওয়েবসাইট' : 'Website', value: 'nursingjob.online', href: 'https://nursingjob.online' },
+    { icon: Globe, label: bn ? 'ওয়েবসাইট' : 'Website', value: 'nursingcareerbd.com', href: 'https://nursingcareerbd.com' },
   ];
   return (
     <div className="mx-auto max-w-3xl">

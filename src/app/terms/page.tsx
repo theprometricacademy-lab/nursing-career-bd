@@ -3,8 +3,8 @@ import { LegalPage, type LegalSection } from '@/components/LegalPage';
 
 const S: LegalSection[] = [
   { h: ['১. সেবার পরিচিতি', '1. About the service'], p: [[
-    'Nursing Career BD (nursingjob.online) নার্সিং চাকরি ও পরীক্ষার প্রস্তুতির জন্য একটি অনলাইন প্ল্যাটফর্ম। এখানে প্রশ্নব্যাংক, বিষয়ভিত্তিক অনুশীলন, মডেল টেস্ট ও ফলাফল বিশ্লেষণ পাওয়া যায়। ওয়েবসাইট ব্যবহার করলে আপনি এই শর্তাবলিতে সম্মত হচ্ছেন বলে ধরা হবে।',
-    'Nursing Career BD (nursingjob.online) is an online platform for nursing job and exam preparation, offering a question bank, subject-wise practice, mock tests and result analysis. By using the website you agree to these terms.',
+    'Nursing Career BD (nursingcareerbd.com) নার্সিং চাকরি ও পরীক্ষার প্রস্তুতির জন্য একটি অনলাইন প্ল্যাটফর্ম। এখানে প্রশ্নব্যাংক, বিষয়ভিত্তিক অনুশীলন, মডেল টেস্ট ও ফলাফল বিশ্লেষণ পাওয়া যায়। ওয়েবসাইট ব্যবহার করলে আপনি এই শর্তাবলিতে সম্মত হচ্ছেন বলে ধরা হবে।',
+    'Nursing Career BD (nursingcareerbd.com) is an online platform for nursing job and exam preparation, offering a question bank, subject-wise practice, mock tests and result analysis. By using the website you agree to these terms.',
   ]] },
   { h: ['২. অ্যাকাউন্ট', '2. Accounts'], p: [
     ['অ্যাকাউন্ট খুলতে সঠিক নাম, ইমেইল ও মোবাইল নম্বর দিতে হবে। আপনার পাসওয়ার্ড গোপন রাখার দায়িত্ব আপনার।', 'You must provide an accurate name, email and mobile number. You are responsible for keeping your password secret.'],

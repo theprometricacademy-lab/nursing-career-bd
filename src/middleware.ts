@@ -3,7 +3,20 @@ import { createServerClient } from '@supabase/ssr';
 
 // Runs ONLY on pages that need a logged-in user (see matcher below), so public pages
 // load without waiting for an auth round-trip.
+const PROTECTED = ['/dashboard', '/exam', '/result', '/results', '/bookmarks', '/wrong-answers', '/profile', '/daily-quiz', '/admin', '/payment'];
+const OLD_HOSTS = ['nursingjob.online', 'www.nursingjob.online', 'www.nursingcareerbd.com'];
+const CANONICAL_HOST = 'nursingcareerbd.com';
+
 export async function middleware(req: NextRequest) {
+  // Old domain (and www) → permanent redirect to the same page on nursingcareerbd.com
+  const host = (req.headers.get('host') || '').toLowerCase().split(':')[0];
+  if (OLD_HOSTS.includes(host)) {
+    const url = new URL(req.nextUrl.pathname + req.nextUrl.search, `https://${CANONICAL_HOST}`);
+    return NextResponse.redirect(url, 301);
+  }
+  const path = req.nextUrl.pathname;
+  if (!PROTECTED.some((p) => path === p || path.startsWith(p + '/'))) return NextResponse.next();
+
   let res = NextResponse.next({ request: req });
   const sb = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,8 +47,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*', '/exam/:path*', '/result/:path*', '/results/:path*', '/bookmarks/:path*',
-    '/wrong-answers/:path*', '/profile/:path*', '/daily-quiz/:path*', '/admin/:path*', '/payment/:path*',
-  ],
+  // Everything except Next.js internals: the old-domain redirect must cover all pages.
+  // Auth checks still only run on the protected paths listed above.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

@@ -7,10 +7,17 @@
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "nursing-career-bd" }],
   "observability": { "enabled": true },
+  // Custom domains (Cloudflare creates the DNS records and SSL). The old domain stays attached
+  // and is 301-redirected to nursingcareerbd.com in src/middleware.ts.
+  "routes": [
+    { "pattern": "nursingcareerbd.com", "custom_domain": true },
+    { "pattern": "www.nursingcareerbd.com", "custom_domain": true },
+    { "pattern": "nursingjob.online", "custom_domain": true }
+  ],
   // Public, non-secret settings. Secrets (SUPABASE_SERVICE_ROLE_KEY, payment keys) are added
   // in the Cloudflare dashboard → Worker → Settings → Variables and Secrets, never in this file.
   "vars": {
-    "APP_URL": "https://nursingjob.online",
+    "APP_URL": "https://nursingcareerbd.com",
     "PAYMENT_MODE": "sandbox",
     "NEXT_PUBLIC_SUPABASE_URL": "https://pnbuydaeooxjojkzjdby.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBuYnV5ZGFlb294am9qa3pqZGJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNTUzMjIsImV4cCI6MjEwOTczMTMyMn0.__xZ-vA9MEHQcNES-6_jVuXedB9k_iDyMaV1VNg8FPU"
