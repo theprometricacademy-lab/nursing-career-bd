@@ -1,5 +1,6 @@
 name: reel-tts
 on:
+  workflow_dispatch:
   push:
     branches: [reel-assets]
     paths: ['tts/**', '.github/workflows/tts.yml']
@@ -20,6 +21,8 @@ jobs:
           pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
           python -c "import torch, torchaudio; print(torch.__version__, torchaudio.__version__)"
       - run: python tts/gen.py
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
       - name: Fetch Bangla font (OFL)
         run: |
           curl -sSL -o out/NotoSansBengali.ttf "https://github.com/google/fonts/raw/main/ofl/notosansbengali/NotoSansBengali%5Bwdth%2Cwght%5D.ttf"
