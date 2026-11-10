@@ -29,8 +29,9 @@ const config: Config = {
       boxShadow: { card: '0 1px 2px rgba(15,42,74,.06), 0 4px 16px rgba(15,42,74,.06)' },
       keyframes: {
         rise: { '0%': { opacity: '0', transform: 'translateY(6px)' }, '100%': { opacity: '1', transform: 'none' } },
+        marquee: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
       },
-      animation: { rise: 'rise .35s ease-out both' },
+      animation: { rise: 'rise .35s ease-out both', marquee: 'marquee 30s linear infinite' },
     },
   },
   plugins: [],

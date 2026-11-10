@@ -58,24 +58,28 @@ export function CircularRail() {
   );
 }
 
-/** Phones/tablets: a slim strip above the page content. */
+/** News-ticker strip above the page content: open circulars scroll right-to-left continuously. */
 export function CircularStrip() {
   const items = useCirculars();
   // Keep the strip's space while loading so the page does not jump when it appears
-  if (!items) return <div className="mb-4 h-[34px] xl:hidden" aria-hidden />;
-  if (items.length === 0) return null;
+  if (!items) return <div className="mb-4 h-[38px]" aria-hidden />;
   const open = items.filter((c) => status(c).key !== 'closed');
   if (open.length === 0) return null;
+  const row = (dup: boolean) => open.map((c) => (
+    <Link key={(dup ? 'd' : '') + c.id} href={`/circulars/${c.slug}`} aria-hidden={dup || undefined} tabIndex={dup ? -1 : undefined}
+      className="mx-1.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-blush-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-blush-50">
+      <span className="h-1.5 w-1.5 rounded-full bg-blush-500" />{c.title_bn}
+      <span className="text-blush-700">· {status(c).label} · শেষ {bnDate(c.apply_end)}</span>
+    </Link>
+  ));
   return (
-    <div className="mb-4 xl:hidden">
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
-        <Link href="/circulars" className="chip shrink-0 bg-blush-600 py-1.5 text-white"><BellRing className="h-3.5 w-3.5" />সার্কুলার</Link>
-        {open.map((c) => (
-          <Link key={c.id} href={`/circulars/${c.slug}`} className="shrink-0 rounded-full border border-blush-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-blush-50">
-            {c.title_bn.length > 42 ? c.title_bn.slice(0, 42) + '…' : c.title_bn}
-            <span className="ml-1.5 text-blush-700">· {status(c).label}</span>
-          </Link>
-        ))}
+    <div className="mb-4 flex items-center gap-2 overflow-hidden rounded-full bg-blush-50/70 py-1 pl-1 pr-0 ring-1 ring-blush-100">
+      <Link href="/circulars" className="chip z-10 shrink-0 bg-blush-600 py-1.5 text-white"><BellRing className="h-3.5 w-3.5" />সার্কুলার</Link>
+      <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_16px,#000_calc(100%-16px),transparent)]">
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] active:[animation-play-state:paused] motion-reduce:animate-none"
+          style={{ animationDuration: `${Math.max(18, open.length * 14)}s` }}>
+          {row(false)}{row(true)}
+        </div>
       </div>
     </div>
   );
