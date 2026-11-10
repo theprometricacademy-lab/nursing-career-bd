@@ -5,6 +5,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Progress, Spinner, Stat } from '@/components/ui';
 import { useL } from './AdminShell';
+import { UsageCard } from './UsageCard';
 
 type S = {
   users: number; new_users_30d: number; premium_users: number; questions: number; premium_questions: number;
@@ -32,6 +33,7 @@ export default function AdminHome() {
         <Stat label={`${L('মোট আয়', 'Revenue')} (৳${num(s.revenue_30d)} ${L('৩০ দিনে', '30d')})`} value={`৳${num(s.revenue)}`} tone="mint" icon={<Wallet className="h-5 w-5" />} />
         <Stat label={L('গড় নম্বর', 'Average score')} value={s.avg_percent === null ? '—' : `${num(s.avg_percent)}%`} icon={<Percent className="h-5 w-5" />} />
       </div>
+      <UsageCard />
       <div className="grid gap-4 xl:grid-cols-2">
         <section className="card p-5">
           <h2 className="mb-3 font-semibold text-ink">{L('বিষয়ভিত্তিক শিক্ষার্থী পারফরম্যান্স', 'Student performance by subject')}</h2>
