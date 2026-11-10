@@ -61,7 +61,9 @@ export function CircularRail() {
 /** Phones/tablets: a slim strip above the page content. */
 export function CircularStrip() {
   const items = useCirculars();
-  if (!items || items.length === 0) return null;
+  // Keep the strip's space while loading so the page does not jump when it appears
+  if (!items) return <div className="mb-4 h-[34px] xl:hidden" aria-hidden />;
+  if (items.length === 0) return null;
   const open = items.filter((c) => status(c).key !== 'closed');
   if (open.length === 0) return null;
   return (

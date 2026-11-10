@@ -28,7 +28,7 @@ function PremiumView() {
   const [manual, setManual] = useState<ManualCfg | null>(null);
   const [test, setTest] = useState<{ id: number; title_en: string; title_bn: string; price: number | null } | null>(null);
   const [plan, setPlan] = useState<'lifetime' | 'single_test'>(testId ? 'single_test' : 'lifetime');
-  const [coupon, setCoupon] = useState('');
+  const [coupon, setCoupon] = useState(() => (params.get('coupon') ?? '').toUpperCase());
   const [quote, setQuote] = useState<Quote | null>(null);
   const [couponMsg, setCouponMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -58,6 +58,13 @@ function PremiumView() {
     setQuote(data as Quote);
     setCouponMsg((data as Quote).coupon_valid ? { ok: true, text: t('couponOk') } : { ok: false, text: t('couponBad') });
   }
+
+  // Coming from the home notice board (?coupon=CODE): apply it automatically once prices are known
+  const [autoApplied, setAutoApplied] = useState(false);
+  useEffect(() => {
+    if (!autoApplied && prices && coupon.trim() && params.get('coupon')) { setAutoApplied(true); applyCoupon(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prices]);
 
   async function pay(gateway: string) {
     if (!user) { router.push(`/login?next=${encodeURIComponent('/premium' + (testId ? `?test=${testId}` : ''))}`); return; }

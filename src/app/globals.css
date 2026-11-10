@@ -8,6 +8,8 @@ html, body { background: #f7fbff; color: #0f2a4a; }
 /* Note: never put overflow-x:hidden on html AND body — on phones that turns body into its own
    scroll box and one-finger scrolling stops working. "clip" hides sideways overflow without that. */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: clip; }
+/* Stop the browser's pull-to-refresh from reloading the page when scrolling back up quickly on phones */
+html, body { overscroll-behavior-y: none; }
 body { -webkit-tap-highlight-color: transparent; overflow-wrap: break-word; }
 img, svg, video, table { max-width: 100%; }
 /* iOS zooms the page when a field under 16px gets focus — keep form fields at 16px on phones */

@@ -16,6 +16,7 @@ export default function CouponsAdmin() {
         { key: 'used_count', label: L('ব্যবহৃত', 'Used'), type: 'number' },
         { key: 'expires_at', label: L('মেয়াদ শেষ', 'Expires'), type: 'datetime' },
         { key: 'is_active', label: L('চালু', 'Active'), type: 'bool' },
+        { key: 'featured', label: L('হোম পেজের নোটিশ বোর্ডে দেখাও', 'Show on home notice board'), type: 'bool' },
       ]} />
     </div>
   );

@@ -2,16 +2,16 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, Megaphone, GraduationCap,
+  BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, GraduationCap,
   CheckCircle2, Crown, UserPlus, Target, TrendingUp, ChevronDown, Smartphone, Languages,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { GuideLinks } from '@/components/SeoBlocks';
+import { NoticeBoard } from '@/components/NoticeBoard';
 import { SEO_SUBJECTS } from '@/lib/seoSubjects';
 
-type Notice = { id: number; title_en: string; title_bn: string; body_en: string | null; body_bn: string | null; published_at: string };
 type Bi = [bn: string, en: string];
 
 const FAQ: { q: Bi; a: Bi }[] = [
@@ -45,7 +45,6 @@ const PATTERN: { label: Bi; n: number; bar: string }[] = [
 export default function HomePage() {
   const { t, pick, user, num, lang, premium } = useApp();
   const subjects = useSubjects();
-  const [notices, setNotices] = useState<Notice[]>([]);
   const [price, setPrice] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(0);
   const i = lang === 'bn' ? 0 : 1;
@@ -53,8 +52,6 @@ export default function HomePage() {
 
   useEffect(() => {
     const sb = supabaseBrowser();
-    sb.from('notices').select('*').eq('is_published', true).order('published_at', { ascending: false }).limit(3)
-      .then(({ data }) => setNotices((data as Notice[]) ?? []));
     sb.from('app_settings').select('value').eq('key', 'price_lifetime').maybeSingle()
       .then(({ data }) => setPrice(data ? Number(data.value) : null));
   }, []);
@@ -110,6 +107,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <NoticeBoard />
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -230,19 +229,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {notices.length > 0 && (
-        <section className="card p-5">
-          <h2 className="mb-3 flex items-center gap-2 font-semibold text-ink"><Megaphone className="h-5 w-5 text-blush-600" />{t('notices')}</h2>
-          <ul className="space-y-3">
-            {notices.map((n) => (
-              <li key={n.id} className="rounded-xl bg-blush-50/60 p-3">
-                <div className="font-medium text-ink">{pick(n, 'title')}</div>
-                {pick(n, 'body') && <p className="mt-1 text-sm text-ink-soft">{pick(n, 'body')}</p>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <section>
         <h2 className="mb-3 text-lg font-bold text-ink">{L('প্রস্তুতি গাইড ও MCQ', 'Preparation guides & MCQs')}</h2>
