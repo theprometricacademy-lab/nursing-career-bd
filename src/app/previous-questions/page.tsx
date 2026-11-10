@@ -38,8 +38,22 @@ export default function PreviousQuestionsPage() {
           <h2 className="mb-2 text-sm font-semibold text-ink">{lang === 'bn' ? 'পরীক্ষা মোডে দিন' : 'Take in exam mode'}</h2>
           {/* newest exam first, one under another */}
           <div className="flex flex-col gap-3">
-            {exams.map((e) => (
-              <div key={e.id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+            {exams.map((e, i) => {
+              const sample = e.name_bn.includes('নমুনা');
+              const prev = exams[i - 1];
+              const group = sample ? 'sample' : String(e.year);
+              const prevGroup = prev ? (prev.name_bn.includes('নমুনা') ? 'sample' : String(prev.year)) : '';
+              return (
+              <div key={e.id}>
+              {group !== prevGroup && (
+                <div className="mb-2 mt-3 flex items-center gap-2 first:mt-0">
+                  <span className="rounded-full bg-brand-600 px-3 py-1 text-sm font-bold text-white">
+                    {sample ? (lang === 'bn' ? 'মডেল সেট' : 'Model sets') : lang === 'bn' ? `${num(e.year)} সাল` : e.year}
+                  </span>
+                  <span className="h-px flex-1 bg-brand-100" />
+                </div>
+              )}
+              <div className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold leading-snug text-ink">{pick(e, 'name')}</div>
                   <div className="mt-1 flex items-center gap-1 text-xs text-ink-soft">
@@ -51,7 +65,9 @@ export default function PreviousQuestionsPage() {
                   <Timer className="h-4 w-4" />{busy === `e${e.id}` ? t('loading') : t('startNow')}
                 </button>
               </div>
-            ))}
+              </div>
+              );
+            })}
           </div>
           {!premium && (
             <p className="mt-2 flex items-center gap-2 text-xs text-blush-700">
