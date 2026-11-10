@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard, FileQuestion, Upload, FolderTree, Timer, Users, CreditCard, Ticket, Megaphone, Settings, ArrowLeft, Menu, X,
+  BellRing,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { LangToggle } from '@/components/AppShell';
@@ -28,6 +29,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     { href: '/admin/payments', icon: CreditCard, label: L('পেমেন্ট', 'Payments') },
     { href: '/admin/coupons', icon: Ticket, label: L('কুপন', 'Coupons') },
     { href: '/admin/notices', icon: Megaphone, label: L('নোটিশ', 'Notices') },
+    { href: '/admin/circulars', icon: BellRing, label: L('চাকরির সার্কুলার', 'Job circulars') },
     { href: '/admin/settings', icon: Settings, label: L('সেটিংস ও মূল্য', 'Settings & prices') },
   ];
   const isActive = (h: string) => (h === '/admin' ? path === h : path.startsWith(h));

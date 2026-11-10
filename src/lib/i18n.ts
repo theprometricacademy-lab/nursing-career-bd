@@ -6,7 +6,7 @@ const en = {
   // nav
   home: 'Home', questionBank: 'Question Bank', subjectPractice: 'Subject Practice', mockTest: 'Mock Test',
   previousYear: 'Previous Year Questions', dailyQuiz: 'Daily Quiz', bookmarks: 'Bookmarks',
-  wrongAnswers: 'Wrong Answer Practice', results: 'Results & Performance', premium: 'Premium',
+  wrongAnswers: 'Wrong Answer Practice', results: 'Results & Performance', circulars: 'Job circulars', premium: 'Premium',
   dashboard: 'Dashboard', profile: 'Profile & Settings', admin: 'Admin Panel', menu: 'Menu', more: 'More',
   // auth
   login: 'Log in', logout: 'Log out', signup: 'Create account', email: 'Email', password: 'Password',
@@ -73,7 +73,7 @@ const bn: Record<DictKey, string> = {
   tagline: 'বাংলাদেশে নার্সিং চাকরির স্মার্ট প্রস্তুতি',
   home: 'হোম', questionBank: 'প্রশ্ন ব্যাংক', subjectPractice: 'বিষয়ভিত্তিক অনুশীলন', mockTest: 'মক টেস্ট',
   previousYear: 'বিগত বছরের প্রশ্ন', dailyQuiz: 'ডেইলি কুইজ', bookmarks: 'বুকমার্ক',
-  wrongAnswers: 'ভুল উত্তর অনুশীলন', results: 'ফলাফল ও পারফরম্যান্স', premium: 'প্রিমিয়াম',
+  wrongAnswers: 'ভুল উত্তর অনুশীলন', results: 'ফলাফল ও পারফরম্যান্স', circulars: 'চাকরির সার্কুলার', premium: 'প্রিমিয়াম',
   dashboard: 'ড্যাশবোর্ড', profile: 'প্রোফাইল ও সেটিংস', admin: 'অ্যাডমিন প্যানেল', menu: 'মেনু', more: 'আরও',
   login: 'লগইন', logout: 'লগআউট', signup: 'অ্যাকাউন্ট খুলুন', email: 'ইমেইল', password: 'পাসওয়ার্ড',
   fullName: 'পূর্ণ নাম', phone: 'মোবাইল নম্বর', forgotPassword: 'পাসওয়ার্ড ভুলে গেছেন?', noAccount: 'অ্যাকাউন্ট নেই?',

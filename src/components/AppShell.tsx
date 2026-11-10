@@ -4,11 +4,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
-  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut,
+  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing,
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
 import { LegalLinks, SUPPORT_PHONE } from './LegalPage';
+import { CircularRail, CircularStrip } from './CircularRail';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import type { DictKey } from '@/lib/i18n';
 
@@ -22,6 +23,7 @@ const NAV: { href: string; key: DictKey; icon: React.ComponentType<{ className?:
   { href: '/bookmarks', key: 'bookmarks', icon: Bookmark },
   { href: '/wrong-answers', key: 'wrongAnswers', icon: RotateCcw },
   { href: '/results', key: 'results', icon: BarChart3 },
+  { href: '/circulars', key: 'circulars', icon: BellRing },
   { href: '/premium', key: 'premium', icon: Crown },
   { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard },
   { href: '/profile', key: 'profile', icon: UserCog },
@@ -77,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-[100dvh] overflow-x-clip">
       <header className="sticky top-0 z-30 border-b border-brand-100 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
+        <div className="mx-auto flex h-14 max-w-7xl items-center 2xl:max-w-[1500px] gap-3 px-4">
           <button className="rounded-lg p-1.5 text-ink lg:hidden" onClick={() => setOpen(true)} aria-label={t('menu')}>
             <Menu className="h-5 w-5" />
           </button>
@@ -101,7 +103,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 pb-24 pt-4 lg:pb-10">
+      <div className="mx-auto flex max-w-7xl gap-6 px-4 pb-24 pt-4 lg:pb-10 2xl:max-w-[1500px]">
         <aside className="sticky top-[4.5rem] hidden h-[calc(100vh-5.5rem)] w-60 shrink-0 overflow-y-auto lg:block">
           {navList}
           {user && (
@@ -111,9 +113,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         </aside>
         <main className="min-w-0 flex-1">
+          <CircularStrip />
           {children}
           <footer className="mt-10 border-t border-brand-100 pt-4">
             <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-brand-700">
+              <Link href="/circulars">নার্সিং চাকরির সার্কুলার</Link>
               <Link href="/senior-staff-nurse">সিনিয়র স্টাফ নার্স প্রস্তুতি</Link>
               <Link href="/nursing-job-preparation">নার্সিং চাকরির প্রস্তুতি</Link>
               <Link href="/nursing-mcq">নার্সিং MCQ প্রশ্ন ও উত্তর</Link>
@@ -122,6 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <p className="mt-1 text-xs text-ink-soft">© {new Date().getFullYear()} Nursing Career BD · {SUPPORT_PHONE}</p>
           </footer>
         </main>
+        <CircularRail />
       </div>
 
       {/* mobile drawer */}
