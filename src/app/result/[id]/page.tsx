@@ -103,7 +103,7 @@ function ResultView() {
                 const letters = LETTERS[ql];
                 const el = q.translatable ? ql : lang;
                 return (
-                  <article key={q.position} className="card p-4">
+                  <article key={q.position} className="wm card p-4">
                     <div className="mb-2 flex items-center gap-2 text-xs">
                       <span className="font-semibold text-brand-700">{num(pos)}.</span>
                       <span className="text-ink-soft">{q.code}</span>

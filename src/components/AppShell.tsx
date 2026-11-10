@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import {
+  Moon, Sun,
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
   Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy,
 } from 'lucide-react';
@@ -43,6 +44,26 @@ export function LangToggle({ compact = false }: { compact?: boolean }) {
         </button>
       ))}
     </div>
+  );
+}
+
+/** Light / dark switch. The choice is saved in the browser; the layout applies it before first paint. */
+export function ThemeToggle() {
+  const { lang } = useApp();
+  const [dark, setDark] = useState(false);
+  useEffect(() => { setDark(document.documentElement.classList.contains('dark')); }, []);
+  const flip = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch { /* private mode */ }
+  };
+  const label = dark ? (lang === 'bn' ? 'লাইট মোড' : 'Light mode') : (lang === 'bn' ? 'ডার্ক মোড' : 'Dark mode');
+  return (
+    <button onClick={flip} aria-label={label} title={label}
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-brand-200 bg-white text-brand-700 transition hover:bg-brand-50">
+      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
   );
 }
 
@@ -95,6 +116,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="text-base font-bold leading-tight text-ink">Nursing Career <span className="text-blush-600">BD</span></span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
             <LangToggle compact />
             {premium && <Link href="/premium" className="gold-chip"><Crown className="h-3.5 w-3.5" />{t('premium')}</Link>}
             {user ? (

@@ -32,3 +32,85 @@ img, svg, video, table { max-width: 100%; }
   .gold-chip { @apply inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 px-2.5 py-0.5 text-xs font-bold text-gold-900 shadow-sm; }
   .gold-card { @apply relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#14213d] via-[#1b2a4e] to-[#0b1324] text-white shadow-xl ring-1 ring-gold-400/40; }
 }
+
+/* ───────────── Question watermark ─────────────
+   Faint, repeated site name behind question cards so screenshots carry it.
+   Sits under the content, never catches taps, can't be selected, and is very light
+   so it doesn't get in the way of reading. */
+.wm { position: relative; isolation: isolate; }
+.wm::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; user-select: none;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120'%3E%3Ctext x='120' y='64' text-anchor='middle' transform='rotate(-20 120 60)' font-family='system-ui,sans-serif' font-size='15' font-weight='700' fill='%231f7ad6' fill-opacity='0.07'%3Enursingcareerbd.com%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 240px 120px;
+}
+.dark .wm::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120'%3E%3Ctext x='120' y='64' text-anchor='middle' transform='rotate(-20 120 60)' font-family='system-ui,sans-serif' font-size='15' font-weight='700' fill='%2393cffb' fill-opacity='0.07'%3Enursingcareerbd.com%3C/text%3E%3C/svg%3E");
+}
+@media print { .wm::before { display: none; } }
+
+/* ───────────── Dark mode ─────────────
+   Turned on by the moon button in the header (adds class "dark" to <html>).
+   Remaps the light surfaces and dark text used across the site; brand-coloured
+   buttons, gradients and the premium gold look stay as they are. */
+html.dark { color-scheme: dark; }
+html.dark, html.dark body { background: #0b1626; color: #e3ecf7; }
+
+.dark .bg-white, .dark .card, .dark .input, .dark .btn-ghost { background-color: #12223a; }
+.dark .bg-white\/90 { background-color: rgb(18 34 58 / .9); }
+.dark .bg-slate-100 { background-color: #1a2b44; }
+.dark .shadow-card { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); }
+
+.dark .text-ink, .dark .label, .dark .page-title, .dark .hover\:text-ink:hover { color: #e3ecf7; }
+.dark .text-ink-soft { color: #9fb4cc; }
+.dark .text-slate-800 { color: #e3ecf7; }
+.dark .text-slate-600 { color: #9fb4cc; }
+
+/* brand (blue) */
+.dark .bg-brand-50, .dark .hover\:bg-brand-50:hover { background-color: #15294a; }
+.dark .bg-brand-50\/40, .dark .bg-brand-50\/50, .dark .bg-brand-50\/60, .dark .bg-brand-50\/70,
+.dark .hover\:bg-brand-50\/60:hover { background-color: rgb(21 41 74 / .6); }
+.dark .bg-brand-100, .dark .hover\:bg-brand-100:hover { background-color: #1b3459; }
+.dark .text-brand-600, .dark .text-brand-700, .dark .hover\:text-brand-700:hover { color: #7cc0fa; }
+.dark .text-brand-800 { color: #a9d6ff; }
+.dark .border-brand-100, .dark .card, .dark .divide-brand-100 > * + * { border-color: #22395c; }
+.dark .border-brand-200, .dark .input, .dark .btn-ghost { border-color: #2b4770; }
+.dark .ring-brand-100, .dark .focus\:ring-brand-100:focus { --tw-ring-color: #22395c; }
+.dark .ring-brand-200 { --tw-ring-color: #2b4770; }
+
+/* mint (success) */
+.dark .bg-mint-50 { background-color: rgb(16 185 129 / .12); }
+.dark .bg-mint-100, .dark .hover\:bg-mint-100:hover { background-color: rgb(16 185 129 / .2); }
+.dark .text-mint-600, .dark .text-mint-700, .dark .text-mint-800 { color: #6ee7b7; }
+.dark .border-mint-200 { border-color: rgb(16 185 129 / .35); }
+
+/* blush (pink) */
+.dark .bg-blush-50, .dark .hover\:bg-blush-50:hover, .dark .bg-blush-50\/50, .dark .bg-blush-50\/70,
+.dark .hover\:bg-blush-50\/60:hover { background-color: rgb(236 72 153 / .12); }
+.dark .bg-blush-100, .dark .hover\:bg-blush-100:hover { background-color: rgb(236 72 153 / .2); }
+.dark .text-blush-600, .dark .text-blush-700 { color: #f9a8d4; }
+.dark .border-blush-200 { border-color: rgb(236 72 153 / .35); }
+
+/* red (wrong) / amber (warning) */
+.dark .bg-red-50, .dark .hover\:bg-red-50:hover { background-color: rgb(239 68 68 / .14); }
+.dark .bg-red-100 { background-color: rgb(239 68 68 / .22); }
+.dark .text-red-600, .dark .text-red-700 { color: #fca5a5; }
+.dark .border-red-300 { border-color: rgb(239 68 68 / .5); }
+.dark .bg-amber-50 { background-color: rgb(245 158 11 / .12); }
+.dark .bg-amber-100 { background-color: rgb(245 158 11 / .2); }
+.dark .text-amber-700, .dark .text-amber-900 { color: #fcd34d; }
+
+/* gold (premium) light tints */
+.dark .bg-gold-50 { background-color: rgb(197 139 37 / .14); }
+.dark .text-gold-700, .dark .text-gold-800 { color: #e7c166; }
+
+/* light gradient tints (e.g. daily-quiz banner, premium stat card) */
+.dark .from-brand-50 { --tw-gradient-from: #15294a var(--tw-gradient-from-position); --tw-gradient-to: rgb(21 41 74 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.dark .from-mint-50 { --tw-gradient-from: rgb(16 185 129 / .14) var(--tw-gradient-from-position); --tw-gradient-to: rgb(16 185 129 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.dark .from-blush-50 { --tw-gradient-from: rgb(236 72 153 / .14) var(--tw-gradient-from-position); --tw-gradient-to: rgb(236 72 153 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.dark .from-gold-50 { --tw-gradient-from: rgb(197 139 37 / .16) var(--tw-gradient-from-position); --tw-gradient-to: rgb(197 139 37 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.dark .to-white { --tw-gradient-to: #12223a var(--tw-gradient-to-position); }
+
+/* dark text that sits on bright buttons must stay dark */
+.dark .bg-mint-400.text-ink, .dark .bg-mint-300.text-ink, .dark .gold-chip { color: #0f2a4a; }
+.dark .gold-chip { color: #3d2810; }

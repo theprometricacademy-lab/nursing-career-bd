@@ -164,7 +164,7 @@ export default function ExamPage() {
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-4 px-4 py-4 lg:grid-cols-[1fr_280px]">
-        <section className="card p-4 md:p-6">
+        <section className="wm card p-4 md:p-6">
           <div className="mb-3 sm:hidden"><ViewModeToggle value={mode} onChange={setMode} /></div>
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-semibold text-brand-700">{lang === 'bn' ? 'প্রশ্ন' : 'Question'} {num(cur + 1)} / {num(qs.length)}</span>

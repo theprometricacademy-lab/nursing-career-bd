@@ -44,7 +44,11 @@ const SITE_LD = {
 // Pages are static and prefetched, so moving between them is instant; the saved language is applied in the browser.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="bn" className={bnFont.variable}>
+    <html lang="bn" className={bnFont.variable} suppressHydrationWarning>
+      <head>
+        {/* apply the saved light/dark choice before the first paint (no white flash) */}
+        <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}" }} />
+      </head>
       <body className="font-sans antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />
         <AppProvider initialLang="bn">

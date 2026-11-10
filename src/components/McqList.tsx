@@ -10,7 +10,7 @@ export function McqList({ items }: { items: SampleQ[] }) {
   return (
     <ol className="space-y-4">
       {items.map((q, n) => (
-        <li key={q.id} className="rounded-xl border border-brand-100 bg-white p-4">
+        <li key={q.id} className="wm rounded-xl border border-brand-100 bg-white p-4">
           <div className="flex items-start justify-between gap-2">
             <p className="font-semibold text-ink">{n + 1}. {q.question_bn}</p>
             <span className="flex shrink-0 items-center gap-1"><ReportQuestion questionId={q.id} />

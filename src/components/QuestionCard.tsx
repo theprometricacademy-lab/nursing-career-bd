@@ -65,7 +65,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
   }
 
   return (
-    <article className="card p-4 md:p-5">
+    <article className="wm card p-4 md:p-5">
       <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
         <span className="font-semibold text-brand-700">{num(index)}.</span>
         <span className="text-ink-soft">{q.code}</span>
