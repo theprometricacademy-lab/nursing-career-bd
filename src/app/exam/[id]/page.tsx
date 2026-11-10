@@ -144,7 +144,7 @@ export default function ExamPage() {
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
           <button aria-label={t('back')} className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-brand-200 text-brand-700 hover:bg-brand-50"
             onClick={() => {
-              if (confirm(lang === 'bn' ? 'পরীক্ষা থেকে বের হবেন? আপনার দেওয়া উত্তরগুলো সংরক্ষিত থাকবে, তবে সময় চলতে থাকবে।' : 'Leave the exam? Your answers are saved, but the timer keeps running.')) {
+              if (window.confirm(lang === 'bn' ? 'পরীক্ষা থেকে বের হবেন? আপনার দেওয়া উত্তরগুলো সংরক্ষিত থাকবে, তবে সময় চলতে থাকবে।' : 'Leave the exam? Your answers are saved, but the timer keeps running.')) {
                 if (window.history.length > 1) router.back(); else router.push('/mock-tests');
               }
             }}>
