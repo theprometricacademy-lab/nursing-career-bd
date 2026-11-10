@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Bookmark, BookmarkCheck, CheckCircle2, XCircle, Lock, Languages } from 'lucide-react';
+import { Bookmark, BookmarkCheck, CheckCircle2, XCircle, Lock, Languages, RotateCcw } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 import { PremiumChip } from './ui';
@@ -24,6 +24,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
   const [view, setView] = useState<'bn' | 'en'>(q.translatable ? lang : q.exam_lang);
   const [selected, setSelected] = useState<number | null>(null);
   const [result, setResult] = useState<{ correct: boolean; correct_option: number; explanation_en: string | null; explanation_bn: string | null } | null>(null);
+  const [known, setKnown] = useState<{ correct: boolean; correct_option: number; explanation_en: string | null; explanation_bn: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [marked, setMarked] = useState(q.bookmarked);
@@ -44,13 +45,24 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
   const expl = q.translatable ? view : lang; // untranslated subjects: explain in the reader's language
   const diffTone = { easy: 'bg-mint-50 text-mint-700', medium: 'bg-brand-50 text-brand-700', hard: 'bg-blush-50 text-blush-700' }[q.difficulty];
 
-  async function check() {
-    if (selected === null) return;
+  // One tap on an option checks it straight away (practice only; mock tests keep answers hidden until the end)
+  async function choose(i: number) {
+    if (result || busy) return;
+    setSelected(i);
+    // A retry is checked on the phone: only the first answer counts in the student's stats
+    // (otherwise a retry after seeing the answer would drop it from "wrong answer practice").
+    if (known) { setResult({ ...known, correct: i === known.correct_option }); return; }
     if (!user) { setErr(t('loginRequired')); return; }
     setBusy(true); setErr('');
-    const { data, error } = await supabaseBrowser().rpc('check_answer', { p_question: q.id, p_option: selected });
+    const { data, error } = await supabaseBrowser().rpc('check_answer', { p_question: q.id, p_option: i });
     setBusy(false);
-    if (error) setErr(errMsg(error)); else setResult(data);
+    if (error) setErr(errMsg(error)); else { setResult(data); setKnown(data); }
+  }
+
+  // Retry: hide the answer and reshuffle the options, so it isn't just remembering the position
+  function tryAgain() {
+    setResult(null); setSelected(null); setErr('');
+    setOrder((o) => { const a = [...o]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; });
   }
 
   async function toggleBookmark() {
@@ -106,7 +118,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
                 else cls = 'border-brand-100 opacity-70';
               } else if (i === selected) cls = 'border-brand-500 bg-brand-50 ring-2 ring-brand-100';
               return (
-                <button key={i} disabled={!!result} onClick={() => setSelected(i)}
+                <button key={i} disabled={!!result || busy} onClick={() => choose(i)}
                   className={`flex items-start gap-2 rounded-xl border p-3 text-left text-sm transition ${cls}`}>
                   <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white text-xs font-bold ring-1 ring-current/20">{letters[pos]}</span>
                   <span className="pt-0.5">{opt}</span>
@@ -116,9 +128,10 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
           </div>
 
           {!result ? (
-            <div className="mt-3 flex items-center gap-3">
-              <button className="btn-primary" onClick={check} disabled={selected === null || busy}>{busy ? t('loading') : t('checkAnswer')}</button>
-              {err && <span className="text-sm text-red-600">{err} {!user && <Link className="font-semibold underline" href="/login">{t('login')}</Link>}</span>}
+            <div className="mt-3 flex items-center gap-3 text-sm">
+              {busy ? <span className="text-ink-soft">{t('loading')}</span>
+                : err ? <span className="text-red-600">{err} {!user && <Link className="font-semibold underline" href="/login">{t('login')}</Link>}</span>
+                : <span className="text-xs text-ink-soft">{t('tapToAnswer')}</span>}
             </div>
           ) : (
             <div className={`mt-3 rounded-xl p-3 text-sm ${result.correct ? 'bg-mint-50' : 'bg-red-50'}`}>
@@ -129,6 +142,9 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
               {(expl === 'bn' ? result.explanation_bn : result.explanation_en) && (
                 <p className="mt-2 leading-relaxed text-ink"><b>{t('explanation')}:</b> {expl === 'bn' ? result.explanation_bn : result.explanation_en}</p>
               )}
+              <button onClick={tryAgain} className="btn-ghost mt-3 !px-3 !py-1.5 text-xs">
+                <RotateCcw className="h-3.5 w-3.5" />{t('tryAgain')}
+              </button>
             </div>
           )}
         </>

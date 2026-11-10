@@ -33,7 +33,7 @@ const en = {
   examsCovered: 'Exams we cover', notices: 'Notices',
   bscExam: 'BSc in Nursing', diplomaExam: 'Diploma in Nursing Science & Midwifery', ssnExam: 'Senior Staff Nurse', otherExam: 'Other nursing recruitment',
   // practice
-  checkAnswer: 'Check answer', correct: 'Correct!', wrong: 'Wrong', correctAnswer: 'Correct answer', explanation: 'Explanation',
+  checkAnswer: 'Check answer', tryAgain: 'Try again', tapToAnswer: 'Tap an option to see the answer', correct: 'Correct!', wrong: 'Wrong', correctAnswer: 'Correct answer', explanation: 'Explanation',
   bookmark: 'Bookmark', bookmarked: 'Bookmarked', showBangla: 'বাংলা', showEnglish: 'English',
   practiceTest: 'Practice test', numQuestions: 'Number of questions', duration: 'Duration (minutes)', practiceQuestions: 'Practise questions',
   // mock
@@ -96,7 +96,7 @@ const bn: Record<DictKey, string> = {
   featureTrack: 'অগ্রগতির হিসাব', featureTrackD: 'বিষয়ভিত্তিক নির্ভুলতা, সেরা ও গড় নম্বর।',
   examsCovered: 'যেসব পরীক্ষার প্রস্তুতি', notices: 'নোটিশ',
   bscExam: 'বিএসসি ইন নার্সিং', diplomaExam: 'ডিপ্লোমা ইন নার্সিং সায়েন্স অ্যান্ড মিডওয়াইফারি', ssnExam: 'সিনিয়র স্টাফ নার্স', otherExam: 'অন্যান্য নার্সিং নিয়োগ',
-  checkAnswer: 'উত্তর যাচাই', correct: 'সঠিক!', wrong: 'ভুল', correctAnswer: 'সঠিক উত্তর', explanation: 'ব্যাখ্যা',
+  checkAnswer: 'উত্তর যাচাই', tryAgain: 'আবার চেষ্টা করুন', tapToAnswer: 'যেকোনো অপশনে চাপ দিলেই উত্তর দেখাবে', correct: 'সঠিক!', wrong: 'ভুল', correctAnswer: 'সঠিক উত্তর', explanation: 'ব্যাখ্যা',
   bookmark: 'বুকমার্ক', bookmarked: 'বুকমার্ক করা', showBangla: 'বাংলা', showEnglish: 'English',
   practiceTest: 'অনুশীলন পরীক্ষা', numQuestions: 'প্রশ্নের সংখ্যা', duration: 'সময় (মিনিট)', practiceQuestions: 'প্রশ্ন অনুশীলন',
   mockTests: 'মক টেস্ট', marks: 'নম্বর', negativeMarking: 'নেগেটিভ মার্কিং', perWrong: 'প্রতি ভুল উত্তরে',
