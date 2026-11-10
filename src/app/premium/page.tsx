@@ -79,9 +79,11 @@ function PremiumView() {
   const [couponMsg, setCouponMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState('');
+  const [offer, setOffer] = useState<{ code: string; discount_type: string; value: number } | null>(null);
 
   useEffect(() => {
     const sb = supabaseBrowser();
+    sb.rpc('public_featured_coupon').then(({ data }) => setOffer(((data as { code: string; discount_type: string; value: number }[] | null) ?? [])[0] ?? null));
     sb.from('app_settings').select('key, value').in('key', ['price_lifetime', 'price_single_test', 'payment_gateways', 'manual_payment']).then(({ data }) => {
       const m = Object.fromEntries((data ?? []).map((r: { key: string; value: unknown }) => [r.key, r.value]));
       setPrices({ lifetime: Number(m.price_lifetime ?? 799), single: Number(m.price_single_test ?? 99) });
@@ -97,9 +99,11 @@ function PremiumView() {
   const basePrice = plan === 'lifetime' ? prices?.lifetime : (test?.price ?? prices?.single);
   const payable = quote?.coupon_valid ? quote.amount : basePrice;
 
-  async function applyCoupon() {
+  async function applyCoupon(code?: string) {
     setCouponMsg(null);
-    const { data, error } = await supabaseBrowser().rpc('quote_price', { p_plan: plan, p_test: plan === 'single_test' ? testId : null, p_coupon: coupon.trim() });
+    const c = (code ?? coupon).trim();
+    if (code) setCoupon(code);
+    const { data, error } = await supabaseBrowser().rpc('quote_price', { p_plan: plan, p_test: plan === 'single_test' ? testId : null, p_coupon: c });
     if (error) { setCouponMsg({ ok: false, text: error.message }); return; }
     setQuote(data as Quote);
     setCouponMsg((data as Quote).coupon_valid ? { ok: true, text: t('couponOk') } : { ok: false, text: t('couponBad') });
@@ -164,6 +168,16 @@ function PremiumView() {
       </div>
 
       <section className="card space-y-4 p-5">
+        {offer && !quote?.coupon_valid && (
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-dashed border-blush-300 bg-blush-50 p-3">
+            <Ticket className="h-6 w-6 shrink-0 text-blush-600" />
+            <div className="min-w-0 flex-1 text-sm">
+              <b className="text-ink">{lang === 'bn' ? 'চলমান অফার' : 'Current offer'}: {offer.discount_type === 'percent' ? `${num(offer.value)}%` : `৳${num(offer.value)}`} {lang === 'bn' ? 'ছাড়' : 'off'}</b>
+              <span className="block text-ink-soft">{lang === 'bn' ? 'কুপন কোড' : 'Coupon code'}: <span className="font-mono font-bold tracking-wider text-blush-700">{offer.code}</span></span>
+            </div>
+            <button className="btn-pink !py-2" onClick={() => applyCoupon(offer.code)}>{lang === 'bn' ? 'কুপন ব্যবহার করুন' : 'Use coupon'}</button>
+          </div>
+        )}
         <div>
           <label className="label">{t('coupon')}</label>
           <div className="flex gap-2">
@@ -171,7 +185,7 @@ function PremiumView() {
               <Ticket className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-ink-soft" />
               <input className="input pl-9 uppercase" value={coupon} onChange={(e) => { setCoupon(e.target.value); setQuote(null); setCouponMsg(null); }} />
             </div>
-            <button className="btn-ghost" onClick={applyCoupon} disabled={!coupon.trim()}>{t('apply')}</button>
+            <button className="btn-ghost" onClick={() => applyCoupon()} disabled={!coupon.trim()}>{t('apply')}</button>
           </div>
           {couponMsg && <p className={`mt-1 text-sm ${couponMsg.ok ? 'text-mint-700' : 'text-red-600'}`}>{couponMsg.text}</p>}
         </div>

@@ -89,7 +89,7 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
       <ol className="space-y-2 text-sm text-ink">
         <li>১. {bn ? `${label} অ্যাপ থেকে "Send Money" করুন এই নম্বরে:` : `Open ${label} and "Send Money" to:`}
           <div className="mt-1 flex items-center gap-2">
-            <span className={`rounded-lg ${color} px-3 py-1.5 font-mono text-base font-bold tracking-wider text-white`}>{num(number)}</span>
+            <span className={`rounded-lg ${color} px-3 py-1.5 font-mono text-base font-bold tracking-wider text-white`}>{number}</span>
             <button type="button" className="btn-ghost !px-2 !py-1.5 text-xs" onClick={() => { navigator.clipboard?.writeText(number); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? (bn ? 'কপি হয়েছে' : 'Copied') : (bn ? 'কপি' : 'Copy')}
             </button>
