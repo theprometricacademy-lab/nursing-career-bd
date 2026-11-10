@@ -8,6 +8,8 @@ import {
 import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { GuideLinks } from '@/components/SeoBlocks';
+import { SEO_SUBJECTS } from '@/lib/seoSubjects';
 
 type Notice = { id: number; title_en: string; title_bn: string; body_en: string | null; body_bn: string | null; published_at: string };
 type Bi = [bn: string, en: string];
@@ -241,6 +243,16 @@ export default function HomePage() {
           </ul>
         </section>
       )}
+
+      <section>
+        <h2 className="mb-3 text-lg font-bold text-ink">{L('প্রস্তুতি গাইড ও MCQ', 'Preparation guides & MCQs')}</h2>
+        <GuideLinks />
+        <div className="mt-3 flex flex-wrap gap-2">
+          {SEO_SUBJECTS.filter((s) => s.nursing).map((s) => (
+            <Link key={s.slug} href={`/mcq/${s.slug}`} className="chip bg-white py-1.5 text-sm text-brand-800 ring-1 ring-brand-100 hover:bg-brand-50">{s.bn} MCQ</Link>
+          ))}
+        </div>
+      </section>
 
       {/* FAQ */}
       <section className="card p-5">

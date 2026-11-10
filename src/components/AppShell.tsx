@@ -113,6 +113,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="min-w-0 flex-1">
           {children}
           <footer className="mt-10 border-t border-brand-100 pt-4">
+            <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-brand-700">
+              <Link href="/senior-staff-nurse">সিনিয়র স্টাফ নার্স প্রস্তুতি</Link>
+              <Link href="/nursing-job-preparation">নার্সিং চাকরির প্রস্তুতি</Link>
+              <Link href="/nursing-mcq">নার্সিং MCQ প্রশ্ন ও উত্তর</Link>
+            </div>
             <LegalLinks />
             <p className="mt-1 text-xs text-ink-soft">© {new Date().getFullYear()} Nursing Career BD · {SUPPORT_PHONE}</p>
           </footer>
