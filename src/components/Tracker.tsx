@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { inAndroidApp } from '@/lib/appContext';
 
 // First-party, cookie-free visit tracking for the admin "Live visitors" page.
 // A random visitor id (this browser) and session id (this tab visit); no IP, no personal data.
@@ -25,7 +26,9 @@ function device() {
   const ua = navigator.userAgent;
   const kind = /iPad|Tablet/i.test(ua) ? 'ট্যাবলেট' : /Mobi|Android|iPhone/i.test(ua) ? 'মোবাইল' : 'কম্পিউটার';
   const os = /Android/i.test(ua) ? 'Android' : /iPhone|iPad|iOS/i.test(ua) ? 'iPhone' : /Windows/i.test(ua) ? 'Windows' : /Mac/i.test(ua) ? 'Mac' : '';
-  return os ? `${kind} · ${os}` : kind;
+  const base = os ? `${kind} · ${os}` : kind;
+  // visits from inside our Android app are labelled so the admin can count app users
+  return inAndroidApp() ? `${base} · অ্যাপ` : base;
 }
 
 function source() {
