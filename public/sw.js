@@ -1,7 +1,7 @@
 // Nursing Career BD service worker.
 // Kept deliberately small: it does NOT cache pages or data (so users always see fresh
 // questions and results). It only shows a friendly offline page when there is no internet.
-const CACHE = 'ncbd-offline-v1';
+const CACHE = 'ncbd-offline-v2';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {
