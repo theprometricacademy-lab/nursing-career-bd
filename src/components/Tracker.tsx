@@ -61,14 +61,31 @@ export function Tracker() {
     sb.rpc('track_view', { p_visitor: visitor, p_session: session, p_path: path + (location.search || ''), p_ref: ref, p_device: device() })
       .then(({ data }) => { if (alive) cur.current = { id: (data as number) ?? null, session }; });
 
+    // Heartbeats: early ones catch short visits, then every 30 s while the page is visible
     const ping = () => {
       const c = cur.current;
       if (c.id && document.visibilityState === 'visible') sb.rpc('track_ping', { p_id: c.id, p_session: c.session }).then(() => {});
     };
-    const t = setInterval(ping, 45000);
-    const onVis = () => { if (document.visibilityState === 'visible') ping(); };
+    // Final heartbeat when the visitor leaves or switches app (keepalive survives page close)
+    const finalPing = () => {
+      const c = cur.current, url = process.env.NEXT_PUBLIC_SUPABASE_URL, key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!c.id || !url || !key) return;
+      try {
+        fetch(`${url}/rest/v1/rpc/track_ping`, { method: 'POST', keepalive: true,
+          headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_id: c.id, p_session: c.session }) }).catch(() => {});
+      } catch { /* ignore */ }
+    };
+    const early = [5000, 15000, 30000].map((ms) => setTimeout(ping, ms));
+    const t = setInterval(ping, 30000);
+    const onVis = () => { if (document.visibilityState === 'visible') ping(); else finalPing(); };
     document.addEventListener('visibilitychange', onVis);
-    return () => { alive = false; ping(); clearInterval(t); document.removeEventListener('visibilitychange', onVis); cur.current = { id: null, session }; };
+    window.addEventListener('pagehide', finalPing);
+    return () => {
+      alive = false; finalPing(); early.forEach(clearTimeout); clearInterval(t);
+      document.removeEventListener('visibilitychange', onVis); window.removeEventListener('pagehide', finalPing);
+      cur.current = { id: null, session };
+    };
   }, [path]);
 
   return null;
