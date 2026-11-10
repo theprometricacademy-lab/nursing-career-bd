@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Pencil, Plus, Trash2, Upload, Search } from 'lucide-react';
+import { Crown, Pencil, Plus, Trash2, Unlock, Upload, Search } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Modal, PageHeader, PremiumChip, Spinner, useExams, useSubjects, type Topic } from '@/components/ui';
@@ -35,6 +35,7 @@ export default function QuestionsAdmin() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [toggling, setToggling] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     let q = sb.from('questions').select('*', { count: 'exact' }).order('id', { ascending: false }).range(page * PAGE, page * PAGE + PAGE - 1);
@@ -86,6 +87,16 @@ export default function QuestionsAdmin() {
     if (error) setErr(error.message); else load();
   }
 
+  async function togglePremium(r: QRow) {
+    if (!r.id) return;
+    setToggling(r.id); setErr('');
+    const next = !r.is_premium;
+    const { error } = await sb.from('questions').update({ is_premium: next }).eq('id', r.id);
+    setToggling(null);
+    if (error) { setErr(error.message); return; }
+    setRows((rs) => rs?.map((x) => (x.id === r.id ? { ...x, is_premium: next } : x)) ?? rs);
+  }
+
   const subjName = (id: number | '') => { const s = subjects.find((x) => x.id === id); return s ? pick(s, 'name') : '—'; };
   const setOpt = (lang: 'en' | 'bn', i: number, v: string) => edit && setEdit({ ...edit, [`options_${lang}`]: edit[`options_${lang}`].map((o, j) => (j === i ? v : o)) } as QRow);
 
@@ -119,8 +130,15 @@ export default function QuestionsAdmin() {
                 <p className="line-clamp-2 text-ink">{r.question_bn}</p>
                 <p className="line-clamp-1 text-xs text-ink-soft">{r.question_en}</p>
               </div>
-              <button className="rounded-lg p-1.5 text-brand-700 hover:bg-brand-50" onClick={() => { setErr(''); setEdit({ ...EMPTY, ...r, topic_id: r.topic_id ?? '', exam_id: r.exam_id ?? '', year: r.year ?? '', explanation_en: r.explanation_en ?? '', explanation_bn: r.explanation_bn ?? '', source: r.source ?? '', exam_lang: r.exam_lang ?? '' }); }} aria-label="edit"><Pencil className="h-4 w-4" /></button>
-              <button className="rounded-lg p-1.5 text-red-600 hover:bg-red-50" onClick={() => remove(r.id!)} aria-label="delete"><Trash2 className="h-4 w-4" /></button>
+              <div className="flex shrink-0 flex-col gap-1 sm:flex-row">
+                <button className={`inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold ring-1 ${r.is_premium ? 'bg-blush-50 text-blush-700 ring-blush-200 hover:bg-blush-100' : 'bg-mint-50 text-mint-700 ring-mint-200 hover:bg-mint-100'}`}
+                  disabled={toggling === r.id} onClick={() => togglePremium(r)} title={L('প্রিমিয়াম/ফ্রি বদলান', 'Switch premium / free')}>
+                  {r.is_premium ? <Crown className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+                  {toggling === r.id ? '…' : r.is_premium ? L('প্রিমিয়াম', 'Premium') : L('ফ্রি', 'Free')}
+                </button>
+                <button className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50" onClick={() => { setErr(''); setEdit({ ...EMPTY, ...r, topic_id: r.topic_id ?? '', exam_id: r.exam_id ?? '', year: r.year ?? '', explanation_en: r.explanation_en ?? '', explanation_bn: r.explanation_bn ?? '', source: r.source ?? '', exam_lang: r.exam_lang ?? '' }); }}><Pencil className="h-3.5 w-3.5" />{L('এডিট', 'Edit')}</button>
+                <button className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-red-600 ring-1 ring-red-200 hover:bg-red-50" onClick={() => remove(r.id!)}><Trash2 className="h-3.5 w-3.5" />{L('ডিলিট', 'Delete')}</button>
+              </div>
             </div>
           ))}
           {rows.length === 0 && <p className="p-6 text-center text-ink-soft">—</p>}
