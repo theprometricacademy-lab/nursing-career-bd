@@ -1,0 +1,29 @@
+name: fetch-circulars
+on:
+  push:
+    branches: [reel-assets]
+    paths: ['fetch/**', '.github/workflows/fetch.yml']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --quiet img2pdf
+      - name: Download circular files
+        run: |
+          mkdir -p out/circulars
+          while read -r name url; do
+            [ -z "$name" ] && continue
+            curl -sSL -A "Mozilla/5.0" --retry 3 -o "out/circulars/$name" "$url" || echo "FAILED $name"
+            echo "$name $(stat -c %s out/circulars/$name 2>/dev/null) $(file -b --mime-type out/circulars/$name 2>/dev/null)"
+          done < fetch/list.txt
+          ls out/circulars/bmu_*.jpg >/dev/null 2>&1 && img2pdf out/circulars/bmu_[1-7].jpg -o out/circulars/bmu-super-specialized-hospital-nurse-2026.pdf && rm out/circulars/bmu_*.jpg
+          ls -la out/circulars
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f out/circulars
+          git commit -m "Circular files [skip ci]" && git push
