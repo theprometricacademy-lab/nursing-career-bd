@@ -3,7 +3,7 @@ from parler_tts import ParlerTTSForConditionalGeneration
 from transformers import AutoTokenizer
 
 torch.manual_seed(7)
-name = "ai4bharat/indic-parler-tts"  # Apache-2.0
+name = "ai4bharat/indic-parler-tts-pretrained"  # Apache-2.0, not gated
 model = ParlerTTSForConditionalGeneration.from_pretrained(name)
 tok = AutoTokenizer.from_pretrained(name)
 dtok = AutoTokenizer.from_pretrained(model.config.text_encoder._name_or_path)
