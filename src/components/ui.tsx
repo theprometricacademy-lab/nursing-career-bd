@@ -6,7 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 
 export type Subject = { id: number; slug: string; name_en: string; name_bn: string; category: 'nursing' | 'general'; icon: string | null; sort_order: number; exam_lang: 'bn' | 'en'; translatable: boolean };
-export type Exam = { id: number; name_en: string; name_bn: string; exam_type: string; year: number };
+export type Exam = { id: number; name_en: string; name_bn: string; exam_type: string; year: number; exam_date?: string | null };
 export type Topic = { id: number; subject_id: number; name_en: string; name_bn: string };
 
 let subjectCache: Subject[] | null = null;
@@ -27,7 +27,7 @@ export function useExams() {
   const [exams, setExams] = useState<Exam[]>(examCache ?? []);
   useEffect(() => {
     if (examCache) return;
-    supabaseBrowser().from('exams').select('*').eq('is_active', true).order('year', { ascending: false })
+    supabaseBrowser().from('exams').select('*').eq('is_active', true).order('exam_date', { ascending: false, nullsFirst: false }).order('year', { ascending: false })
       .then(({ data }) => { examCache = (data as Exam[]) ?? []; setExams(examCache); });
   }, []);
   return exams;
