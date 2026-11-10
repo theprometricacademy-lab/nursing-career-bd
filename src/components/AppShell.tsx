@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
+import { InstallMenuItem, registerPwa } from './InstallApp';
 import { LegalLinks, SUPPORT_PHONE } from './LegalPage';
 import { CircularRail, CircularStrip } from './CircularRail';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -73,6 +74,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
+  useEffect(() => { registerPwa(); }, []);
+
   const visited = useRef(0);
   useEffect(() => { visited.current += 1; }, [path]);
 
@@ -136,6 +139,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className={`mx-auto flex max-w-7xl gap-6 px-4 pt-4 lg:pb-10 2xl:max-w-[1500px] ${ready && !user ? 'pb-44' : 'pb-24'}`}>
         <aside className="sticky top-[4.5rem] hidden h-[calc(100vh-5.5rem)] w-60 shrink-0 overflow-y-auto lg:block">
           {navList}
+          <InstallMenuItem />
           {user && (
             <button onClick={logout} className="mt-3 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-soft hover:bg-brand-50">
               <LogOut className="h-[18px] w-[18px]" /> {t('logout')}
@@ -175,6 +179,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <button onClick={() => setOpen(false)} aria-label={t('close')}><X className="h-5 w-5" /></button>
             </div>
             {navList}
+            <InstallMenuItem onDone={() => setOpen(false)} />
             {user ? (
               <button onClick={logout} className="mt-3 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-soft hover:bg-brand-50">
                 <LogOut className="h-[18px] w-[18px]" /> {t('logout')}

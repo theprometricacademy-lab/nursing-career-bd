@@ -10,6 +10,7 @@ import { useSubjects } from '@/components/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { GuideLinks } from '@/components/SeoBlocks';
 import { NoticeBoard } from '@/components/NoticeBoard';
+import { InstallBanner } from '@/components/InstallApp';
 import { SEO_SUBJECTS } from '@/lib/seoSubjects';
 
 type Bi = [bn: string, en: string];
@@ -176,6 +177,8 @@ export default function HomePage() {
         </div>
         <ArrowRight className="h-5 w-5 text-mint-600" />
       </Link>
+
+      <InstallBanner />
 
       <section>
         <h2 className="mb-3 text-lg font-bold text-ink">{L('যা যা পাচ্ছেন', 'What you get')}</h2>
