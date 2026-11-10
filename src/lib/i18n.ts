@@ -46,7 +46,7 @@ const en = {
   instr3: 'Correct answers are shown only after you submit.', buyTest: 'Buy this test', premiumTest: 'Premium test',
   // results
   score: 'Score', accuracy: 'Accuracy', correctCount: 'Correct', wrongCount: 'Wrong', skipped: 'Skipped', review: 'Review answers',
-  subjectAccuracy: 'Subject-wise accuracy', onlyWrong: 'Only wrong', allQuestions: 'All', yourAnswer: 'Your answer',
+  subjectAccuracy: 'Subject-wise accuracy', onlyWrong: 'Only wrong', allQuestions: 'All', tapTabToReview: 'Tap Correct, Wrong or Skipped above to see those questions', noQuestionsHere: 'No questions here', yourAnswer: 'Your answer',
   notAttempted: 'Not attempted', retake: 'Take another test', testHistory: 'Test history', inProgress: 'In progress', resume: 'Resume',
   // dashboard
   welcome: 'Welcome', testsCompleted: 'Mock tests completed', questionsAttempted: 'Questions attempted', correctAnswers: 'Correct answers',
@@ -107,7 +107,7 @@ const bn: Record<DictKey, string> = {
   instructions: 'নির্দেশনা', instr1: 'আপনার উত্তর সাথে সাথে স্বয়ংক্রিয়ভাবে সংরক্ষিত হয়।', instr2: 'টাইমার শূন্য হলে পরীক্ষা নিজে থেকেই জমা হবে।',
   instr3: 'সঠিক উত্তর শুধু জমা দেওয়ার পর দেখানো হবে।', buyTest: 'টেস্টটি কিনুন', premiumTest: 'প্রিমিয়াম টেস্ট',
   score: 'নম্বর', accuracy: 'নির্ভুলতা', correctCount: 'সঠিক', wrongCount: 'ভুল', skipped: 'বাদ', review: 'উত্তর পর্যালোচনা',
-  subjectAccuracy: 'বিষয়ভিত্তিক নির্ভুলতা', onlyWrong: 'শুধু ভুলগুলো', allQuestions: 'সব', yourAnswer: 'আপনার উত্তর',
+  subjectAccuracy: 'বিষয়ভিত্তিক নির্ভুলতা', onlyWrong: 'শুধু ভুলগুলো', allQuestions: 'সব', tapTabToReview: 'প্রশ্নগুলো দেখতে উপরের সঠিক, ভুল বা বাদ-এ চাপ দিন', noQuestionsHere: 'এখানে কোনো প্রশ্ন নেই', yourAnswer: 'আপনার উত্তর',
   notAttempted: 'উত্তর দেওয়া হয়নি', retake: 'আরেকটি টেস্ট দিন', testHistory: 'টেস্টের ইতিহাস', inProgress: 'চলমান', resume: 'আবার শুরু',
   welcome: 'স্বাগতম', testsCompleted: 'সম্পন্ন মক টেস্ট', questionsAttempted: 'উত্তর দেওয়া প্রশ্ন', correctAnswers: 'সঠিক উত্তর',
   averageScore: 'গড় নম্বর', bestScore: 'সেরা নম্বর', subjectPerformance: 'বিষয়ভিত্তিক পারফরম্যান্স', recentActivity: 'সাম্প্রতিক কার্যক্রম',
