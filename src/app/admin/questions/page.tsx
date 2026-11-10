@@ -37,6 +37,9 @@ export default function QuestionsAdmin() {
   const [busy, setBusy] = useState(false);
   const [toggling, setToggling] = useState<number | null>(null);
 
+  // Deep link from the reports page: /admin/questions?q=NCB-001234
+  useEffect(() => { try { const v = new URLSearchParams(window.location.search).get('q'); if (v) setSearch(v); } catch { /* ignore */ } }, []);
+
   const load = useCallback(async () => {
     let q = sb.from('questions').select('*', { count: 'exact' }).order('id', { ascending: false }).range(page * PAGE, page * PAGE + PAGE - 1);
     if (subject) q = q.eq('subject_id', Number(subject));

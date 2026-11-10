@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, MinusCircle, Trophy, AlarmClock, RotateCcw } fro
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Progress, Spinner, Stat } from '@/components/ui';
+import { ReportQuestion } from '@/components/ReportQuestion';
 import { LETTERS, displayLang, type Attempt, type ViewMode } from '@/components/examTypes';
 import { ViewModeToggle } from '@/components/ViewModeToggle';
 
@@ -94,7 +95,8 @@ function ResultView() {
                 <div className="mb-2 flex items-center gap-2 text-xs">
                   <span className="font-semibold text-brand-700">{num(pos)}.</span>
                   <span className="text-ink-soft">{q.code}</span>
-                  <span className={`chip ml-auto ${q.is_correct ? 'bg-mint-100 text-mint-700' : q.selected === null ? 'bg-brand-50 text-brand-700' : 'bg-red-50 text-red-700'}`}>
+                  <span className="ml-auto"><ReportQuestion questionId={q.question_id} code={q.code} /></span>
+                  <span className={`chip ${q.is_correct ? 'bg-mint-100 text-mint-700' : q.selected === null ? 'bg-brand-50 text-brand-700' : 'bg-red-50 text-red-700'}`}>
                     {q.is_correct ? t('correct') : q.selected === null ? t('notAttempted') : t('wrong')}
                   </span>
                 </div>

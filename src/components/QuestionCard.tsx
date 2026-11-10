@@ -5,6 +5,7 @@ import { Bookmark, BookmarkCheck, CheckCircle2, XCircle, Lock, Languages } from 
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 import { PremiumChip } from './ui';
+import { ReportQuestion } from './ReportQuestion';
 
 export type BankQuestion = {
   id: number; code: string; subject_id: number; topic_id: number | null; exam_id: number | null; year: number | null;
@@ -78,6 +79,7 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
               <Languages className="h-4 w-4" />{view === 'bn' ? 'EN' : 'বাং'}
             </button>
           )}
+          {!q.locked && <ReportQuestion questionId={q.id} code={q.code} />}
           <button onClick={toggleBookmark} className="rounded-lg p-1.5 text-blush-600 hover:bg-blush-50" aria-label={t('bookmark')}>
             {marked ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
           </button>

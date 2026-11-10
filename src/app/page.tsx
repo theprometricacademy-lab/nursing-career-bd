@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, GraduationCap,
-  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages,
+  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages, ChevronRight,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
@@ -43,7 +43,7 @@ const PATTERN: { label: Bi; n: number; bar: string }[] = [
 ];
 
 export default function HomePage() {
-  const { t, pick, user, num, lang, premium, profile } = useApp();
+  const { t, pick, user, num, lang, setLang, premium, profile } = useApp();
   const subjects = useSubjects();
   const [price, setPrice] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(0);
@@ -63,11 +63,12 @@ export default function HomePage() {
     { icon: BarChart3, title: t('featureTrack'), d: t('featureTrackD'), href: '/dashboard', tone: 'bg-brand-50 text-brand-700' },
   ];
 
-  const stats: [string, string][] = [
-    [L('১০,০০০+', '10,000+'), L('ব্যাখ্যাসহ প্রশ্ন', 'questions with explanations')],
-    [subjects.length ? num(subjects.length) : L('১৮', '18'), L('বিষয়', 'subjects')],
-    [L('১০০ নম্বর', '100 marks'), L('PSC প্যাটার্নে মডেল টেস্ট', 'PSC-pattern mock tests')],
-    [L('বাংলা + English', 'Bangla + English'), L('দুই ভাষায় ব্যবহার', 'use in either language')],
+  // Each stat card opens the matching section ('' = language switch)
+  const stats: [string, string, string][] = [
+    [L('১০,০০০+', '10,000+'), L('ব্যাখ্যাসহ প্রশ্ন', 'questions with explanations'), '/question-bank'],
+    [subjects.length ? num(subjects.length) : L('১৮', '18'), L('বিষয়', 'subjects'), '/subject-practice'],
+    [L('১০০ নম্বর', '100 marks'), L('PSC প্যাটার্নে মডেল টেস্ট', 'PSC-pattern mock tests'), '/mock-tests'],
+    [L('বাংলা + English', 'Bangla + English'), L('দুই ভাষায় ব্যবহার · চাপ দিয়ে ভাষা বদলান', 'tap to switch language'), ''],
   ];
 
   const steps = [
@@ -149,12 +150,18 @@ export default function HomePage() {
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map(([v, l]) => (
-          <div key={l} className="card px-4 py-3.5">
-            <div className="text-lg font-bold text-brand-700 md:text-xl">{v}</div>
-            <div className="text-xs text-ink-soft md:text-sm">{l}</div>
-          </div>
-        ))}
+        {stats.map(([v, l, href]) => {
+          const inner = (
+            <>
+              <div className="flex items-center justify-between gap-2 text-lg font-bold text-brand-700 md:text-xl">{v}<ChevronRight className="h-4 w-4 shrink-0 text-brand-300" /></div>
+              <div className="text-xs text-ink-soft md:text-sm">{l}</div>
+            </>
+          );
+          const cls = 'card block px-4 py-3.5 text-left transition hover:-translate-y-0.5 hover:shadow-md active:scale-[.98]';
+          return href
+            ? <Link key={l} href={href} className={cls}>{inner}</Link>
+            : <button key={l} onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className={cls}>{inner}</button>;
+        })}
       </section>
 
       <Link href="/daily-quiz" className="card flex items-center gap-4 border-mint-200 bg-gradient-to-r from-mint-50 to-white p-4 transition hover:shadow-md">

@@ -1,5 +1,6 @@
 import { CheckCircle2 } from 'lucide-react';
 import type { SampleQ } from '@/lib/seoSubjects';
+import { ReportQuestion } from './ReportQuestion';
 
 const L = ['ক', 'খ', 'গ', 'ঘ'];
 const DIFF: Record<string, string> = { hard: 'কঠিন', medium: 'মাঝারি', easy: 'সহজ' };
@@ -12,7 +13,8 @@ export function McqList({ items }: { items: SampleQ[] }) {
         <li key={q.id} className="rounded-xl border border-brand-100 bg-white p-4">
           <div className="flex items-start justify-between gap-2">
             <p className="font-semibold text-ink">{n + 1}. {q.question_bn}</p>
-            {DIFF[q.difficulty] && <span className={`chip shrink-0 ${q.difficulty === 'hard' ? 'bg-blush-100 text-blush-700' : 'bg-brand-50 text-brand-700'}`}>{DIFF[q.difficulty]}</span>}
+            <span className="flex shrink-0 items-center gap-1"><ReportQuestion questionId={q.id} />
+            {DIFF[q.difficulty] && <span className={`chip shrink-0 ${q.difficulty === 'hard' ? 'bg-blush-100 text-blush-700' : 'bg-brand-50 text-brand-700'}`}>{DIFF[q.difficulty]}</span>}</span>
           </div>
           <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
             {q.options_bn.map((o, k) => (
