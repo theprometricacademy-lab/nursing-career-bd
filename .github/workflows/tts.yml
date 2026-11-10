@@ -13,8 +13,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
-      - run: pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
       - run: pip install --quiet git+https://github.com/huggingface/parler-tts.git soundfile
+      - name: CPU-only torch + torchaudio (matching versions)
+        run: |
+          pip uninstall -y torch torchaudio
+          pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          python -c "import torch, torchaudio; print(torch.__version__, torchaudio.__version__)"
       - run: python tts/gen.py
       - name: Fetch Bangla font (OFL)
         run: |
