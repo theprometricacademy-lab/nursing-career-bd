@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nursingcareerbd.twa",
+      "sha256_cert_fingerprints": [
+        "0C:97:70:5A:E0:4B:01:79:CB:7E:25:8F:30:A7:8A:33:F5:D8:71:93:36:A8:3C:F6:E4:5F:5A:31:47:74:F6:39"
+      ]
+    }
+  }
+]
