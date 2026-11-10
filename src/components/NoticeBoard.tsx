@@ -16,7 +16,7 @@ function offText(c: Coupon) {
 
 /** Home-page notice board: pops up once per visit (closable with ✕) and can be reopened from the bar. */
 export function NoticeBoard() {
-  const { pick, premium } = useApp();
+  const { pick, premium, user } = useApp();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [openCount, setOpenCount] = useState(0);
@@ -35,11 +35,16 @@ export function NoticeBoard() {
       setCoupon(((c.data as Coupon[] | null) ?? [])[0] ?? null);
       setOpenCount(o.count ?? 0);
       setLoaded(true);
-      let closed = false;
-      try { closed = sessionStorage.getItem(KEY) === '1'; } catch { /* storage unavailable */ }
-      if (!closed) setOpen(true);
     });
   }, []);
+
+  // Pop up automatically only for logged-in members; new visitors (e.g. from ads) just see the bar
+  useEffect(() => {
+    if (!loaded || !user) return;
+    let closed = false;
+    try { closed = sessionStorage.getItem(KEY) === '1'; } catch { /* storage unavailable */ }
+    if (!closed) setOpen(true);
+  }, [loaded, user]);
 
   useEffect(() => {
     if (!open) return;

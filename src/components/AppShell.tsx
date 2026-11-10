@@ -47,7 +47,7 @@ export function LangToggle({ compact = false }: { compact?: boolean }) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { t, user, isAdmin, premium, profile, lang } = useApp();
+  const { t, user, isAdmin, premium, profile, lang, ready } = useApp();
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -111,7 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 pb-24 pt-4 lg:pb-10 2xl:max-w-[1500px]">
+      <div className={`mx-auto flex max-w-7xl gap-6 px-4 pt-4 lg:pb-10 2xl:max-w-[1500px] ${ready && !user ? 'pb-44' : 'pb-24'}`}>
         <aside className="sticky top-[4.5rem] hidden h-[calc(100vh-5.5rem)] w-60 shrink-0 overflow-y-auto lg:block">
           {navList}
           {user && (
@@ -160,6 +160,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link href="/login" onClick={() => setOpen(false)} className="btn-primary mt-3 w-full">{t('login')}</Link>
             )}
           </div>
+        </div>
+      )}
+
+      {/* sticky free sign-up prompt for visitors (phones), above the bottom bar */}
+      {ready && !user && !['/signup', '/login', '/forgot-password', '/reset-password'].includes(path) && (
+        <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom))] z-30 px-3 pb-2 lg:hidden">
+          <Link href="/signup" className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-mint-500 to-brand-600 px-4 py-3 text-white shadow-lg">
+            <span className="flex-1 leading-tight">
+              <b className="block text-[15px]">{lang === 'bn' ? 'ফ্রি অ্যাকাউন্ট খুলুন' : 'Create a free account'}</b>
+              <span className="text-xs text-white/90">{lang === 'bn' ? 'মোবাইল নম্বর বা Google দিয়ে ১ মিনিটে' : 'With mobile number or Google in a minute'}</span>
+            </span>
+            <span className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-brand-700">{lang === 'bn' ? 'শুরু করুন' : 'Start'}</span>
+          </Link>
         </div>
       )}
 

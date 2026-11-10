@@ -51,7 +51,9 @@ export function Tracker() {
   }, []);
 
   useEffect(() => {
-    if (!path || path.startsWith('/admin') || (navigator as Navigator & { webdriver?: boolean }).webdriver) return;
+    // skip admin pages, automated browsers and search-engine/preview crawlers (they inflate visitor counts)
+    if (!path || path.startsWith('/admin') || (navigator as Navigator & { webdriver?: boolean }).webdriver
+      || /bot|crawl|spider|slurp|facebookexternalhit|Lighthouse|HeadlessChrome|Google-InspectionTool|bingpreview|PageSpeed/i.test(navigator.userAgent)) return;
     const sb = supabaseBrowser();
     const visitor = stored('localStorage', 'ncbd_vid');
     const session = stored('sessionStorage', 'ncbd_sid');

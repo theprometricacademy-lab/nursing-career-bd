@@ -36,7 +36,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
   };
   const badIdent = () => new Error(lang === 'bn' ? 'সঠিক মোবাইল নম্বর (01XXXXXXXXX) অথবা ইমেইল দিন' : 'Enter a valid mobile number (01XXXXXXXXX) or email');
 
+  const inApp = typeof navigator !== 'undefined' && /FBAN|FBAV|FB_IAB|Instagram|Messenger/i.test(navigator.userAgent);
   async function google() {
+    if (inApp) {
+      setMsg({ ok: false, text: lang === 'bn'
+        ? 'Facebook-এর ভেতরের ব্রাউজারে Google লগইন কাজ করে না। নিচে মোবাইল নম্বর দিয়ে অ্যাকাউন্ট খুলুন, অথবা উপরের ⋯ চেপে "Open in browser" দিয়ে Chrome-এ খুলুন।'
+        : "Google sign-in doesn't work inside Facebook's browser. Use your mobile number below, or tap ⋯ → Open in browser." });
+      return;
+    }
     setBusy(true); setMsg(null);
     const dest = next.startsWith('/') ? next : '/dashboard';
     const { error } = await sb.auth.signInWithOAuth({
