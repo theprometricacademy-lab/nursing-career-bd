@@ -21,7 +21,13 @@ function examDate(iso: string, lang: string) {
 
 export default function PreviousQuestionsPage() {
   const { t, pick, num, lang, premium } = useApp();
-  const exams = useExams();
+  // Real papers newest first (undated papers by their year); sample/model sets at the end
+  const exams = [...useExams()].sort((a, b) => {
+    const sa = a.name_bn.includes('নমুনা') ? 1 : 0, sb = b.name_bn.includes('নমুনা') ? 1 : 0;
+    if (sa !== sb) return sa - sb;
+    const da = a.exam_date ?? `${a.year}-06-30`, db = b.exam_date ?? `${b.year}-06-30`;
+    return db.localeCompare(da);
+  });
   const { start, busy, err } = useStartExam();
 
   return (
