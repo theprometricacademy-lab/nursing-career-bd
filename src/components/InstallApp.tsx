@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Download, Share, SquarePlus, X } from 'lucide-react';
+import { Download, Share, SquarePlus, X, ShieldCheck, ChevronDown } from 'lucide-react';
 import { useApp } from './AppProvider';
 
 // Android/Chrome fires `beforeinstallprompt` when the site can be installed as an app;
@@ -25,6 +25,22 @@ export function registerPwa() {
   if (early) { deferred = early; notify(); }
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e as InstallEvent; notify(); });
   window.addEventListener('appinstalled', () => { deferred = null; notify(); });
+}
+
+/** The Android app is a direct download from our own site (not Play Store). */
+export const APK_URL = '/downloads/NursingCareerBD-v1.apk';
+const APK_SIZE_BN = '১.৩ MB';
+
+function isAndroid() { return /Android/i.test(navigator.userAgent); }
+
+/** True when the page is open inside our Android app (it starts at /?source=app). */
+function inAndroidApp() {
+  try {
+    if (new URLSearchParams(location.search).get('source') === 'app' || document.referrer.startsWith('android-app://')) {
+      sessionStorage.setItem('inApp', '1');
+    }
+    return sessionStorage.getItem('inApp') === '1';
+  } catch { return false; }
 }
 
 function isIos() {
@@ -111,6 +127,17 @@ function useInstaller() {
 export function InstallMenuItem({ onDone }: { onDone?: () => void }) {
   const { lang } = useApp();
   const { mode, start, guideEl } = useInstaller();
+  const [android, setAndroid] = useState<'app' | 'card' | null>(null);
+  useEffect(() => { if (isAndroid()) setAndroid(inAndroidApp() ? 'app' : 'card'); }, []);
+  if (android === 'app') return null;
+  if (android === 'card') {
+    return (
+      <a href="/#android-app" onClick={() => onDone?.()}
+        className="mt-2 flex w-full items-center gap-3 rounded-xl bg-mint-50 px-3 py-2.5 text-sm font-semibold text-mint-700 hover:bg-mint-100">
+        <Download className="h-[18px] w-[18px]" />{lang === 'bn' ? 'Android অ্যাপ ডাউনলোড' : 'Get the Android app'}
+      </a>
+    );
+  }
   if (!mode) return null;
   return (
     <>
@@ -123,8 +150,64 @@ export function InstallMenuItem({ onDone }: { onDone?: () => void }) {
   );
 }
 
-/** Home-page banner inviting phone users to install the app. */
+/** Home-page card for Android phones: download the app file, with install steps as a notice. */
+function AndroidAppCard() {
+  const { lang } = useApp();
+  const L = (bn: string, en: string) => (lang === 'bn' ? bn : en);
+  const [open, setOpen] = useState(true);
+  const steps = [
+    L('নিচের "অ্যাপ ডাউনলোড করুন" বোতাম চাপুন।', 'Tap "Download the app" below.'),
+    L('Chrome "এই ফাইলটি ক্ষতিকর হতে পারে" বললে "Download anyway" (তবুও ডাউনলোড) চাপুন।', 'If Chrome warns the file may be harmful, tap "Download anyway".'),
+    L('ডাউনলোড শেষে নোটিফিকেশন থেকে বা ফোনের Downloads ফোল্ডার থেকে ফাইলটা খুলুন।', 'When it finishes, open the file from the notification or the Downloads folder.'),
+    L('"Install unknown apps" অনুমতি চাইলে Settings-এ গিয়ে "Allow from this source" চালু করে ফিরে আসুন।', 'If asked for "Install unknown apps", turn on "Allow from this source" in Settings and come back.'),
+    L('"Install" চাপুন। Play Protect সতর্কবার্তা দেখালে "More details" → "Install anyway" চাপুন।', 'Tap "Install". If Play Protect warns, tap "More details" → "Install anyway".'),
+    L('ইনস্টল শেষে হোম স্ক্রিনের NC আইকন থেকে অ্যাপ খুলুন ও লগইন করুন।', 'Open the app from the NC icon on your home screen and log in.'),
+  ];
+  return (
+    <section id="android-app" className="card scroll-mt-20 overflow-hidden border-mint-200">
+      <div className="flex items-center gap-4 bg-gradient-to-r from-mint-50 to-white p-4">
+        <img src="/icons/icon-192.png" alt="" width={56} height={56} className="h-14 w-14 rounded-2xl" />
+        <div className="flex-1">
+          <b className="block text-ink">{L('Android অ্যাপ ডাউনলোড করুন', 'Get the Android app')}</b>
+          <span className="text-sm text-ink-soft">{L(`ফ্রি · ${APK_SIZE_BN} · সব প্রশ্ন ও মডেল টেস্ট অ্যাপেই`, 'Free · 1.3 MB · every question and mock test in the app')}</span>
+        </div>
+      </div>
+      <div className="space-y-3 p-4 pt-3">
+        <a href={APK_URL} download="NursingCareerBD.apk" className="btn-success w-full !py-3 text-base">
+          <Download className="h-5 w-5" />{L('অ্যাপ ডাউনলোড করুন', 'Download the app')}
+        </a>
+        <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+          <button type="button" onClick={() => setOpen(!open)} aria-expanded={open}
+            className="flex w-full items-center justify-between gap-2 text-left font-semibold">
+            <span>📢 {L('নোটিশ: অ্যাপ কীভাবে ইনস্টল করবেন', 'Notice: how to install the app')}</span>
+            <ChevronDown className={`h-4 w-4 shrink-0 transition ${open ? 'rotate-180' : ''}`} />
+          </button>
+          {open && (
+            <ol className="mt-2 list-decimal space-y-1.5 pl-5 leading-relaxed">
+              {steps.map((x) => <li key={x}>{x}</li>)}
+            </ol>
+          )}
+          <p className="mt-2 flex items-start gap-1.5 text-xs">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
+            {L('অ্যাপটি Play Store-এ নয়, আমাদের নিজস্ব সাইট থেকে দেওয়া হচ্ছে, তাই ফোন সতর্ক করে। এটি নিরাপদ — শুধু nursingcareerbd.com থেকেই নামাবেন।',
+               'The app comes from our own site, not the Play Store, so the phone shows a warning. It is safe — only download it from nursingcareerbd.com.')}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Home-page banner: Android gets the app download card; iPhone and others get "add to home screen". */
 export function InstallBanner() {
+  const [android, setAndroid] = useState<'app' | 'card' | null>(null);
+  useEffect(() => { if (isAndroid()) setAndroid(inAndroidApp() ? 'app' : 'card'); }, []);
+  if (android === 'card') return <AndroidAppCard />;
+  if (android === 'app') return null;
+  return <InstallBannerPwa />;
+}
+
+function InstallBannerPwa() {
   const { lang } = useApp();
   const { mode, start, guideEl } = useInstaller();
   if (!mode) return null;

@@ -11,6 +11,13 @@ const nextConfig = {
         { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
       ],
     }, {
+      // Android app file: correct type so phones offer to install it, and download instead of opening
+      source: '/downloads/:file*.apk',
+      headers: [
+        { key: 'Content-Type', value: 'application/vnd.android.package-archive' },
+        { key: 'Content-Disposition', value: 'attachment; filename="NursingCareerBD.apk"' },
+      ],
+    }, {
       source: '/(.*)',
       headers: [
         { key: 'X-Frame-Options', value: 'DENY' },
