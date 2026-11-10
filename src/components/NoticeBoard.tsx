@@ -29,7 +29,7 @@ export function NoticeBoard() {
     Promise.all([
       sb.from('notices').select('id, title_en, title_bn, body_en, body_bn').eq('is_published', true).order('published_at', { ascending: false }).limit(3),
       sb.rpc('public_featured_coupon'),
-      sb.from('circulars').select('id', { count: 'exact', head: true }).gte('apply_end', new Date().toISOString()),
+      sb.from('circulars').select('id', { count: 'exact', head: true }).eq('is_published', true).gte('apply_end', new Date().toISOString()),
     ]).then(([n, c, o]) => {
       setNotices((n.data as Notice[]) ?? []);
       setCoupon(((c.data as Coupon[] | null) ?? [])[0] ?? null);

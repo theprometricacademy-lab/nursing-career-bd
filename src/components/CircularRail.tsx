@@ -12,12 +12,12 @@ function useCirculars() {
   useEffect(() => {
     const sb = supabaseBrowser();
     sb.from('circulars').select('id, slug, title_bn, org_bn, total_posts, apply_start, apply_end')
-      .gte('apply_end', new Date().toISOString()).order('apply_end', { ascending: true }).limit(6)
+      .eq('is_published', true).gte('apply_end', new Date().toISOString()).order('apply_end', { ascending: true }).limit(6)
       .then(async ({ data }) => {
         if (data && data.length) { setItems(data as Item[]); return; }
         // Nothing open right now: show the most recent ones instead
         const { data: recent } = await sb.from('circulars').select('id, slug, title_bn, org_bn, total_posts, apply_start, apply_end')
-          .order('apply_end', { ascending: false }).limit(4);
+          .eq('is_published', true).order('apply_end', { ascending: false }).limit(4);
         setItems((recent as Item[]) ?? []);
       });
   }, []);
