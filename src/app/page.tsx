@@ -1,0 +1,275 @@
+'use client';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import {
+  BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, Megaphone, GraduationCap,
+  CheckCircle2, Crown, UserPlus, Target, TrendingUp, ChevronDown, Smartphone, Languages,
+} from 'lucide-react';
+import { useApp } from '@/components/AppProvider';
+import { useSubjects } from '@/components/ui';
+import { supabaseBrowser } from '@/lib/supabase/client';
+import { GuideLinks } from '@/components/SeoBlocks';
+import { SEO_SUBJECTS } from '@/lib/seoSubjects';
+
+type Notice = { id: number; title_en: string; title_bn: string; body_en: string | null; body_bn: string | null; published_at: string };
+type Bi = [bn: string, en: string];
+
+const FAQ: { q: Bi; a: Bi }[] = [
+  { q: ['এখানে কোন কোন পরীক্ষার প্রস্তুতি নেওয়া যায়?', 'Which exams can I prepare for here?'],
+    a: ['PSC-র সিনিয়র স্টাফ নার্স নিয়োগ পরীক্ষা, বিএসসি ও ডিপ্লোমা নার্সিং ভর্তি পরীক্ষা এবং অন্যান্য সরকারি-বেসরকারি নার্সিং নিয়োগ পরীক্ষার প্রস্তুতি নেওয়া যায়।',
+        'The PSC Senior Staff Nurse recruitment exam, BSc and Diploma nursing admission tests, and other government and private nursing recruitment exams.'] },
+  { q: ['মডেল টেস্টের প্রশ্ন কীভাবে ভাগ করা থাকে?', 'How are mock test questions distributed?'],
+    a: ['পূর্ণাঙ্গ মডেল টেস্টে ১০০টি প্রশ্ন থাকে: বাংলা ২০, ইংরেজি ২০, সাধারণ জ্ঞান ২০ এবং নার্সিং বিষয়ে ৪০টি। সময় ৬০ মিনিট, প্রতিটি ভুল উত্তরে ০.৫ নম্বর কাটা যায়।',
+        'A full mock test has 100 questions: Bangla 20, English 20, General Knowledge 20 and Nursing 40, in 60 minutes, with 0.5 negative marking per wrong answer.'] },
+  { q: ['প্রশ্নগুলো কোন ভাষায়?', 'What language are the questions in?'],
+    a: ['PSC পরীক্ষার মতোই প্রশ্ন বাংলায়, আর ইংরেজি বিষয়ের প্রশ্ন ইংরেজিতে। মেডিকেল পরিভাষাগুলো ইংরেজিতে রাখা হয়েছে, প্রতিটি প্রশ্নের সাথে ব্যাখ্যা আছে।',
+        'Like the PSC exam, questions are in Bangla and English-subject questions are in English. Medical terms are kept in English, and every question has an explanation.'] },
+  { q: ['ফ্রিতে কী কী ব্যবহার করা যায়?', 'What can I use for free?'],
+    a: ['ফ্রি অ্যাকাউন্ট খুলে ফ্রি প্রশ্ন অনুশীলন, প্রতিদিনের ডেইলি কুইজ, বুকমার্ক ও অগ্রগতির হিসাব ব্যবহার করা যায়। সব প্রশ্ন ও পূর্ণাঙ্গ মডেল টেস্টের জন্য প্রিমিয়াম প্যাকেজ লাগে।',
+        'With a free account you get free practice questions, the daily quiz, bookmarks and progress tracking. Premium unlocks every question and the full mock tests.'] },
+  { q: ['প্রিমিয়ামের পেমেন্ট কীভাবে করব?', 'How do I pay for Premium?'],
+    a: ['প্রিমিয়াম পেজ থেকে প্যাকেজ বেছে bKash বা Nagad-এ পেমেন্ট করুন। লাইফটাইম প্যাকেজে একবার পেমেন্ট করলেই হয়, প্রতি মাসে টাকা দিতে হয় না।',
+        'Choose a package on the Premium page and pay with bKash or Nagad. The Lifetime package is a one-time payment — no monthly fee.'] },
+  { q: ['মোবাইলে কি ব্যবহার করা যাবে?', 'Does it work on mobile?'],
+    a: ['হ্যাঁ। কোনো অ্যাপ ইনস্টল করা ছাড়াই মোবাইলের ব্রাউজারে পুরো সাইট ব্যবহার করা যায়।',
+        'Yes. The whole site works in your phone\'s browser — no app to install.'] },
+];
+
+const PATTERN: { label: Bi; n: number; bar: string }[] = [
+  { label: ['বাংলা', 'Bangla'], n: 20, bar: 'bg-blush-400' },
+  { label: ['ইংরেজি', 'English'], n: 20, bar: 'bg-brand-400' },
+  { label: ['সাধারণ জ্ঞান', 'General knowledge'], n: 20, bar: 'bg-mint-400' },
+  { label: ['নার্সিং', 'Nursing'], n: 40, bar: 'bg-brand-700' },
+];
+
+export default function HomePage() {
+  const { t, pick, user, num, lang, premium } = useApp();
+  const subjects = useSubjects();
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [price, setPrice] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(0);
+  const i = lang === 'bn' ? 0 : 1;
+  const L = (bn: string, en: string) => (lang === 'bn' ? bn : en);
+
+  useEffect(() => {
+    const sb = supabaseBrowser();
+    sb.from('notices').select('*').eq('is_published', true).order('published_at', { ascending: false }).limit(3)
+      .then(({ data }) => setNotices((data as Notice[]) ?? []));
+    sb.from('app_settings').select('value').eq('key', 'price_lifetime').maybeSingle()
+      .then(({ data }) => setPrice(data ? Number(data.value) : null));
+  }, []);
+
+  const features = [
+    { icon: BookOpen, title: t('featureBank'), d: t('featureBankD'), href: '/question-bank', tone: 'bg-brand-50 text-brand-700' },
+    { icon: Timer, title: t('featureMock'), d: t('featureMockD'), href: '/mock-tests', tone: 'bg-mint-50 text-mint-700' },
+    { icon: History, title: t('featurePyq'), d: t('featurePyqD'), href: '/previous-questions', tone: 'bg-blush-50 text-blush-700' },
+    { icon: BarChart3, title: t('featureTrack'), d: t('featureTrackD'), href: '/dashboard', tone: 'bg-brand-50 text-brand-700' },
+  ];
+
+  const stats: [string, string][] = [
+    [L('১০,০০০+', '10,000+'), L('ব্যাখ্যাসহ প্রশ্ন', 'questions with explanations')],
+    [subjects.length ? num(subjects.length) : L('১৮', '18'), L('বিষয়', 'subjects')],
+    [L('১০০ নম্বর', '100 marks'), L('PSC প্যাটার্নে মডেল টেস্ট', 'PSC-pattern mock tests')],
+    [L('বাংলা + English', 'Bangla + English'), L('দুই ভাষায় ব্যবহার', 'use in either language')],
+  ];
+
+  const steps = [
+    { icon: UserPlus, h: L('ফ্রি অ্যাকাউন্ট খুলুন', 'Create a free account'), d: L('ইমেইল বা Google দিয়ে এক মিনিটে।', 'With email or Google in a minute.') },
+    { icon: Target, h: L('অনুশীলন ও মডেল টেস্ট', 'Practise and take mock tests'), d: L('বিষয়ভিত্তিক অনুশীলন, তারপর টাইমারসহ পূর্ণ পরীক্ষা।', 'Subject-wise practice, then full timed exams.') },
+    { icon: TrendingUp, h: L('দুর্বলতা ঠিক করুন', 'Fix your weak areas'), d: L('ভুল উত্তর আবার অনুশীলন করুন, অগ্রগতি দেখুন।', 'Retry wrong answers and watch your progress.') },
+  ];
+
+  const faqLd = {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q[0], acceptedAnswer: { '@type': 'Answer', text: f.a[0] } })),
+  };
+
+  return (
+    <div className="space-y-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800 p-6 text-white md:p-10">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-blush-400/30 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-20 left-1/3 h-56 w-56 rounded-full bg-mint-300/30 blur-2xl" />
+        <div className="relative max-w-2xl animate-rise">
+          <span className="chip bg-white/15 text-white">{t('tagline')}</span>
+          <h1 className="mt-3 text-2xl font-bold leading-snug md:text-4xl">{t('heroTitle')}</h1>
+          <p className="mt-3 text-sm text-brand-50 md:text-base">{t('heroSub')}</p>
+          <ul className="mt-4 grid gap-1.5 text-sm text-white/95 sm:grid-cols-2">
+            {[L('সিনিয়র স্টাফ নার্স (PSC) প্যাটার্ন', 'Senior Staff Nurse (PSC) pattern'), L('প্রতিটি প্রশ্নে ব্যাখ্যা', 'Explanation for every question'),
+              L('নেগেটিভ মার্কিংসহ আসল পরীক্ষার পরিবেশ', 'Real exam feel with negative marking'), L('ভুল উত্তর আলাদা করে অনুশীলন', 'Practise your wrong answers')].map((x) => (
+              <li key={x} className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-mint-300" />{x}</li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href={user ? '/mock-tests' : '/signup'} className="btn bg-mint-400 text-ink hover:bg-mint-300">
+              {user ? t('startNow') : t('getStarted')} <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/question-bank" className="btn border border-white/40 bg-white/10 text-white hover:bg-white/20">{t('exploreQuestions')}</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {stats.map(([v, l]) => (
+          <div key={l} className="card px-4 py-3.5">
+            <div className="text-lg font-bold text-brand-700 md:text-xl">{v}</div>
+            <div className="text-xs text-ink-soft md:text-sm">{l}</div>
+          </div>
+        ))}
+      </section>
+
+      <Link href="/daily-quiz" className="card flex items-center gap-4 border-mint-200 bg-gradient-to-r from-mint-50 to-white p-4 transition hover:shadow-md">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-mint-500 text-white"><CalendarCheck className="h-6 w-6" /></span>
+        <div className="flex-1">
+          <div className="font-semibold text-ink">{t('dailyQuiz')}</div>
+          <div className="text-sm text-ink-soft">{num(10)} {t('questions')} · {num(10)} {t('minutes')}</div>
+        </div>
+        <ArrowRight className="h-5 w-5 text-mint-600" />
+      </Link>
+
+      <section>
+        <h2 className="mb-3 text-lg font-bold text-ink">{L('যা যা পাচ্ছেন', 'What you get')}</h2>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {features.map(({ icon: Icon, title, d, href, tone }) => (
+            <Link key={href} href={href} className="card group p-4 transition hover:-translate-y-0.5 hover:shadow-md">
+              <span className={`grid h-11 w-11 place-items-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
+              <h3 className="mt-3 font-semibold text-ink">{title}</h3>
+              <p className="mt-1 text-sm text-ink-soft">{d}</p>
+              <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 opacity-80 group-hover:opacity-100">
+                {L('দেখুন', 'Open')} <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Exam pattern + how it works */}
+      <section className="grid gap-4 lg:grid-cols-2">
+        <div className="card p-5">
+          <h2 className="font-bold text-ink">{L('মডেল টেস্টের মানবণ্টন', 'Mock test mark distribution')}</h2>
+          <p className="mt-1 text-sm text-ink-soft">{L('সিনিয়র স্টাফ নার্স পরীক্ষার প্যাটার্নে ১০০ নম্বর, ৬০ মিনিট', 'Senior Staff Nurse pattern: 100 marks, 60 minutes')}</p>
+          <div className="mt-4 flex h-3 overflow-hidden rounded-full">
+            {PATTERN.map((p) => <div key={p.label[1]} className={p.bar} style={{ width: `${p.n}%` }} />)}
+          </div>
+          <ul className="mt-4 grid grid-cols-2 gap-2">
+            {PATTERN.map((p) => (
+              <li key={p.label[1]} className="flex items-center justify-between rounded-xl bg-brand-50/60 px-3 py-2 text-sm">
+                <span className="flex items-center gap-2 text-ink"><span className={`h-2.5 w-2.5 rounded-full ${p.bar}`} />{p.label[i]}</span>
+                <b className="text-ink">{num(p.n)}</b>
+              </li>
+            ))}
+          </ul>
+          <Link href="/mock-tests" className="btn-ghost mt-4 w-full">{L('মডেল টেস্ট দিন', 'Take a mock test')} <ArrowRight className="h-4 w-4" /></Link>
+        </div>
+
+        <div className="card p-5">
+          <h2 className="font-bold text-ink">{L('কীভাবে প্রস্তুতি নেবেন', 'How it works')}</h2>
+          <ol className="mt-4 space-y-4">
+            {steps.map(({ icon: Icon, h, d }, k) => (
+              <li key={h} className="flex gap-3">
+                <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-100 text-brand-700">
+                  <Icon className="h-5 w-5" />
+                  <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-blush-500 text-[11px] font-bold text-white">{num(k + 1)}</span>
+                </span>
+                <div><div className="font-semibold text-ink">{h}</div><p className="text-sm text-ink-soft">{d}</p></div>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-5 flex flex-wrap gap-2 text-xs text-ink-soft">
+            <span className="chip bg-mint-50 py-1 text-mint-700"><Smartphone className="h-3.5 w-3.5" />{L('মোবাইলে চলে, অ্যাপ লাগে না', 'Works on mobile, no app')}</span>
+            <span className="chip bg-brand-50 py-1 text-brand-700"><Languages className="h-3.5 w-3.5" />{L('বাংলা / English', 'Bangla / English')}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="mb-3 flex items-center gap-2 font-semibold text-ink"><GraduationCap className="h-5 w-5 text-brand-600" />{t('examsCovered')}</h2>
+        <div className="flex flex-wrap gap-2">
+          {(['bscExam', 'diplomaExam', 'ssnExam', 'otherExam'] as const).map((k, n) => (
+            <span key={k} className={`chip py-1.5 text-sm ${['bg-brand-100 text-brand-800', 'bg-mint-100 text-mint-700', 'bg-blush-100 text-blush-700', 'bg-brand-50 text-brand-700'][n]}`}>{t(k)}</span>
+          ))}
+        </div>
+      </section>
+
+      {subjects.length > 0 && (
+        <section className="grid gap-4 md:grid-cols-2">
+          {(['nursing', 'general'] as const).map((cat) => (
+            <div key={cat} className="card p-5">
+              <h2 className="mb-3 font-semibold text-ink">{cat === 'nursing' ? t('nursingSubjects') : t('generalSubjects')}</h2>
+              <div className="flex flex-wrap gap-2">
+                {subjects.filter((s) => s.category === cat).map((s) => (
+                  <Link key={s.id} href={`/question-bank?subject=${s.id}`}
+                    className={`chip py-1.5 text-sm transition ${cat === 'nursing' ? 'bg-brand-50 text-brand-800 hover:bg-brand-100' : 'bg-mint-50 text-mint-700 hover:bg-mint-100'}`}>
+                    {pick(s, 'name')}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* Premium band */}
+      {!premium && (
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blush-600 to-blush-500 p-5 text-white md:p-7">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-xl" />
+          <div className="relative flex flex-wrap items-center gap-4">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/20"><Crown className="h-6 w-6" /></span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-bold">{L('প্রিমিয়াম নিন — সব প্রশ্ন ও সব মডেল টেস্ট', 'Go Premium — every question and every mock test')}</h2>
+              <p className="text-sm text-white/90">
+                {price ? L(`একবার ৳${num(price)} পেমেন্টে লাইফটাইম অ্যাক্সেস। মাসিক কোনো চার্জ নেই।`, `Lifetime access for a one-time ৳${price}. No monthly fee.`)
+                  : L('একবারের পেমেন্টে লাইফটাইম অ্যাক্সেস। মাসিক কোনো চার্জ নেই।', 'Lifetime access for a one-time payment. No monthly fee.')}
+              </p>
+            </div>
+            <Link href="/premium" className="btn bg-white text-blush-700 hover:bg-blush-50">{L('প্রিমিয়াম দেখুন', 'See Premium')} <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+        </section>
+      )}
+
+      {notices.length > 0 && (
+        <section className="card p-5">
+          <h2 className="mb-3 flex items-center gap-2 font-semibold text-ink"><Megaphone className="h-5 w-5 text-blush-600" />{t('notices')}</h2>
+          <ul className="space-y-3">
+            {notices.map((n) => (
+              <li key={n.id} className="rounded-xl bg-blush-50/60 p-3">
+                <div className="font-medium text-ink">{pick(n, 'title')}</div>
+                {pick(n, 'body') && <p className="mt-1 text-sm text-ink-soft">{pick(n, 'body')}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section>
+        <h2 className="mb-3 text-lg font-bold text-ink">{L('প্রস্তুতি গাইড ও MCQ', 'Preparation guides & MCQs')}</h2>
+        <GuideLinks />
+        <div className="mt-3 flex flex-wrap gap-2">
+          {SEO_SUBJECTS.filter((s) => s.nursing).map((s) => (
+            <Link key={s.slug} href={`/mcq/${s.slug}`} className="chip bg-white py-1.5 text-sm text-brand-800 ring-1 ring-brand-100 hover:bg-brand-50">{s.bn} MCQ</Link>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="card p-5">
+        <h2 className="mb-2 text-lg font-bold text-ink">{L('সচরাচর জিজ্ঞাসা', 'Frequently asked questions')}</h2>
+        <div className="divide-y divide-brand-100">
+          {FAQ.map((f, k) => (
+            <div key={k}>
+              <button onClick={() => setOpen(open === k ? null : k)} aria-expanded={open === k}
+                className="flex w-full items-center justify-between gap-3 py-3 text-left font-semibold text-ink">
+                <span>{f.q[i]}</span>
+                <ChevronDown className={`h-5 w-5 shrink-0 text-brand-600 transition ${open === k ? 'rotate-180' : ''}`} />
+              </button>
+              <p className={`pb-3 text-sm leading-6 text-ink-soft ${open === k ? '' : 'hidden'}`}>{f.a[i]}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}

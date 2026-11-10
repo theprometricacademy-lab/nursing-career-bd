@@ -1,0 +1,35 @@
+'use client';
+import { LegalPage, type LegalSection } from '@/components/LegalPage';
+
+const S: LegalSection[] = [
+  { h: ['১. আমরা যে তথ্য সংগ্রহ করি', '1. Information we collect'], p: [
+    ['অ্যাকাউন্ট তথ্য: নাম, ইমেইল, মোবাইল নম্বর এবং Google দিয়ে লগইন করলে Google অ্যাকাউন্টের নাম ও ইমেইল।', 'Account details: name, email, mobile number, and your Google name and email if you sign in with Google.'],
+    ['ব্যবহারের তথ্য: কোন প্রশ্নের উত্তর দিয়েছেন, পরীক্ষার ফলাফল, বুকমার্ক ও ভুল উত্তরের তালিকা।', 'Usage data: questions answered, test results, bookmarks and wrong-answer lists.'],
+    ['পেমেন্ট তথ্য: পরিমাণ, পেমেন্টের মাধ্যম, ট্রানজেকশন আইডি ও যে নম্বর থেকে টাকা পাঠিয়েছেন। আপনার bKash/Nagad PIN, OTP বা কার্ডের তথ্য আমরা কখনো দেখি না বা সংরক্ষণ করি না।', 'Payment data: amount, method, transaction ID and the sending number. We never see or store your bKash/Nagad PIN, OTP or card details.'],
+  ] },
+  { h: ['২. তথ্য যে কাজে ব্যবহার হয়', '2. How we use it'], p: [[
+    'অ্যাকাউন্ট চালানো, প্রিমিয়াম সুবিধা চালু করা, আপনার অগ্রগতি ও দুর্বল বিষয় দেখানো, পেমেন্ট যাচাই, সাপোর্ট দেওয়া এবং জরুরি নোটিশ (যেমন পাসওয়ার্ড রিসেট) পাঠানো।',
+    'To run your account, activate premium, show your progress and weak areas, verify payments, provide support and send essential notices such as password resets.',
+  ]] },
+  { h: ['৩. তথ্য শেয়ার', '3. Sharing'], p: [
+    ['আমরা আপনার ব্যক্তিগত তথ্য বিক্রি করি না এবং বিজ্ঞাপনদাতাদের দিই না।', 'We do not sell your personal data or give it to advertisers.'],
+    ['সেবা চালাতে যেসব প্রতিষ্ঠানের সাহায্য নেওয়া হয় (যেমন ডাটাবেস ও হোস্টিং সেবা, ইমেইল সেবা, এবং bKash/Nagad-এর মতো পেমেন্ট প্রতিষ্ঠান), তারা শুধু প্রয়োজনীয় তথ্যটুকু পায়। আইন অনুযায়ী বাধ্য হলে কর্তৃপক্ষকে তথ্য দেওয়া হতে পারে।', 'Service providers we rely on (database and hosting, email, and payment providers such as bKash/Nagad) receive only what they need. We may disclose data where required by law.'],
+  ] },
+  { h: ['৪. কুকি', '4. Cookies'], p: [[
+    'লগইন অবস্থা ধরে রাখা ও ভাষা পছন্দ মনে রাখার জন্য প্রয়োজনীয় কুকি ও ব্রাউজার স্টোরেজ ব্যবহার করা হয়।',
+    'We use essential cookies and browser storage to keep you signed in and remember your language choice.',
+  ]] },
+  { h: ['৫. নিরাপত্তা', '5. Security'], p: [[
+    'তথ্য এনক্রিপ্টেড সংযোগে (HTTPS) আদান-প্রদান হয় এবং প্রতিটি ব্যবহারকারী শুধু নিজের তথ্য দেখতে পারেন—এমনভাবে ডাটাবেস সুরক্ষিত রাখা হয়েছে।',
+    'Data is transferred over encrypted HTTPS, and the database is protected so each user can access only their own data.',
+  ]] },
+  { h: ['৬. আপনার অধিকার', '6. Your rights'], p: [[
+    'প্রোফাইল পেজ থেকে আপনার তথ্য হালনাগাদ করতে পারেন। অ্যাকাউন্ট ও সংশ্লিষ্ট তথ্য মুছে ফেলতে চাইলে নিচের নম্বরে যোগাযোগ করুন; যাচাইয়ের পর ৭ কার্যদিবসের মধ্যে মুছে ফেলা হবে (আইনগত কারণে পেমেন্টের রেকর্ড কিছুদিন রাখা লাগতে পারে)।',
+    'You can update your details from the Profile page. To delete your account and data, contact us at the number below; after verification it will be deleted within 7 working days (payment records may be kept for a period where legally required).',
+  ]] },
+];
+
+export default function PrivacyPage() {
+  return <LegalPage title={['গোপনীয়তা নীতি', 'Privacy Policy']} updated="10 November 2026" sections={S}
+    intro={['Nursing Career BD আপনার ব্যক্তিগত তথ্যের গোপনীয়তাকে গুরুত্ব দেয়। কোন তথ্য নেওয়া হয় এবং কীভাবে ব্যবহার হয়, তা এখানে বলা হলো।', 'Nursing Career BD respects your privacy. This page explains what we collect and how we use it.']} />;
+}

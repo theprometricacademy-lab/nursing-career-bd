@@ -1,0 +1,29 @@
+name: reel-tts
+on:
+  push:
+    branches: [reel-assets]
+    paths: ['tts/**', '.github/workflows/tts.yml']
+permissions:
+  contents: write
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install --quiet git+https://github.com/huggingface/parler-tts.git soundfile
+      - run: python tts/gen.py
+      - name: Fetch Bangla font (OFL)
+        run: |
+          curl -sSL -o out/NotoSansBengali.ttf "https://github.com/google/fonts/raw/main/ofl/notosansbengali/NotoSansBengali%5Bwdth%2Cwght%5D.ttf"
+          curl -sSL -o out/HindSiliguri-Bold.ttf "https://github.com/google/fonts/raw/main/ofl/hindsiliguri/HindSiliguri-Bold.ttf"
+      - name: Commit outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add out
+          git commit -m "TTS outputs [skip ci]"
+          git push
