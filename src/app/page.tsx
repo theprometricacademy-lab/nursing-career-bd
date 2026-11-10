@@ -43,7 +43,7 @@ const PATTERN: { label: Bi; n: number; bar: string }[] = [
 ];
 
 export default function HomePage() {
-  const { t, pick, user, num, lang, premium } = useApp();
+  const { t, pick, user, num, lang, premium, profile } = useApp();
   const subjects = useSubjects();
   const [price, setPrice] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(0);
@@ -86,6 +86,33 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
 
       {/* Hero */}
+      {premium ? (
+        <section className="gold-card p-6 md:p-10">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 left-1/4 h-56 w-56 rounded-full bg-brand-500/25 blur-3xl" />
+          <div className="relative max-w-2xl animate-rise">
+            <span className="gold-chip"><Crown className="h-3.5 w-3.5" />{L('প্রিমিয়াম সদস্য', 'Premium member')}</span>
+            <h1 className="mt-3 text-2xl font-bold leading-snug md:text-4xl">
+              {L('স্বাগতম', 'Welcome')}{profile?.full_name ? <>, <span className="gold-text">{profile.full_name.split(' ')[0]}</span></> : ''}!
+            </h1>
+            <p className="mt-2 text-sm text-white/80 md:text-base">{L('আপনার জন্য সব প্রশ্ন, সব মডেল টেস্ট আর বিস্তারিত ফলাফল বিশ্লেষণ খোলা। আজ কোথা থেকে শুরু করবেন?', 'Every question, every mock test and full analysis are unlocked for you. Where do you want to start today?')}</p>
+            <div className="mt-6 grid gap-2.5 sm:grid-cols-3">
+              {[
+                ['/mock-tests', Timer, L('মডেল টেস্ট দিন', 'Take a mock test')],
+                ['/wrong-answers', Target, L('ভুলগুলো আবার করুন', 'Retry mistakes')],
+                ['/dashboard', TrendingUp, L('আমার অগ্রগতি', 'My progress')],
+              ].map(([href, Icon, label]) => {
+                const I = Icon as typeof Timer;
+                return (
+                  <Link key={href as string} href={href as string} className="flex items-center gap-2.5 rounded-2xl border border-gold-400/40 bg-white/5 px-4 py-3 font-semibold text-white transition hover:bg-white/10">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-gold-300 to-gold-500 text-gold-900"><I className="h-5 w-5" /></span>{label as string}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      ) : (
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800 p-6 text-white md:p-10">
         <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-blush-400/30 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-20 left-1/3 h-56 w-56 rounded-full bg-mint-300/30 blur-2xl" />
@@ -107,6 +134,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       <NoticeBoard />
 

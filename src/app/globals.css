@@ -27,4 +27,8 @@ img, svg, video, table { max-width: 100%; }
   .label { @apply mb-1 block text-sm font-medium text-ink; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
   .page-title { @apply text-xl font-bold text-ink md:text-2xl; }
+  /* premium look */
+  .gold-text { @apply bg-gradient-to-r from-gold-300 via-gold-100 to-gold-400 bg-clip-text text-transparent; }
+  .gold-chip { @apply inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 px-2.5 py-0.5 text-xs font-bold text-gold-900 shadow-sm; }
+  .gold-card { @apply relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#14213d] via-[#1b2a4e] to-[#0b1324] text-white shadow-xl ring-1 ring-gold-400/40; }
 }

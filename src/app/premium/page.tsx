@@ -14,6 +14,52 @@ const GW_STYLE: Record<string, string> = {
   bkash: 'bg-[#e2136e] text-white hover:opacity-90', nagad: 'bg-[#f6921e] text-white hover:opacity-90', sslcommerz: 'bg-brand-700 text-white hover:bg-brand-800',
 };
 
+function MemberCard() {
+  const { user, profile, lang } = useApp();
+  const [since, setSince] = useState<string | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    supabaseBrowser().from('subscriptions').select('starts_at').eq('user_id', user.id).eq('plan', 'lifetime').eq('status', 'active')
+      .order('starts_at', { ascending: true }).limit(1).then(({ data }) => setSince(data?.[0]?.starts_at ?? null));
+  }, [user]);
+  const bn = lang === 'bn';
+  const perks = bn
+    ? ['১০,০০০+ প্রশ্ন ও ব্যাখ্যা', 'সব মডেল টেস্ট', 'বিষয়ভিত্তিক ফলাফল বিশ্লেষণ', 'ভুল উত্তর অনুশীলন', 'নতুন প্রশ্ন ও টেস্ট — আজীবন']
+    : ['10,000+ questions & explanations', 'All mock tests', 'Subject-wise analysis', 'Wrong-answer practice', 'New questions & tests — for life'];
+  return (
+    <div className="space-y-3">
+      <div className="gold-card p-6">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-gold-400/25 blur-3xl" />
+        <div className="relative flex items-start justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-[.2em] text-gold-200">Nursing Career BD</div>
+            <div className="mt-1 text-2xl font-extrabold gold-text">{bn ? 'লাইফটাইম প্রিমিয়াম' : 'Lifetime Premium'}</div>
+          </div>
+          <Crown className="h-9 w-9 text-gold-300" />
+        </div>
+        <div className="relative mt-8 flex items-end justify-between gap-3">
+          <div>
+            <div className="text-xs text-white/60">{bn ? 'সদস্য' : 'Member'}</div>
+            <div className="text-lg font-bold">{profile?.full_name || user?.email}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs text-white/60">{bn ? 'সদস্য হয়েছেন' : 'Member since'}</div>
+            <div className="font-semibold">{since ? new Date(since).toLocaleDateString(bn ? 'bn-BD' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}</div>
+          </div>
+        </div>
+        <div className="relative mt-4 font-mono text-xs tracking-widest text-gold-200/80">ID · {(user?.id || '').slice(0, 8).toUpperCase()}</div>
+      </div>
+      <div className="card p-4">
+        <div className="mb-2 font-semibold text-ink">{bn ? 'আপনার জন্য খোলা' : 'Unlocked for you'}</div>
+        <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
+          {perks.map((p) => <li key={p} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold-500" />{p}</li>)}
+        </ul>
+        <p className="mt-3 text-xs text-ink-soft">{bn ? 'নিরাপত্তার জন্য প্রিমিয়াম একসাথে একটি ডিভাইসেই চলে।' : 'For security, Premium works on one device at a time.'}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function PremiumPage() {
   return <Suspense><PremiumView /></Suspense>;
 }
@@ -91,10 +137,10 @@ function PremiumView() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <PageHeader title={t('premiumTitle')} sub={t('premiumSub')} />
-      {premium && plan === 'lifetime' && <p className="rounded-xl bg-mint-50 p-4 font-semibold text-mint-700">{t('alreadyPremium')}</p>}
+      <PageHeader title={premium ? (lang === 'bn' ? 'আমার প্রিমিয়াম' : 'My Premium') : t('premiumTitle')} sub={premium ? undefined : t('premiumSub')} />
+      {premium && plan === 'lifetime' && <MemberCard />}
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className={`grid gap-3 md:grid-cols-2 ${premium && !test ? 'hidden' : ''}`}>
         <button onClick={() => { setPlan('lifetime'); setQuote(null); setCouponMsg(null); }}
           className={`card relative overflow-hidden p-5 text-left transition ${plan === 'lifetime' ? 'border-blush-400 ring-2 ring-blush-200' : ''}`}>
           <span className="absolute right-3 top-3 chip bg-blush-600 text-white">{lang === 'bn' ? 'সেরা মূল্য' : 'Best value'}</span>

@@ -19,6 +19,11 @@ const config: Config = {
           500: '#ec4899', 600: '#db2777', 700: '#be185d',
         },
         ink: { DEFAULT: '#0f2a4a', soft: '#4a6380' },
+        // premium members' accent
+        gold: {
+          50: '#fdf8ec', 100: '#f9edcc', 200: '#f1d999', 300: '#e7c166', 400: '#d9a73f',
+          500: '#c58b25', 600: '#a46e1b', 700: '#7f5418', 800: '#5c3d14', 900: '#3d2810',
+        },
       },
       fontFamily: { sans: ['var(--font-bn)', 'system-ui', 'sans-serif'] },
       boxShadow: { card: '0 1px 2px rgba(15,42,74,.06), 0 4px 16px rgba(15,42,74,.06)' },

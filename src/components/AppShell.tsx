@@ -46,7 +46,7 @@ export function LangToggle({ compact = false }: { compact?: boolean }) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { t, user, isAdmin, premium, profile } = useApp();
+  const { t, user, isAdmin, premium, profile, lang } = useApp();
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -68,8 +68,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link key={href} href={href} onClick={() => setOpen(false)}
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
             active(href) ? 'bg-brand-100 text-brand-800' : 'text-ink-soft hover:bg-brand-50 hover:text-ink'}`}>
-          <Icon className={`h-[18px] w-[18px] ${key === 'premium' ? 'text-blush-600' : ''}`} />
-          {t(key)}
+          <Icon className={`h-[18px] w-[18px] ${key === 'premium' ? (premium ? 'text-gold-500' : 'text-blush-600') : ''}`} />
+          {key === 'premium' && premium ? (lang === 'bn' ? 'আমার প্রিমিয়াম' : 'My Premium') : t(key)}
         </Link>
       ))}
       {isAdmin && (
@@ -83,7 +83,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] overflow-x-clip">
-      <header className="sticky top-0 z-30 border-b border-brand-100 bg-white/90 backdrop-blur">
+      <header className={`sticky top-0 z-30 border-b bg-white/90 backdrop-blur ${premium ? 'border-gold-300' : 'border-brand-100'}`}>
+        {premium && <div className="h-[3px] bg-gradient-to-r from-gold-300 via-gold-500 to-gold-300" />}
         <div className="mx-auto flex h-14 max-w-7xl items-center 2xl:max-w-[1500px] gap-3 px-4">
           <button className="rounded-lg p-1.5 text-ink lg:hidden" onClick={() => setOpen(true)} aria-label={t('menu')}>
             <Menu className="h-5 w-5" />
@@ -94,12 +95,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           <div className="ml-auto flex items-center gap-2">
             <LangToggle compact />
+            {premium && <Link href="/premium" className="gold-chip"><Crown className="h-3.5 w-3.5" />{t('premium')}</Link>}
             {user ? (
-              <Link href="/profile" className="hidden items-center gap-2 rounded-full bg-brand-50 py-1 pl-1 pr-3 text-sm font-medium text-brand-800 sm:flex">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white">
+              <Link href="/profile" className={`hidden items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-medium sm:flex ${premium ? 'bg-gold-50 text-gold-800' : 'bg-brand-50 text-brand-800'}`}>
+                <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white ${premium ? 'bg-gradient-to-br from-gold-400 to-gold-600 ring-2 ring-gold-300' : 'bg-brand-600'}`}>
                   {(profile?.full_name || user.email || '?').trim().charAt(0).toUpperCase()}
                 </span>
-                {premium && <Crown className="h-4 w-4 text-blush-600" />}
+                {(profile?.full_name || '').split(' ')[0]}
               </Link>
             ) : (
               <Link href="/login" className="btn-primary !px-3 !py-1.5"><LogIn className="h-4 w-4" />{t('login')}</Link>
