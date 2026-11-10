@@ -10,6 +10,7 @@ import {
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
 import { InstallMenuItem, registerPwa } from './InstallApp';
+import { useUpdateChecker } from './UpdateChecker';
 import { LegalLinks, SUPPORT_PHONE } from './LegalPage';
 import { CircularRail, CircularStrip } from './CircularRail';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -75,6 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => { registerPwa(); }, []);
+  useUpdateChecker(path);
 
   const visited = useRef(0);
   useEffect(() => { visited.current += 1; }, [path]);

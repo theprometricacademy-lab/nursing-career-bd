@@ -1,6 +1,11 @@
+// A fresh id for every build: open pages (and the Android app) compare it with /build-id
+// and reload themselves when a newer version of the site is live.
+const BUILD_ID = String(Date.now());
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   eslint: { ignoreDuringBuilds: true },
   async headers() {
     return [{
