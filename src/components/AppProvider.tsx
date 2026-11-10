@@ -65,13 +65,19 @@ export function AppProvider({ initialLang, children }: { initialLang: Lang; chil
   }, [sb]);
 
   useEffect(() => {
-    load();
-    const { data: sub } = sb.auth.onAuthStateChange((event) => { if (event !== 'TOKEN_REFRESHED') load(); });
+    // Wait until the page content has finished hydrating before applying the login state,
+    // otherwise logged-in visitors get a server/client mismatch (React #418) on static pages.
+    let started = false;
+    const start = () => { if (!started) { started = true; load(); } };
+    const w = window as Window & { __ncbdHydrated?: boolean };
+    if (w.__ncbdHydrated) start(); else window.addEventListener('ncbd:hydrated', start, { once: true });
+    const fallback = setTimeout(start, 2500);
+    const { data: sub } = sb.auth.onAuthStateChange((event) => { if (event !== 'TOKEN_REFRESHED' && event !== 'INITIAL_SESSION' && started) load(); });
     // re-check now and then, and whenever the tab comes back, so a second phone is noticed quickly
-    const recheck = () => { if (document.visibilityState === 'visible') load(); };
+    const recheck = () => { if (document.visibilityState === 'visible' && started) load(); };
     const t = setInterval(recheck, 120000);
     document.addEventListener('visibilitychange', recheck);
-    return () => { sub.subscription.unsubscribe(); clearInterval(t); document.removeEventListener('visibilitychange', recheck); };
+    return () => { sub.subscription.unsubscribe(); clearInterval(t); clearTimeout(fallback); window.removeEventListener('ncbd:hydrated', start); document.removeEventListener('visibilitychange', recheck); };
   }, [sb, load]);
 
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
@@ -145,4 +151,14 @@ export function useApp() {
   const c = useContext(AppCtx);
   if (!c) throw new Error('useApp outside AppProvider');
   return c;
+}
+
+/** Rendered last inside the page's Suspense boundary: tells AppProvider the page has hydrated. */
+export function HydrationMark() {
+  useEffect(() => {
+    const w = window as Window & { __ncbdHydrated?: boolean };
+    w.__ncbdHydrated = true;
+    window.dispatchEvent(new Event('ncbd:hydrated'));
+  }, []);
+  return null;
 }

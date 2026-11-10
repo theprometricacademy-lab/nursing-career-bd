@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import { Noto_Sans_Bengali } from 'next/font/google';
 import './globals.css';
-import { AppProvider } from '@/components/AppProvider';
+import { AppProvider, HydrationMark } from '@/components/AppProvider';
 import { AppShell } from '@/components/AppShell';
 import { Tracker } from '@/components/Tracker';
 
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />
         <AppProvider initialLang="bn">
           <Suspense fallback={null}><Tracker /></Suspense>
-          <AppShell><Suspense fallback={null}>{children}</Suspense></AppShell>
+          <AppShell><Suspense fallback={null}>{children}<HydrationMark /></Suspense></AppShell>
         </AppProvider>
       </body>
     </html>

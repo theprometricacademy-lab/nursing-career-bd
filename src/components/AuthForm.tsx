@@ -68,8 +68,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         if (id.bad) throw badIdent();
         const { error } = await sb.auth.signInWithPassword({ email: id.email, password: form.password });
         if (error) throw error;
-        router.replace(next.startsWith('/') ? next : '/dashboard');
-        router.refresh();
+        window.location.assign(next.startsWith('/') ? next : '/dashboard');
       } else if (mode === 'signup') {
         const id = ident();
         if (id.bad) throw badIdent();
@@ -82,7 +81,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           if (!r.ok) throw new Error(j.error || 'Error');
           const { error: le } = await sb.auth.signInWithPassword({ email: id.email, password: form.password });
           if (le) throw le;
-          router.replace('/dashboard'); router.refresh();
+          window.location.assign('/dashboard');
           return;
         }
         const extraPhone = form.phone.trim() ? normalizeBdPhone(form.phone) : null;
@@ -92,7 +91,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           options: { data: { full_name: form.name.trim(), phone: extraPhone ?? '' }, emailRedirectTo: `${origin}/auth/callback?next=/dashboard` },
         });
         if (error) throw error;
-        if (data.session) { router.replace('/dashboard'); router.refresh(); }
+        if (data.session) window.location.assign('/dashboard');
         else setMsg({ ok: true, text: t('checkEmail') });
       } else if (mode === 'forgot') {
         const id = ident();
