@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
+import { LegalLinks, SUPPORT_PHONE } from './LegalPage';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import type { DictKey } from '@/lib/i18n';
 
@@ -109,7 +110,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
           )}
         </aside>
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          {children}
+          <footer className="mt-10 border-t border-brand-100 pt-4">
+            <LegalLinks />
+            <p className="mt-1 text-xs text-ink-soft">© {new Date().getFullYear()} Nursing Career BD · {SUPPORT_PHONE}</p>
+          </footer>
+        </main>
       </div>
 
       {/* mobile drawer */}
