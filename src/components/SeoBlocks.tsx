@@ -83,12 +83,13 @@ export function Faq({ items }: { items: [q: string, a: string][] }) {
 
 export function GuideLinks({ current }: { current?: string }) {
   const all: [string, string, string][] = [
+    ['/question-solution', 'সিনিয়র স্টাফ নার্স প্রশ্ন সমাধান', '২০১৬–২০২৬ সালের আসল পরীক্ষার প্রশ্ন ও উত্তর'],
     ['/senior-staff-nurse', 'সিনিয়র স্টাফ নার্স প্রস্তুতি', 'সিলেবাস, মানবণ্টন ও ৬০ দিনের পরিকল্পনা'],
     ['/nursing-job-preparation', 'নার্সিং চাকরির প্রস্তুতি গাইড', 'সরকারি নার্সিং চাকরি ও ভর্তি পরীক্ষার প্রস্তুতি'],
     ['/nursing-mcq', 'নার্সিং MCQ প্রশ্ন ও উত্তর', 'ব্যাখ্যাসহ ফ্রি নমুনা প্রশ্ন'],
   ];
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="grid gap-3 sm:grid-cols-2">
       {all.filter(([h]) => h !== current).map(([href, t, d]) => (
         <Link key={href} href={href} className="card p-4 transition hover:-translate-y-0.5 hover:shadow-md">
           <div className="font-semibold text-ink">{t}</div>

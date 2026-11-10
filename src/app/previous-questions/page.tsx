@@ -36,6 +36,7 @@ export default function PreviousQuestionsPage() {
       {exams.length > 0 && (
         <div className="mb-4">
           <h2 className="mb-2 text-sm font-semibold text-ink">{lang === 'bn' ? 'পরীক্ষা মোডে দিন' : 'Take in exam mode'}</h2>
+          <Link href="/question-solution" className="mb-3 inline-block text-sm font-semibold text-brand-700 underline">{lang === 'bn' ? 'সব প্রশ্ন ও উত্তর একসাথে পড়ুন (প্রশ্ন সমাধান) →' : 'Read all questions with answers →'}</Link>
           {/* newest exam first, one under another */}
           <div className="flex flex-col gap-3">
             {exams.map((e, i) => {

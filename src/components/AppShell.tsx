@@ -130,6 +130,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
           <footer className="mt-10 border-t border-brand-100 pt-4">
             <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-brand-700">
+              <Link href="/question-solution">সিনিয়র স্টাফ নার্স প্রশ্ন সমাধান</Link>
               <Link href="/circulars">নার্সিং চাকরির সার্কুলার</Link>
               <Link href="/senior-staff-nurse">সিনিয়র স্টাফ নার্স প্রস্তুতি</Link>
               <Link href="/nursing-job-preparation">নার্সিং চাকরির প্রস্তুতি</Link>
