@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Timer, ListChecks, MinusCircle, Crown, Play } from 'lucide-react';
+import { Timer, ListChecks, MinusCircle, Crown, Play, Trophy } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Empty, PageHeader, PremiumChip, Spinner } from '@/components/ui';
@@ -15,14 +15,14 @@ type MockTest = {
 };
 
 export default function MockTestsPage() {
-  const { t, pick, num, premium, user } = useApp();
+  const { t, pick, num, premium, user, lang } = useApp();
   const [tests, setTests] = useState<MockTest[] | null>(null);
   const [owned, setOwned] = useState<Set<number>>(new Set());
   const { start, busy, err } = useStartExam();
 
   useEffect(() => {
     const sb = supabaseBrowser();
-    sb.from('mock_tests').select('*').eq('is_published', true).order('is_premium').order('id')
+    sb.from('mock_tests').select('*').eq('is_published', true).order('sort_order').order('id')
       .then(({ data }) => setTests((data as MockTest[]) ?? []));
     if (user) {
       sb.from('subscriptions').select('mock_test_id').eq('user_id', user.id).eq('plan', 'single_test').eq('status', 'active')
@@ -39,6 +39,14 @@ export default function MockTestsPage() {
           <li>{t('instr1')}</li><li>{t('instr2')}</li><li>{t('instr3')}</li>
         </ul>
       </div>
+      <Link href="/leaderboard" className="gold-card mb-4 flex items-center gap-4 p-4 transition hover:brightness-110">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-gold-300 to-gold-500 text-gold-900"><Trophy className="h-6 w-6" /></span>
+        <span className="flex-1">
+          <span className="block font-bold"><span className="gold-text">{lang === 'bn' ? 'সাপ্তাহিক মেধাতালিকা' : 'Weekly leaderboard'}</span></span>
+          <span className="block text-sm text-white/80">{lang === 'bn' ? 'প্রিমিয়াম মডেল টেস্ট সিরিজ (১–১০) দিন, প্রতি সপ্তাহের সেরা ২০ জনের তালিকায় নাম তুলুন।' : 'Take the premium model test series (1–10) and get into this week’s top 20.'}</span>
+        </span>
+        <span className="text-gold-300">→</span>
+      </Link>
       {err && <p className="mb-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p>}
       {!tests ? <Spinner /> : tests.length === 0 ? <Empty /> : (
         <div className="grid gap-3 md:grid-cols-2">

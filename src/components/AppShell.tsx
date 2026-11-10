@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import {
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
-  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft,
+  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy,
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
@@ -18,6 +18,7 @@ const NAV: { href: string; key: DictKey; icon: React.ComponentType<{ className?:
   { href: '/question-bank', key: 'questionBank', icon: BookOpen },
   { href: '/subject-practice', key: 'subjectPractice', icon: Layers },
   { href: '/mock-tests', key: 'mockTest', icon: Timer },
+  { href: '/leaderboard', key: 'leaderboard', icon: Trophy },
   { href: '/previous-questions', key: 'previousYear', icon: History },
   { href: '/daily-quiz', key: 'dailyQuiz', icon: CalendarCheck },
   { href: '/bookmarks', key: 'bookmarks', icon: Bookmark },

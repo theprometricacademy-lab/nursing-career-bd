@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, GraduationCap,
-  CheckCircle2, Crown, UserPlus, Target, TrendingUp, ChevronDown, Smartphone, Languages,
+  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
@@ -100,7 +100,7 @@ export default function HomePage() {
               {[
                 ['/mock-tests', Timer, L('মডেল টেস্ট দিন', 'Take a mock test')],
                 ['/wrong-answers', Target, L('ভুলগুলো আবার করুন', 'Retry mistakes')],
-                ['/dashboard', TrendingUp, L('আমার অগ্রগতি', 'My progress')],
+                ['/leaderboard', Trophy, L('সাপ্তাহিক মেধাতালিকা', 'Weekly leaderboard')],
               ].map(([href, Icon, label]) => {
                 const I = Icon as typeof Timer;
                 return (
