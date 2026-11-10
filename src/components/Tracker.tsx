@@ -5,13 +5,20 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 
 // First-party, cookie-free visit tracking for the admin "Live visitors" page.
 // A random visitor id (this browser) and session id (this tab visit); no IP, no personal data.
+function uuid() {
+  try { if (crypto.randomUUID) return crypto.randomUUID(); } catch { /* older browsers */ }
+  const b = new Uint8Array(16); crypto.getRandomValues(b); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 function stored(store: 'localStorage' | 'sessionStorage', key: string) {
   try {
     const s = window[store];
     let v = s.getItem(key);
-    if (!v) { v = crypto.randomUUID(); s.setItem(key, v); }
+    if (!v) { v = uuid(); s.setItem(key, v); }
     return v;
-  } catch { return crypto.randomUUID(); }
+  } catch { return uuid(); }
 }
 
 function device() {
@@ -36,6 +43,12 @@ export function Tracker() {
   const path = usePathname();
   const cur = useRef<{ id: number | null; session: string }>({ id: null, session: '' });
   const first = useRef(true);
+
+  // The page loaded fine: allow the error page to auto-reload again later in this visit if needed
+  useEffect(() => {
+    const t = setTimeout(() => { try { sessionStorage.removeItem('ncbd_reloaded'); sessionStorage.removeItem('ncbd_reloaded_g'); } catch { /* ignore */ } }, 15000);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (!path || path.startsWith('/admin') || (navigator as Navigator & { webdriver?: boolean }).webdriver) return;
