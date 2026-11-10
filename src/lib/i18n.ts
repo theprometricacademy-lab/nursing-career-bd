@@ -55,7 +55,7 @@ const en = {
   active: 'Active', inactive: 'Not active', upgrade: 'Upgrade',
   // premium
   premiumTitle: 'Go Premium', premiumSub: 'Unlock everything you need to crack the exam.', lifetime: 'Premium Lifetime Access',
-  singleTest: 'Single Mock Test', oneTime: 'one-time payment', coupon: 'Coupon code', apply: 'Apply', couponOk: 'Coupon applied',
+  singleTest: 'Single Mock Test', oneTime: 'one-time payment', coupon: 'Coupon / referral code', apply: 'Apply', couponOk: 'Coupon applied',
   couponBad: 'Invalid or expired coupon', payWith: 'Pay with', alreadyPremium: 'You already have Premium. Enjoy!',
   pf1: 'Full question bank', pf2: 'Unlimited mock tests', pf3: 'All previous-year questions', pf4: 'Detailed explanations',
   pf5: 'Performance analytics', pf6: 'Advanced practice mode', paySuccess: 'Payment successful! Premium is now active.',
@@ -114,7 +114,7 @@ const bn: Record<DictKey, string> = {
   learningProgress: 'শেখার অগ্রগতি', coverage: 'প্রশ্ন ব্যাংক অনুশীলন করা হয়েছে', premiumStatus: 'প্রিমিয়াম স্ট্যাটাস',
   active: 'চালু', inactive: 'চালু নেই', upgrade: 'আপগ্রেড',
   premiumTitle: 'প্রিমিয়াম নিন', premiumSub: 'পরীক্ষায় সফল হতে যা দরকার, সব খুলে যাবে।', lifetime: 'আজীবন প্রিমিয়াম অ্যাক্সেস',
-  singleTest: 'একটি মক টেস্ট', oneTime: 'একবারের পেমেন্ট', coupon: 'কুপন কোড', apply: 'প্রয়োগ', couponOk: 'কুপন প্রয়োগ হয়েছে',
+  singleTest: 'একটি মক টেস্ট', oneTime: 'একবারের পেমেন্ট', coupon: 'কুপন / রেফারেল কোড', apply: 'প্রয়োগ', couponOk: 'কুপন প্রয়োগ হয়েছে',
   couponBad: 'কুপনটি সঠিক নয় বা মেয়াদ শেষ', payWith: 'পেমেন্ট করুন', alreadyPremium: 'আপনার প্রিমিয়াম চালু আছে।',
   pf1: 'পূর্ণ প্রশ্ন ব্যাংক', pf2: 'আনলিমিটেড মক টেস্ট', pf3: 'সব বিগত বছরের প্রশ্ন', pf4: 'বিস্তারিত ব্যাখ্যা',
   pf5: 'পারফরম্যান্স বিশ্লেষণ', pf6: 'অ্যাডভান্সড অনুশীলন মোড', paySuccess: 'পেমেন্ট সফল! প্রিমিয়াম চালু হয়েছে।',

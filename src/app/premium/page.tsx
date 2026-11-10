@@ -1,14 +1,45 @@
 'use client';
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Check, Crown, Ticket, ShieldCheck } from 'lucide-react';
+import { Check, Crown, Ticket, ShieldCheck, Snowflake, Gift, Copy } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
 import { SendMoneyBox, type ManualCfg } from '@/components/SendMoneyBox';
 
 type Gateways = { bkash?: boolean; nagad?: boolean; sslcommerz?: boolean };
-type Quote = { base: number; discount: number; amount: number; coupon_valid: boolean };
+type Quote = { base: number; discount: number; amount: number; coupon_valid: boolean; offer: 'winter' | 'referral' | null };
+type Winter = { active: boolean; price: number; limit: number; left: number };
+
+/** Each user's referral code: a friend who enters it gets ৳50 off the full price. */
+function ReferralCard() {
+  const { user, lang, num } = useApp();
+  const [code, setCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    supabaseBrowser().from('profiles').select('referral_code').eq('id', user.id).maybeSingle()
+      .then(({ data }) => setCode((data as { referral_code: string | null } | null)?.referral_code ?? null));
+  }, [user]);
+  if (!user || !code) return null;
+  const bn = lang === 'bn';
+  const link = `https://nursingcareerbd.com/premium?coupon=${code}`;
+  const share = () => {
+    const text = bn ? `Nursing Career BD-তে প্রিমিয়াম নিতে আমার রেফারেল কোড ${code} দিন, ৳${num(50)} ছাড় পাবেন: ${link}` : `Use my referral code ${code} on Nursing Career BD for ৳50 off: ${link}`;
+    if (navigator.share) navigator.share({ text }).catch(() => {});
+    else { navigator.clipboard?.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }
+  };
+  return (
+    <section className="card flex flex-wrap items-center gap-3 p-4">
+      <Gift className="h-6 w-6 shrink-0 text-mint-600" />
+      <div className="min-w-0 flex-1 text-sm">
+        <b className="text-ink">{bn ? 'বন্ধুকে রেফার করুন' : 'Refer a friend'}</b>
+        <span className="block text-ink-soft">{bn ? `আপনার কোড দিলে বন্ধু ৳${num(50)} ছাড় পাবে।` : 'Your friend gets ৳50 off with your code.'} <span className="font-mono font-bold tracking-wider text-mint-700">{code}</span></span>
+      </div>
+      <button className="btn-ghost !py-2" onClick={share}><Copy className="h-4 w-4" />{copied ? (bn ? 'কপি হয়েছে' : 'Copied') : (bn ? 'শেয়ার করুন' : 'Share')}</button>
+    </section>
+  );
+}
 const GW_LABEL: Record<string, string> = { bkash: 'bKash', nagad: 'Nagad', sslcommerz: 'Card / Bank (SSLCommerz)' };
 const GW_STYLE: Record<string, string> = {
   bkash: 'bg-[#e2136e] text-white hover:opacity-90', nagad: 'bg-[#f6921e] text-white hover:opacity-90', sslcommerz: 'bg-brand-700 text-white hover:bg-brand-800',
@@ -80,9 +111,11 @@ function PremiumView() {
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState('');
   const [offer, setOffer] = useState<{ code: string; discount_type: string; value: number } | null>(null);
+  const [winter, setWinter] = useState<Winter | null>(null);
 
   useEffect(() => {
     const sb = supabaseBrowser();
+    sb.rpc('winter_offer_status').then(({ data }) => setWinter((data as Winter) ?? null));
     sb.rpc('public_featured_coupon').then(({ data }) => setOffer(((data as { code: string; discount_type: string; value: number }[] | null) ?? [])[0] ?? null));
     sb.from('app_settings').select('key, value').in('key', ['price_lifetime', 'price_single_test', 'payment_gateways', 'manual_payment']).then(({ data }) => {
       const m = Object.fromEntries((data ?? []).map((r: { key: string; value: unknown }) => [r.key, r.value]));
@@ -97,16 +130,28 @@ function PremiumView() {
   }, [testId]);
 
   const basePrice = plan === 'lifetime' ? prices?.lifetime : (test?.price ?? prices?.single);
-  const payable = quote?.coupon_valid ? quote.amount : basePrice;
+  const payable = quote ? quote.amount : basePrice;
+  const winterOn = plan === 'lifetime' && !!winter?.active;
+
+  // Price without a code (the winter offer applies to Lifetime while seats are left)
+  useEffect(() => {
+    if (!prices) return;
+    supabaseBrowser().rpc('quote_price', { p_plan: plan, p_test: plan === 'single_test' ? testId : null, p_coupon: null })
+      .then(({ data }) => { if (data) setQuote(data as Quote); });
+  }, [prices, plan, testId]);
 
   async function applyCoupon(code?: string) {
     setCouponMsg(null);
     const c = (code ?? coupon).trim();
     if (code) setCoupon(code);
+    if (!c) return;
     const { data, error } = await supabaseBrowser().rpc('quote_price', { p_plan: plan, p_test: plan === 'single_test' ? testId : null, p_coupon: c });
     if (error) { setCouponMsg({ ok: false, text: error.message }); return; }
     setQuote(data as Quote);
-    setCouponMsg((data as Quote).coupon_valid ? { ok: true, text: t('couponOk') } : { ok: false, text: t('couponBad') });
+    const q = data as Quote;
+    setCouponMsg(q.coupon_valid
+      ? { ok: true, text: q.offer === 'referral' ? (lang === 'bn' ? 'রেফারেল কোড প্রয়োগ হয়েছে (৳৫০ ছাড়)' : 'Referral code applied (৳50 off)') : t('couponOk') }
+      : { ok: false, text: t('couponBad') });
   }
 
   // Coming from the home notice board (?coupon=CODE): apply it automatically once prices are known
@@ -150,7 +195,18 @@ function PremiumView() {
           <span className="absolute right-3 top-3 chip bg-blush-600 text-white">{lang === 'bn' ? 'সেরা মূল্য' : 'Best value'}</span>
           <Crown className="h-7 w-7 text-blush-600" />
           <h3 className="mt-2 font-bold text-ink">{t('lifetime')}</h3>
-          <div className="mt-1 text-3xl font-bold text-ink">৳{num(prices.lifetime)}</div>
+          {winterOn ? (
+            <>
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-brand-600 px-2.5 py-0.5 text-xs font-bold text-white"><Snowflake className="h-3.5 w-3.5" />{lang === 'bn' ? 'শীতের অফার' : 'Winter offer'}</span>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-ink">৳{num(winter!.price)}</span>
+                <span className="text-lg text-ink-soft line-through">৳{num(prices.lifetime)}</span>
+              </div>
+              <div className="text-xs font-semibold text-blush-700">{lang === 'bn' ? `৳${num(prices.lifetime - winter!.price)} ছাড় · প্রথম ${num(winter!.limit)} জনের জন্য · বাকি ${num(winter!.left)} জন` : `৳${prices.lifetime - winter!.price} off · first ${winter!.limit} buyers · ${winter!.left} left`}</div>
+            </>
+          ) : (
+            <div className="mt-1 text-3xl font-bold text-ink">৳{num(prices.lifetime)}</div>
+          )}
           <div className="text-xs text-ink-soft">{t('oneTime')}</div>
           <ul className="mt-3 space-y-1.5 text-sm">
             {features.map((f) => <li key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-mint-600" />{t(f)}</li>)}
@@ -183,17 +239,27 @@ function PremiumView() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Ticket className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-ink-soft" />
-              <input className="input pl-9 uppercase" value={coupon} onChange={(e) => { setCoupon(e.target.value); setQuote(null); setCouponMsg(null); }} />
+              <input className="input pl-9 uppercase" value={coupon} onChange={(e) => {
+                setCoupon(e.target.value); setCouponMsg(null);
+                if (quote?.coupon_valid) supabaseBrowser().rpc('quote_price', { p_plan: plan, p_test: plan === 'single_test' ? testId : null, p_coupon: null }).then(({ data }) => { if (data) setQuote(data as Quote); });
+              }} />
             </div>
             <button className="btn-ghost" onClick={() => applyCoupon()} disabled={!coupon.trim()}>{t('apply')}</button>
           </div>
           {couponMsg && <p className={`mt-1 text-sm ${couponMsg.ok ? 'text-mint-700' : 'text-red-600'}`}>{couponMsg.text}</p>}
+          {winterOn && (
+            <p className="mt-2 rounded-xl bg-amber-50 p-2.5 text-xs leading-relaxed text-amber-900">
+              {lang === 'bn'
+                ? `খেয়াল করুন: কুপন বা রেফারেল কোড দিলে শীতের অফার (৳${num(winter!.price)}) প্রযোজ্য হবে না। কোডের ছাড় হিসাব হবে মূল দাম ৳${num(prices.lifetime)} থেকে।`
+                : `Note: with a coupon or referral code the winter offer (৳${winter!.price}) does not apply; the code's discount is taken off the full price ৳${prices.lifetime}.`}
+            </p>
+          )}
         </div>
 
         <div className="flex items-end justify-between border-t border-brand-100 pt-4">
           <span className="text-sm text-ink-soft">{lang === 'bn' ? 'মোট পরিশোধ' : 'Total payable'}</span>
           <span className="text-right">
-            {quote?.coupon_valid && <span className="mr-2 text-sm text-ink-soft line-through">৳{num(basePrice ?? 0)}</span>}
+            {!!quote && quote.discount > 0 && <span className="mr-2 text-sm text-ink-soft line-through">৳{num(basePrice ?? 0)}</span>}
             <span className="text-2xl font-bold text-ink">৳{num(payable ?? 0)}</span>
           </span>
         </div>
@@ -217,6 +283,7 @@ function PremiumView() {
           </div>
         )}
       </section>
+      <ReferralCard />
     </div>
   );
 }

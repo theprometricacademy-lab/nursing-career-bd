@@ -8,7 +8,7 @@ import { useL } from '../AdminShell';
 type P = {
   id: string; user_id: string; plan: string; mock_test_id: number | null; amount: number; original_amount: number; gateway: string;
   status: string; gateway_ref: string | null; gateway_txn_id: string | null; created_at: string; verified_at: string | null;
-  gateway_payload?: { method?: string; sender?: string; paid_to?: string } | null;
+  gateway_payload?: { method?: string; sender?: string; paid_to?: string; auto_approved?: boolean; checked_at?: string; offer?: string; code?: string } | null;
   profiles?: { full_name: string | null; phone: string | null } | null;
 };
 const TONE: Record<string, string> = {
@@ -56,7 +56,17 @@ export default function PaymentsAdmin() {
     setErr(error ? error.message : ''); load();
   }
 
+  async function check(p: P, genuine: boolean) {
+    const ok = genuine
+      ? confirm(L(`TrxID ${p.gateway_txn_id} আপনার ${p.gateway_payload?.method === 'nagad' ? 'Nagad' : 'bKash'} অ্যাপে ৳${p.amount} হিসেবে মিলেছে?`, `Did TrxID ${p.gateway_txn_id} match ৳${p.amount} in your app?`))
+      : confirm(L('এই TrxID ভুয়া? নিশ্চিত করলে এই ইউজারের প্রিমিয়াম সাথে সাথে বন্ধ হবে, আর পরেরবার তার পেমেন্ট আর স্বয়ংক্রিয়ভাবে চালু হবে না।', 'Is this TrxID fake? Premium is revoked at once, and this user\'s future payments will need manual approval.'));
+    if (!ok) return;
+    const { error } = await sb.rpc('admin_check_auto_payment', { p_payment: p.id, p_genuine: genuine });
+    setErr(error ? error.message : ''); load();
+  }
+
   const pendingManual = (rows ?? []).filter((r) => r.gateway === 'manual' && r.status === 'pending');
+  const toCheck = (rows ?? []).filter((r) => r.gateway === 'manual' && r.status === 'paid' && r.gateway_payload?.auto_approved && !r.gateway_payload?.checked_at);
   const total = (rows ?? []).filter((r) => r.status === 'paid').reduce((s, r) => s + Number(r.amount), 0);
 
   return (
@@ -67,6 +77,29 @@ export default function PaymentsAdmin() {
           {Object.keys(TONE).map((s) => <option key={s} value={s}>{s}</option>)}
         </select>} />
       {err && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p>}
+      {toCheck.length > 0 && (
+        <section className="card border-amber-300 p-4">
+          <h2 className="mb-1 font-semibold text-ink">{L('স্বয়ংক্রিয়ভাবে চালু হয়েছে — বিকাশ/নগদে মিলিয়ে দেখুন', 'Auto-activated — check in bKash/Nagad')} ({num(toCheck.length)})</h2>
+          <p className="mb-3 text-xs text-ink-soft">{L('এরা TrxID দিতেই প্রিমিয়াম পেয়েছে। আপনার অ্যাপে TrxID ও টাকা মিললে "মিলেছে" চাপুন; না মিললে "ভুয়া" চাপুন — প্রিমিয়াম সাথে সাথে বন্ধ হবে।', 'These got Premium on submitting a TrxID. Press "Matched" if it is in your app, or "Fake" to revoke at once.')}</p>
+          <div className="space-y-2">
+            {toCheck.map((p) => (
+              <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-amber-50 p-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold">{p.profiles?.full_name || '—'} <span className="text-xs font-normal text-ink-soft">{p.profiles?.phone}</span></div>
+                  <div className="text-xs text-ink-soft">
+                    {p.gateway_payload?.method === 'nagad' ? 'Nagad' : 'bKash'} · {L('পাঠিয়েছেন', 'from')} {p.gateway_payload?.sender}
+                    {p.gateway_payload?.offer === 'winter' ? ` · ${L('শীতের অফার', 'winter offer')}` : p.gateway_payload?.code ? ` · ${L('কোড', 'code')} ${p.gateway_payload.code}` : ''} · {new Date(p.created_at).toLocaleString()}
+                  </div>
+                </div>
+                <span className="font-mono font-bold">{p.gateway_txn_id}</span>
+                <span className="font-bold">৳{num(p.amount)}</span>
+                <button className="btn-success !px-3 !py-1.5" onClick={() => check(p, true)}>{L('মিলেছে ✓', 'Matched ✓')}</button>
+                <button className="btn-ghost !px-3 !py-1.5 text-red-600" onClick={() => check(p, false)}>{L('ভুয়া — বাতিল', 'Fake — revoke')}</button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {pendingManual.length > 0 && (
         <section className="card border-blush-200 p-4">
           <h2 className="mb-1 font-semibold text-ink">{L('যাচাইয়ের অপেক্ষায় Send Money পেমেন্ট', 'Send Money payments awaiting verification')} ({num(pendingManual.length)})</h2>

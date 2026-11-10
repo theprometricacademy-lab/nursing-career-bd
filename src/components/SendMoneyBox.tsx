@@ -62,7 +62,7 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
       return;
     }
     setTrx(''); setSender('');
-    setMsg({ ok: true, text: bn ? 'জমা হয়েছে! যাচাইয়ের পর সাধারণত কয়েক ঘণ্টার মধ্যে প্রিমিয়াম চালু হবে।' : 'Submitted! Premium will be activated after verification, usually within a few hours.' });
+    setMsg({ ok: true, text: bn ? 'জমা হয়েছে! ১ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু হবে।' : 'Submitted! Your Premium will be activated within 1 minute.' });
     loadPending();
   }
 
@@ -99,6 +99,9 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
         <li>২. {bn ? 'টাকার পরিমাণ:' : 'Amount:'} <b className="text-lg">৳{num(amount)}</b></li>
         <li>৩. {bn ? 'টাকা পাঠানোর পর মেসেজে আসা Transaction ID (TrxID) নিচে লিখুন।' : 'Enter the Transaction ID (TrxID) from the confirmation message below.'}</li>
       </ol>
+      <p className="flex items-center gap-2 rounded-xl bg-mint-50 p-2.5 text-sm font-semibold text-mint-700">
+        <Clock className="h-4 w-4 shrink-0" />{bn ? 'TrxID জমা দেওয়ার ১ মিনিটের মধ্যে প্রিমিয়াম চালু হবে।' : 'Premium is activated within 1 minute of submitting your TrxID.'}
+      </p>
 
       <form onSubmit={submit} className="grid gap-2 sm:grid-cols-2">
         <input className="input" required inputMode="tel" placeholder={bn ? 'যে নম্বর থেকে পাঠিয়েছেন' : 'Number you sent from'} value={sender} onChange={(e) => setSender(e.target.value)} />

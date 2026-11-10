@@ -47,12 +47,14 @@ export default function HomePage() {
   const { t, pick, user, num, lang, premium, profile } = useApp();
   const subjects = useSubjects();
   const [price, setPrice] = useState<number | null>(null);
+  const [winter, setWinter] = useState<{ active: boolean; price: number; limit: number } | null>(null);
   const [open, setOpen] = useState<number | null>(0);
   const i = lang === 'bn' ? 0 : 1;
   const L = (bn: string, en: string) => (lang === 'bn' ? bn : en);
 
   useEffect(() => {
     const sb = supabaseBrowser();
+    sb.rpc('winter_offer_status').then(({ data }) => setWinter(data as { active: boolean; price: number; limit: number } | null));
     sb.from('app_settings').select('value').eq('key', 'price_lifetime').maybeSingle()
       .then(({ data }) => setPrice(data ? Number(data.value) : null));
   }, []);
@@ -71,7 +73,7 @@ export default function HomePage() {
     [L('১০০ নম্বর', '100 marks'), L('PSC প্যাটার্নে মডেল টেস্ট', 'PSC-pattern mock tests'), '/mock-tests'],
     premium
       ? [L('প্রিমিয়াম চালু', 'Premium active'), L('সব প্রশ্ন ও মডেল টেস্ট খোলা', 'all questions and mock tests unlocked'), '/premium']
-      : [L('প্রিমিয়াম প্যাকেজ', 'Premium package'), price ? L(`একবার ৳${num(price)} · আজীবন অ্যাক্সেস`, `one-time ৳${price} · lifetime access`) : L('সব প্রশ্ন ও মডেল টেস্ট খুলুন', 'unlock all questions and mock tests'), '/premium'],
+      : [L('প্রিমিয়াম প্যাকেজ', 'Premium package'), winter?.active ? L(`❄️ শীতের অফার ৳${num(winter.price)} · প্রথম ${num(winter.limit)} জন`, `❄️ Winter offer ৳${winter.price} · first ${winter.limit}`) : price ? L(`একবার ৳${num(price)} · আজীবন অ্যাক্সেস`, `one-time ৳${price} · lifetime access`) : L('সব প্রশ্ন ও মডেল টেস্ট খুলুন', 'unlock all questions and mock tests'), '/premium'],
   ];
 
   const steps = [
@@ -88,6 +90,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <div className="-mt-2"><NoticeBoard /></div>
 
       {/* Hero */}
       {premium ? (
@@ -149,7 +152,6 @@ export default function HomePage() {
       </section>
       )}
 
-      <NoticeBoard />
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">

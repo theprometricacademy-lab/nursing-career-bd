@@ -14,12 +14,14 @@ function offText(c: Coupon) {
   return c.discount_type === 'percent' ? `${bnNum(Number(c.value))}% ছাড়` : `৳${bnNum(Number(c.value))} ছাড়`;
 }
 
-/** Home-page notice board: pops up once per visit (closable with ✕) and can be reopened from the bar. */
+/** Home-page notices: a slim right-to-left ticker under the circulars strip; tapping it opens the full board.
+ *  It never pops up by itself (a pop-up on arrival was sending new visitors away). */
 export function NoticeBoard() {
-  const { pick, premium, user } = useApp();
+  const { pick, premium } = useApp();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [openCount, setOpenCount] = useState(0);
+  const [winter, setWinter] = useState<{ active: boolean; price: number; limit: number; left: number } | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -30,21 +32,15 @@ export function NoticeBoard() {
       sb.from('notices').select('id, title_en, title_bn, body_en, body_bn').eq('is_published', true).order('published_at', { ascending: false }).limit(3),
       sb.rpc('public_featured_coupon'),
       sb.from('circulars').select('id', { count: 'exact', head: true }).eq('is_published', true).gte('apply_end', new Date().toISOString()),
-    ]).then(([n, c, o]) => {
+      sb.rpc('winter_offer_status'),
+    ]).then(([n, c, o, w]) => {
+      setWinter((w.data as typeof winter) ?? null);
       setNotices((n.data as Notice[]) ?? []);
       setCoupon(((c.data as Coupon[] | null) ?? [])[0] ?? null);
       setOpenCount(o.count ?? 0);
       setLoaded(true);
     });
   }, []);
-
-  // Pop up automatically only for logged-in members; new visitors (e.g. from ads) just see the bar
-  useEffect(() => {
-    if (!loaded || !user) return;
-    let closed = false;
-    try { closed = sessionStorage.getItem(KEY) === '1'; } catch { /* storage unavailable */ }
-    if (!closed) setOpen(true);
-  }, [loaded, user]);
 
   useEffect(() => {
     if (!open) return;
@@ -62,23 +58,36 @@ export function NoticeBoard() {
     try { await navigator.clipboard.writeText(coupon.code); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* ignore */ }
   }
 
-  const showCoupon = coupon && !premium;
-  if (!loaded || (!notices.length && !showCoupon && !openCount)) return null;
+  const showWinter = !!winter?.active && !premium;
+  // while the winter offer runs it is the better deal, so the coupon isn't advertised
+  const showCoupon = !!coupon && !premium && !showWinter;
+  if (!loaded || (!notices.length && !showCoupon && !showWinter)) return null;
+
+  const items: { key: string; text: string; href?: string }[] = [
+    ...(showWinter ? [{ key: 'w', text: `❄️ শীতের অফার: প্রথম ${bnNum(winter!.limit)} জনের জন্য প্রিমিয়াম মাত্র ৳${bnNum(Number(winter!.price))} · বাকি ${bnNum(winter!.left)} জন`, href: '/premium' }] : []),
+    ...(showCoupon ? [{ key: 'c', text: `প্রিমিয়ামে ${offText(coupon!)} · কুপন ${coupon!.code}`, href: `/premium?coupon=${encodeURIComponent(coupon!.code)}` }] : []),
+    ...notices.map((n) => ({ key: `n${n.id}`, text: pick(n, 'title') })),
+  ];
+  const row = (dup: boolean) => items.map((it) => {
+    const cls = 'mx-1.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-brand-50';
+    const inner = <><span className="h-1.5 w-1.5 rounded-full bg-brand-500" />{it.text}</>;
+    return it.href
+      ? <Link key={(dup ? 'd' : '') + it.key} href={it.href} className={cls} aria-hidden={dup || undefined} tabIndex={dup ? -1 : undefined}>{inner}</Link>
+      : <button key={(dup ? 'd' : '') + it.key} type="button" onClick={() => setOpen(true)} className={cls} aria-hidden={dup || undefined} tabIndex={dup ? -1 : undefined}>{inner}</button>;
+  });
 
   return (
     <>
-      {/* Always-visible bar near the top of the home page */}
-      <button onClick={() => setOpen(true)}
-        className="card flex w-full items-center gap-3 border-blush-200 bg-gradient-to-r from-blush-50 to-white p-3.5 text-left transition hover:shadow-md">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blush-600 text-white"><Megaphone className="h-5 w-5" /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-semibold text-ink">নোটিশ বোর্ড</span>
-          <span className="block truncate text-sm text-ink-soft">
-            {showCoupon ? `প্রিমিয়ামে ${offText(coupon!)} · কুপন ${coupon!.code}` : notices[0] ? pick(notices[0], 'title') : `${bnNum(openCount)}টি সার্কুলারে আবেদন চলছে`}
-          </span>
-        </span>
-        <span className="chip bg-blush-600 text-white">দেখুন</span>
-      </button>
+      {/* Slim ticker, right to left, like the circulars strip above it */}
+      <div className="flex items-center gap-2 overflow-hidden rounded-full bg-brand-50/70 py-1 pl-1 ring-1 ring-brand-100">
+        <button type="button" onClick={() => setOpen(true)} className="chip z-10 shrink-0 bg-brand-600 py-1.5 text-white"><Megaphone className="h-3.5 w-3.5" />নোটিশ</button>
+        <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_16px,#000_calc(100%-16px),transparent)]">
+          <div className="flex w-max animate-marquee hover:[animation-play-state:paused] active:[animation-play-state:paused] motion-reduce:animate-none"
+            style={{ animationDuration: `${Math.max(18, items.length * 14)}s` }}>
+            {row(false)}{row(true)}
+          </div>
+        </div>
+      </div>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="নোটিশ বোর্ড">
@@ -92,6 +101,14 @@ export function NoticeBoard() {
             </div>
 
             <div className="max-h-[70vh] space-y-3 overflow-y-auto p-4">
+              {showWinter && (
+                <Link href="/premium" onClick={close} className="block rounded-2xl bg-gradient-to-br from-brand-600 to-brand-500 p-4 text-white">
+                  <div className="text-sm font-semibold text-white/90">❄️ শীতের অফার</div>
+                  <div className="mt-1 text-2xl font-extrabold">প্রিমিয়াম মাত্র ৳{bnNum(Number(winter!.price))}</div>
+                  <p className="mt-1 text-sm text-white/90">প্রথম {bnNum(winter!.limit)} জনের জন্য · বাকি {bnNum(winter!.left)} জন · আজীবন অ্যাক্সেস</p>
+                  <span className="btn mt-3 w-full bg-white text-brand-700">এখনই অফারটি নিন</span>
+                </Link>
+              )}
               {showCoupon && (
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blush-600 to-blush-500 p-4 text-white">
                   <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/15" />
