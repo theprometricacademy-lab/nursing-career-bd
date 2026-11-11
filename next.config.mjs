@@ -1,6 +1,10 @@
 // A fresh id for every build: open pages (and the Android app) compare it with /build-id
 // and reload themselves when a newer version of the site is live.
-const BUILD_ID = String(Date.now());
+// Next.js reads this config several times during one build (sometimes in separate processes), so a plain
+// Date.now() gave the browser code and the /build-id route DIFFERENT ids — every page then thought it was
+// outdated and reloaded itself. Use the commit being built (same everywhere), else one shared value.
+const BUILD_ID = (process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').slice(0, 12)
+  || (process.env.NCBD_BUILD_ID ||= String(Date.now()));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

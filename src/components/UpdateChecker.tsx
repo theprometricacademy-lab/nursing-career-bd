@@ -18,7 +18,13 @@ async function checkLive() {
   if (!mine || stale) return;
   try {
     const live = (await (await fetch('/build-id', { cache: 'no-store' })).text()).trim();
-    if (live && live !== mine) stale = true;
+    if (!live || live === mine) return;
+    // Already reloaded once for this live build and still differ? Then a reload can't fix it — never loop.
+    let tried = '';
+    try { tried = sessionStorage.getItem('ncbd_reloaded_for') ?? ''; } catch { /* blocked */ }
+    if (tried === live) return;
+    try { sessionStorage.setItem('ncbd_reloaded_for', live); } catch { /* blocked */ }
+    stale = true;
   } catch { /* offline: try again later */ }
 }
 
