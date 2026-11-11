@@ -48,16 +48,19 @@ export default function HomePage() {
   const { t, pick, user, num, lang, premium, profile, ready } = useApp();
   const subjects = useSubjects();
   const [price, setPrice] = useState<number | null>(null);
-  const [winter, setWinter] = useState<{ active: boolean; price: number; limit: number } | null>(null);
+  const [winter, setWinter] = useState<{ active: boolean; price: number; limit: number; left?: number } | null>(null);
+  const [refOff, setRefOff] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(0);
   const i = lang === 'bn' ? 0 : 1;
   const L = (bn: string, en: string) => (lang === 'bn' ? bn : en);
 
   useEffect(() => {
     const sb = supabaseBrowser();
-    sb.rpc('winter_offer_status').then(({ data }) => setWinter(data as { active: boolean; price: number; limit: number } | null));
-    sb.from('app_settings').select('value').eq('key', 'price_lifetime').maybeSingle()
-      .then(({ data }) => setPrice(data ? Number(data.value) : null));
+    sb.rpc('winter_offer_status').then(({ data }) => setWinter(data as { active: boolean; price: number; limit: number; left?: number } | null));
+    sb.from('app_settings').select('key, value').in('key', ['price_lifetime', 'referral_discount']).then(({ data }) => {
+      const m = Object.fromEntries((data ?? []).map((r: { key: string; value: unknown }) => [r.key, Number(r.value)]));
+      setPrice(m.price_lifetime || null); setRefOff(m.referral_discount || null);
+    });
   }, []);
 
   const features = [
@@ -275,11 +278,38 @@ export default function HomePage() {
             <div className="min-w-0 flex-1">
               <h2 className="text-lg font-bold">{L('প্রিমিয়াম নিন — সব প্রশ্ন ও সব মডেল টেস্ট', 'Go Premium — every question and every mock test')}</h2>
               <p className="text-sm text-white/90">
-                {price ? L(`একবার ৳${num(price)} পেমেন্টে লাইফটাইম অ্যাক্সেস। মাসিক কোনো চার্জ নেই।`, `Lifetime access for a one-time ৳${price}. No monthly fee.`)
+                {winter?.active && price
+                  ? <>{L('লাইফটাইম অ্যাক্সেস ', 'Lifetime access ')}<s className="opacity-75">৳{num(price)}</s> <b className="text-base text-white">৳{num(winter.price)}</b>{L(' — একবার পেমেন্ট, মাসিক চার্জ নেই।', ' — one-time, no monthly fee.')}</>
+                  : price ? L(`একবার ৳${num(price)} পেমেন্টে লাইফটাইম অ্যাক্সেস। মাসিক কোনো চার্জ নেই।`, `Lifetime access for a one-time ৳${price}. No monthly fee.`)
                   : L('একবারের পেমেন্টে লাইফটাইম অ্যাক্সেস। মাসিক কোনো চার্জ নেই।', 'Lifetime access for a one-time payment. No monthly fee.')}
               </p>
             </div>
-            <Link href="/premium" className="btn bg-white text-blush-700 hover:bg-blush-50">{L('প্রিমিয়াম দেখুন', 'See Premium')} <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/premium" className="btn bg-white text-blush-700 hover:bg-blush-50">{winter?.active ? L('অফারে নিন', 'Get the offer') : L('প্রিমিয়াম দেখুন', 'See Premium')} <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+          {/* running offers */}
+          <div className="relative mt-4 grid gap-2 sm:grid-cols-3">
+            {winter?.active && (
+              <Link href="/premium" className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/25 transition hover:bg-white/25">
+                <p className="text-xs font-semibold uppercase tracking-wide text-white/80">{L('চলমান অফার', 'Running offer')}</p>
+                <p className="mt-0.5 font-bold">❄️ {L('শীতের অফার', 'Winter offer')}: ৳{num(winter.price)}{price ? <span className="ml-1 text-sm font-medium line-through opacity-70">৳{num(price)}</span> : null}</p>
+                <p className="text-xs text-white/90">{L(`প্রথম ${num(winter.limit)} জনের জন্য`, `For the first ${winter.limit}`)}{typeof winter.left === 'number' ? L(` · বাকি ${num(winter.left)} জন`, ` · ${winter.left} left`) : ''}</p>
+                {typeof winter.left === 'number' && winter.limit > 0 && (
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/25"><div className="h-full rounded-full bg-white" style={{ width: `${Math.max(4, Math.round(((winter.limit - winter.left) / winter.limit) * 100))}%` }} /></div>
+                )}
+              </Link>
+            )}
+            <Link href="/previous-questions" className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/25 transition hover:bg-white/25">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/80">{L('একদম ফ্রি', 'Totally free')}</p>
+              <p className="mt-0.5 font-bold">🎁 {L('বিগত সালের সব প্রশ্ন', 'All previous-year papers')}</p>
+              <p className="text-xs text-white/90">{L('সাথে সেগুলোর মডেল টেস্টও ফ্রি', 'plus their mock tests, free')}</p>
+            </Link>
+            {refOff ? (
+              <Link href="/premium" className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/25 transition hover:bg-white/25">
+                <p className="text-xs font-semibold uppercase tracking-wide text-white/80">{L('রেফারেল', 'Referral')}</p>
+                <p className="mt-0.5 font-bold">🤝 {L(`বন্ধুর কোডে ৳${num(refOff)} ছাড়`, `৳${refOff} off with a friend's code`)}</p>
+                <p className="text-xs text-white/90">{price ? L(`মূল দাম ৳${num(price)} থেকে`, `from the full ৳${price}`) : ''}</p>
+              </Link>
+            ) : null}
           </div>
         </section>
       )}
