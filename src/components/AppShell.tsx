@@ -11,7 +11,7 @@ import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
 import { InstallMenuItem, registerPwa } from './InstallApp';
 import { useUpdateChecker } from './UpdateChecker';
-import { LegalLinks, SUPPORT_PHONE } from './LegalPage';
+import { LegalLinks, SUPPORT_PHONE, SUPPORT_EMAIL, FACEBOOK_URL } from './LegalPage';
 import { CircularRail, CircularStrip } from './CircularRail';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import type { DictKey } from '@/lib/i18n';
@@ -165,6 +165,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link href="/nursing-mcq">নার্সিং MCQ প্রশ্ন ও উত্তর</Link>
             </div>
             <LegalLinks />
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+              <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-[#1877F2] px-3 py-1 font-semibold text-white">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+                Facebook পেজ
+              </a>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium text-brand-700">{SUPPORT_EMAIL}</a>
+            </div>
             <p className="mt-1 text-xs text-ink-soft">© {new Date().getFullYear()} Nursing Career BD · {SUPPORT_PHONE}</p>
           </footer>
         </main>

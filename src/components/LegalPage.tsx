@@ -5,6 +5,8 @@ import { PageHeader } from './ui';
 
 export const SUPPORT_PHONE = '01710921994';
 export const SUPPORT_PHONE_INTL = '+8801710921994';
+export const SUPPORT_EMAIL = 'nursingcareerbd@gmail.com';
+export const FACEBOOK_URL = 'https://www.facebook.com/share/1Ej43zxCY7/';
 
 type Bi = [bn: string, en: string];
 export type LegalSection = { h: Bi; p: Bi[] };

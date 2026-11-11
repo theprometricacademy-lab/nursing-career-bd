@@ -1,9 +1,9 @@
 'use client';
 import Link from 'next/link';
-import { Phone, MessageCircle, Globe } from 'lucide-react';
+import { Phone, MessageCircle, Globe, Mail, ThumbsUp } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader } from '@/components/ui';
-import { LegalLinks, SUPPORT_PHONE, SUPPORT_PHONE_INTL } from '@/components/LegalPage';
+import { LegalLinks, SUPPORT_PHONE, SUPPORT_PHONE_INTL, SUPPORT_EMAIL, FACEBOOK_URL } from '@/components/LegalPage';
 
 export default function ContactPage() {
   const { lang } = useApp();
@@ -11,6 +11,8 @@ export default function ContactPage() {
   const rows = [
     { icon: Phone, label: bn ? 'ফোন' : 'Phone', value: SUPPORT_PHONE, href: `tel:${SUPPORT_PHONE_INTL}` },
     { icon: MessageCircle, label: 'WhatsApp', value: SUPPORT_PHONE, href: `https://wa.me/${SUPPORT_PHONE_INTL.replace('+', '')}` },
+    { icon: Mail, label: bn ? 'ইমেইল' : 'Email', value: SUPPORT_EMAIL, href: `mailto:${SUPPORT_EMAIL}` },
+    { icon: ThumbsUp, label: bn ? 'ফেসবুক পেজ' : 'Facebook page', value: 'Nursing Career BD', href: FACEBOOK_URL },
     { icon: Globe, label: bn ? 'ওয়েবসাইট' : 'Website', value: 'nursingcareerbd.com', href: 'https://nursingcareerbd.com' },
   ];
   return (
