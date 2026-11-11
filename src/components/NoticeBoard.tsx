@@ -68,7 +68,7 @@ export function NoticeBoard() {
     ...(showWinter ? [{ key: 'w', text: `❄️ শীতের অফার: প্রথম ${bnNum(winter!.limit)} জনের জন্য প্রিমিয়াম মাত্র ৳${bnNum(Number(winter!.price))} · বাকি ${bnNum(winter!.left)} জন`, href: '/premium' }] : []),
     { key: 'pyq', text: '🎁 বিগত সালের সব প্রশ্ন ও সেগুলোর মডেল টেস্ট এখন একদম ফ্রি', href: '/previous-questions' },
     ...(showWinter ? [{ key: 'ref', text: '🤝 বন্ধুর রেফারেল কোডে ৳৫০ ছাড় (মূল দাম ৳৫৯৯ থেকে)', href: '/premium' }] : []),
-    { key: 'fast', text: '⚡ bKash/Nagad-এ পেমেন্ট করে TrxID দিলে ১ মিনিটের মধ্যে প্রিমিয়াম চালু', href: '/premium' },
+    { key: 'fast', text: '💳 bKash/Nagad-এ পেমেন্ট করে TrxID দিন — যাচাইয়ের পর প্রিমিয়াম চালু', href: '/premium' },
     ...(showCoupon ? [{ key: 'c', text: `প্রিমিয়ামে ${offText(coupon!)} · কুপন ${coupon!.code}`, href: `/premium?coupon=${encodeURIComponent(coupon!.code)}` }] : []),
     ...notices.map((n) => ({ key: `n${n.id}`, text: pick(n, 'title') })),
   ];
@@ -113,7 +113,7 @@ export function NoticeBoard() {
                   <ul className="mt-2 space-y-1 text-sm text-white/95">
                     <li>🎁 বিগত সালের সব প্রশ্ন ও মডেল টেস্ট ফ্রি</li>
                     <li>🤝 রেফারেল কোডে ৳৫০ ছাড় (মূল দাম ৳৫৯৯ থেকে; তখন শীতের অফার প্রযোজ্য নয়)</li>
-                    <li>⚡ TrxID দেওয়ার ১ মিনিটের মধ্যে চালু</li>
+                    <li>💳 bKash / Nagad-এ সহজ পেমেন্ট</li>
                   </ul>
                   <span className="btn mt-3 w-full bg-white text-brand-700">{premium ? 'বন্ধুদের জানান' : 'এখনই অফারটি নিন'}</span>
                 </Link>

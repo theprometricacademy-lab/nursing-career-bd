@@ -5,7 +5,7 @@ import { Copy, Check, Smartphone, Clock } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 
-export type ManualCfg = { enabled: boolean; bkash: string; nagad: string; account_type?: string; bkash_type?: 'personal' | 'merchant'; nagad_type?: 'personal' | 'merchant' };
+export type ManualCfg = { enabled: boolean; bkash: string; nagad: string; account_type?: string; auto_approve?: boolean; bkash_type?: 'personal' | 'merchant'; nagad_type?: 'personal' | 'merchant' };
 
 const ERR: Record<string, [string, string]> = {
   bad_trx: ['সঠিক TrxID দিন (৮–১২ অক্ষরের ইংরেজি অক্ষর ও সংখ্যা)।', 'Enter a valid TrxID (8–12 letters and digits).'],
@@ -66,7 +66,9 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
       return;
     }
     setTrx(''); setSender('');
-    setMsg({ ok: true, text: bn ? 'জমা হয়েছে! ১ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু হবে।' : 'Submitted! Your Premium will be activated within 1 minute.' });
+    setMsg({ ok: true, text: cfg.auto_approve
+      ? (bn ? 'জমা হয়েছে! ১ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু হবে।' : 'Submitted! Your Premium will be activated within 1 minute.')
+      : (bn ? 'জমা হয়েছে! আমরা পেমেন্টটি মিলিয়ে দেখে আপনার প্রিমিয়াম চালু করে দেব। নিচে অবস্থা দেখতে পাবেন।' : 'Submitted! We will verify the payment and activate your Premium. You can see its status below.') });
     loadPending();
   }
 
@@ -108,7 +110,9 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
         <li>৩. {bn ? 'টাকা পাঠানোর পর মেসেজে আসা Transaction ID (TrxID) নিচে লিখুন।' : 'Enter the Transaction ID (TrxID) from the confirmation message below.'}</li>
       </ol>
       <p className="flex items-center gap-2 rounded-xl bg-mint-50 p-2.5 text-sm font-semibold text-mint-700">
-        <Clock className="h-4 w-4 shrink-0" />{bn ? 'TrxID জমা দেওয়ার ১ মিনিটের মধ্যে প্রিমিয়াম চালু হবে।' : 'Premium is activated within 1 minute of submitting your TrxID.'}
+        <Clock className="h-4 w-4 shrink-0" />{cfg.auto_approve
+          ? (bn ? 'TrxID জমা দেওয়ার ১ মিনিটের মধ্যে প্রিমিয়াম চালু হবে।' : 'Premium is activated within 1 minute of submitting your TrxID.')
+          : (bn ? 'TrxID জমা দেওয়ার পর আমরা পেমেন্ট মিলিয়ে দেখে প্রিমিয়াম চালু করে দেব।' : 'After you submit the TrxID, we verify the payment and activate your Premium.')}
       </p>
 
       <form onSubmit={submit} className="grid gap-2 sm:grid-cols-2">

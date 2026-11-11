@@ -7,7 +7,7 @@ import { useL } from '../AdminShell';
 type S = {
   price_lifetime: number; price_single_test: number; default_negative_mark: number; default_duration_minutes: number;
   payment_gateways: { bkash: boolean; nagad: boolean; sslcommerz: boolean }; support_phone: string;
-  manual_payment: { enabled: boolean; bkash: string; nagad: string; account_type: string; bkash_type?: string; nagad_type?: string };
+  manual_payment: { enabled: boolean; bkash: string; nagad: string; account_type: string; auto_approve?: boolean; bkash_type?: string; nagad_type?: string };
 };
 
 export default function SettingsAdmin() {
@@ -59,6 +59,11 @@ export default function SettingsAdmin() {
           <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={s.manual_payment.enabled}
             onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, enabled: e.target.checked } })} />
           {L('এই পেমেন্ট চালু', 'Enable these payments')}
+        </label>
+        <label className="flex items-center gap-3 text-sm font-medium">
+          <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={!!s.manual_payment.auto_approve}
+            onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, auto_approve: e.target.checked } })} />
+          {L('TrxID দিলেই প্রিমিয়াম স্বয়ংক্রিয়ভাবে চালু (বন্ধ থাকলে "পেমেন্ট" পাতায় আপনি অনুমোদন দিলে চালু হবে)', 'Activate Premium automatically on TrxID (off = you approve on the Payments page)')}
         </label>
         <div className="grid gap-3 sm:grid-cols-3">
           <div><label className="label">{L('bKash নম্বর', 'bKash number')}</label><input className="input" inputMode="tel" placeholder="01XXXXXXXXX" value={s.manual_payment.bkash} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, bkash: e.target.value.trim() } })} /></div>
