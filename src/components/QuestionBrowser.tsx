@@ -21,6 +21,8 @@ export function QuestionBrowser({ filter = 'all', showExamFilters = false, empty
     subject: params.get('subject') ?? '', topic: '', exam: params.get('exam') ?? '', year: params.get('year') ?? '',
     difficulty: '', search: '',
   });
+  // New random order on every visit; the same seed keeps "load more" pages consistent within the visit
+  const [seed] = useState(() => Math.floor(Math.random() * 1_000_000_000));
   const [items, setItems] = useState<BankQuestion[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -44,12 +46,13 @@ export function QuestionBrowser({ filter = 'all', showExamFilters = false, empty
       p_filter: filter,
       p_limit: PAGE,
       p_offset: offset,
+      p_seed: seed,
     });
     setLoading(false);
     if (error) { setErr(errMsg(error)); return; }
     setTotal(data.total);
     setItems((prev) => (offset === 0 ? data.items : [...prev, ...data.items]));
-  }, [f, filter, errMsg]);
+  }, [f, filter, errMsg, seed]);
 
   // debounce filter changes
   useEffect(() => {
