@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard, FileQuestion, Upload, FolderTree, Timer, Users, CreditCard, Ticket, Megaphone, Settings, ArrowLeft, Menu, X,
-  BellRing, Activity, Flag, ImagePlus, MessageSquareHeart, FileUp, FileUp,
+  BellRing, Activity, Flag, ImagePlus, MessageSquareHeart, FileUp,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { LangToggle } from '@/components/AppShell';
@@ -22,7 +22,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const items = [
     { href: '/admin', icon: LayoutDashboard, label: L('ড্যাশবোর্ড ও পরিসংখ্যান', 'Analytics') },
     { href: '/admin/questions', icon: FileQuestion, label: L('প্রশ্ন', 'Questions') },
-    { href: '/admin/pyq-uploads', icon: FileUp, label: L('পাঠানো প্রশ্নপত্র', 'Uploaded papers') },
     { href: '/admin/pyq-uploads', icon: FileUp, label: L('পাঠানো প্রশ্নপত্র', 'Uploaded papers') },
     { href: '/admin/reports', icon: Flag, label: L('প্রশ্নের রিপোর্ট', 'Question reports') },
     { href: '/admin/import', icon: Upload, label: L('বাল্ক ইমপোর্ট', 'Bulk import') },
