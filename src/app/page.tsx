@@ -9,6 +9,7 @@ import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { GuideLinks } from '@/components/SeoBlocks';
+import { QuickQuiz } from '@/components/QuickQuiz';
 import { NoticeBoard } from '@/components/NoticeBoard';
 import { InstallBanner } from '@/components/InstallApp';
 import { SEO_SUBJECTS } from '@/lib/seoSubjects';
@@ -44,7 +45,7 @@ const PATTERN: { label: Bi; n: number; bar: string }[] = [
 ];
 
 export default function HomePage() {
-  const { t, pick, user, num, lang, premium, profile } = useApp();
+  const { t, pick, user, num, lang, premium, profile, ready } = useApp();
   const subjects = useSubjects();
   const [price, setPrice] = useState<number | null>(null);
   const [winter, setWinter] = useState<{ active: boolean; price: number; limit: number } | null>(null);
@@ -152,6 +153,7 @@ export default function HomePage() {
       </section>
       )}
 
+      {ready && !user && <QuickQuiz />}
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">

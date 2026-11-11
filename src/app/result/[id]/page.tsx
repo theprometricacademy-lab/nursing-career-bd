@@ -7,6 +7,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Progress, Spinner } from '@/components/ui';
 import { ReportQuestion } from '@/components/ReportQuestion';
+import { ResultShare } from '@/components/ShareResult';
 import { LETTERS, displayLang, type Attempt, type ViewMode } from '@/components/examTypes';
 import { ViewModeToggle } from '@/components/ViewModeToggle';
 
@@ -19,7 +20,7 @@ type Tab = 'correct' | 'wrong' | 'skipped';
 function ResultView() {
   const { id } = useParams<{ id: string }>();
   const search = useSearchParams();
-  const { t, lang, num, pick } = useApp();
+  const { t, lang, num, pick, profile } = useApp();
   const [a, setA] = useState<Attempt | null>(null);
   const [err, setErr] = useState('');
   const [tab, setTab] = useState<Tab | null>(null);
@@ -64,6 +65,9 @@ function ResultView() {
         <div className="mt-2 text-4xl font-bold">{num(Number(a.score))}<span className="text-xl opacity-80"> / {num(Number(a.max_score))}</span></div>
         <div className="mt-1 text-sm opacity-90">{num(percent)}% · {t('accuracy')} {num(accuracy)}%</div>
       </section>
+
+      <ResultShare title={pick(a, 'title') || 'মডেল টেস্ট'} correct={a.correct ?? 0} total={a.questions.length} pct={percent}
+        name={(profile?.full_name || '').split(' ')[0] || undefined} />
 
       <div className="grid grid-cols-3 gap-3" role="tablist">
         {tabs.map((x) => (
