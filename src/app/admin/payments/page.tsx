@@ -54,7 +54,9 @@ export default function PaymentsAdmin() {
   }
 
   async function review(p: P, approve: boolean) {
-    const ok = approve
+    const ok = approve && p.status === 'failed'
+      ? confirm(L(`এই পেমেন্ট আগে বাতিল করা হয়েছিল। TrxID ${p.gateway_txn_id} (৳${p.amount}) আপনার অ্যাপে মিলেছে? অনুমোদন দিলে এখনই প্রিমিয়াম চালু হবে।`, `This payment was rejected earlier. Did TrxID ${p.gateway_txn_id} (৳${p.amount}) match? Approving activates premium now.`))
+      : approve
       ? confirm(L(`TrxID ${p.gateway_txn_id} আপনার ${p.gateway_payload?.method === 'nagad' ? 'Nagad' : 'bKash'} অ্যাপে ৳${p.amount} হিসেবে মিলেছে? অনুমোদন দিলে সাথে সাথে প্রিমিয়াম চালু হবে।`, `Did TrxID ${p.gateway_txn_id} match ৳${p.amount} in your app? Approving activates premium immediately.`))
       : confirm(L('এই পেমেন্ট বাতিল করবেন?', 'Reject this payment?'));
     if (!ok) return;
@@ -158,7 +160,10 @@ export default function PaymentsAdmin() {
                   <td className="px-3 py-2">{p.gateway}</td>
                   <td className="px-3 py-2 text-xs">{p.gateway_txn_id || '—'}</td>
                   <td className="px-3 py-2"><span className={`chip ${TONE[p.status] ?? ''}`}>{p.status}</span></td>
-                  <td className="px-3 py-2 text-right">{p.status === 'paid' && <button className="text-xs text-red-600 hover:underline" onClick={() => refund(p)}>{L('রিফান্ড', 'Refund')}</button>}</td>
+                  <td className="px-3 py-2 text-right">
+                    {p.status === 'paid' && <button className="text-xs text-red-600 hover:underline" onClick={() => refund(p)}>{L('রিফান্ড', 'Refund')}</button>}
+                    {p.status === 'failed' && p.gateway === 'manual' && <button className="whitespace-nowrap text-xs font-semibold text-mint-700 hover:underline" onClick={() => review(p, true)}>{L('ভুলে বাতিল? অনুমোদন দিন', 'Rejected by mistake? Approve')}</button>}
+                  </td>
                 </tr>
               ))}
               {rows.length === 0 && <tr><td colSpan={8} className="p-6 text-center text-ink-soft">—</td></tr>}
