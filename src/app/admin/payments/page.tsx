@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
+import { Search, X } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
@@ -23,10 +24,15 @@ export default function PaymentsAdmin() {
   const [rows, setRows] = useState<P[] | null>(null);
   const [status, setStatus] = useState('');
   const [err, setErr] = useState('');
+  const [search, setSearch] = useState('');
+  const [term, setTerm] = useState('');
+  // wait until typing pauses; only letters/digits are kept (TrxIDs and phone numbers)
+  useEffect(() => { const t = setTimeout(() => setTerm(search.replace(/[^A-Za-z0-9]/g, '').toUpperCase()), 350); return () => clearTimeout(t); }, [search]);
 
   const load = useCallback(async () => {
     let q = sb.from('payments').select('*').order('created_at', { ascending: false }).limit(200);
     if (status) q = q.eq('status', status);
+    if (term) q = q.or(`gateway_txn_id.ilike.*${term}*,gateway_payload->>sender.ilike.*${term}*`);
     const { data, error } = await q;
     if (error) { setErr(error.message); return; }
     const list = (data ?? []) as P[];
@@ -37,7 +43,7 @@ export default function PaymentsAdmin() {
       list.forEach((p) => { p.profiles = (m.get(p.user_id) as P['profiles']) ?? null; });
     }
     setRows(list);
-  }, [sb, status]);
+  }, [sb, status, term]);
   useEffect(() => { load(); }, [load]);
 
   async function refund(p: P) {
@@ -76,6 +82,20 @@ export default function PaymentsAdmin() {
           <option value="">{L('সব স্ট্যাটাস', 'All statuses')}</option>
           {Object.keys(TONE).map((s) => <option key={s} value={s}>{s}</option>)}
         </select>} />
+      <div className="card flex items-center gap-2 p-3">
+        <Search className="h-5 w-5 shrink-0 text-ink-soft" />
+        <input className="input !border-0 !shadow-none font-mono uppercase" inputMode="text" autoCapitalize="characters"
+          placeholder={L('TrxID বা যে নম্বর থেকে পাঠিয়েছে — লিখে খুঁজুন', 'Search by TrxID or sender number')}
+          value={search} onChange={(e) => setSearch(e.target.value)} />
+        {search && <button className="btn-ghost !px-2 !py-1.5" onClick={() => setSearch('')} aria-label="clear"><X className="h-4 w-4" /></button>}
+      </div>
+      {term && rows && (
+        <p className={`rounded-xl p-3 text-sm ${rows.length ? 'bg-brand-50 text-brand-800' : 'bg-amber-50 text-amber-800'}`}>
+          {rows.length
+            ? L(`"${term}" — ${num(rows.length)}টি পেমেন্ট পাওয়া গেছে${pendingManual.length ? ` (${num(pendingManual.length)}টি অনুমোদনের অপেক্ষায় — নিচে অনুমোদন দিন)` : ''}।`, `"${term}" — ${rows.length} payment(s) found${pendingManual.length ? `, ${pendingManual.length} awaiting approval below` : ''}.`)
+            : L(`"${term}" দিয়ে কোনো পেমেন্ট পাওয়া যায়নি — শিক্ষার্থী এখনো TrxID জমা দেয়নি বা ভুল লিখেছে।`, `No payment found for "${term}".`)}
+        </p>
+      )}
       {err && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p>}
       {toCheck.length > 0 && (
         <section className="card border-amber-300 p-4">
@@ -102,7 +122,7 @@ export default function PaymentsAdmin() {
       )}
       {pendingManual.length > 0 && (
         <section className="card border-blush-200 p-4">
-          <h2 className="mb-1 font-semibold text-ink">{L('যাচাইয়ের অপেক্ষায় Send Money পেমেন্ট', 'Send Money payments awaiting verification')} ({num(pendingManual.length)})</h2>
+          <h2 className="mb-1 font-semibold text-ink">{L('অনুমোদনের অপেক্ষায় পেমেন্ট', 'Payments awaiting approval')} ({num(pendingManual.length)})</h2>
           <p className="mb-3 text-xs text-ink-soft">{L('আপনার bKash/Nagad অ্যাপের লেনদেন তালিকায় TrxID ও টাকার পরিমাণ মিলিয়ে তারপর অনুমোদন দিন।', 'Match the TrxID and amount in your bKash/Nagad app before approving.')}</p>
           <div className="space-y-2">
             {pendingManual.map((p) => (
