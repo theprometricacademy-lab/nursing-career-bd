@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { CalendarDays, FileText, Mail } from 'lucide-react';
 import { Article, Crumbs, Hero, Section, GuideLinks } from '@/components/SeoBlocks';
 import { PyqTabs } from '@/components/PyqTabs';
+import { PyqUpload } from '@/components/PyqUpload';
 import { listWritten } from '@/lib/writtenPapers';
 import { bn, bnExamDate } from '@/lib/examPapers';
 // plain constants (LegalPage is a client module, so its exports can't be read here)
@@ -26,6 +27,7 @@ export default async function WrittenListPage() {
       <PyqTabs active="written" />
       <Hero title="বিগত সালের লিখিত পরীক্ষার প্রশ্ন ও উত্তর"
         sub="সরকারি নার্সিং নিয়োগের লিখিত পরীক্ষার আসল প্রশ্ন, প্রতিটির নম্বরসহ। প্রতিটি প্রশ্নের নিচে নমুনা উত্তর।" updated="নভেম্বর ২০২৬" />
+      <PyqUpload defaultType="written" />
 
       {papers.length === 0 ? (
         <Section title="শীঘ্রই আসছে">

@@ -7,6 +7,7 @@ import { QuestionBrowser } from '@/components/QuestionBrowser';
 import { PageHeader, useExams } from '@/components/ui';
 import { useStartExam } from '@/components/useStartExam';
 import { PyqTabs } from '@/components/PyqTabs';
+import { PyqUpload } from '@/components/PyqUpload';
 
 const BN_MONTHS = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
 const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -35,6 +36,7 @@ export default function PreviousQuestionsPage() {
     <div>
       <PageHeader title={t('previousYear')} sub={t('featurePyqD')} />
       <PyqTabs active="mcq" />
+      <PyqUpload defaultType="mcq" />
       {exams.length > 0 && (
         <div className="mb-4">
           <h2 className="mb-2 text-sm font-semibold text-ink">{lang === 'bn' ? 'পরীক্ষা মোডে দিন' : 'Take in exam mode'}</h2>
