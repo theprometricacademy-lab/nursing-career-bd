@@ -102,9 +102,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       load('mock_tests', () => sbData(supabaseBrowser().from('mock_tests').select('*').eq('is_published', true).order('sort_order').order('id'))).catch(() => {});
       if (user) load(`my_stats:${user.id}`, () => sbData(supabaseBrowser().rpc('my_stats'))).catch(() => {});
     };
-    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number; cancelIdleCallback?: (id: number) => void };
-    const id = w.requestIdleCallback ? w.requestIdleCallback(go) : window.setTimeout(go, 1200);
-    return () => { if (w.cancelIdleCallback && w.requestIdleCallback) w.cancelIdleCallback(id); else clearTimeout(id); };
+    // a short delay keeps the first screen fast; then everything else loads quietly
+    const id = window.setTimeout(go, 1200);
+    return () => clearTimeout(id);
   }, [ready, user, router]);
 
   // Exam runner and admin have their own chrome
