@@ -80,6 +80,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const visited = useRef(0);
   useEffect(() => { visited.current += 1; }, [path]);
+  // on the home page the free quiz fills the first screen, so the sign-up bar waits until the visitor scrolls
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 700);
+    on(); window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
+  }, [path]);
 
   // Exam runner and admin have their own chrome
   if (path.startsWith('/exam/') || path.startsWith('/admin')) return <>{children}</>;
@@ -201,7 +208,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* sticky free sign-up prompt for visitors (phones), above the bottom bar */}
-      {ready && !user && !['/signup', '/login', '/forgot-password', '/reset-password'].includes(path) && (
+      {ready && !user && !['/signup', '/login', '/forgot-password', '/reset-password'].includes(path) && (path !== '/' || scrolled) && (
         <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom))] z-30 px-3 pb-2 lg:hidden">
           <Link href="/signup" className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-mint-500 to-brand-600 px-4 py-3 text-white shadow-lg">
             <span className="flex-1 leading-tight">
