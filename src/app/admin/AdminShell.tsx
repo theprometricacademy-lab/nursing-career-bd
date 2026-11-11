@@ -56,8 +56,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-[100dvh] overflow-x-clip bg-brand-50/40">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-brand-100 bg-white px-4">
         <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="menu"><Menu className="h-5 w-5" /></button>
-        <LogoMark size={28} />
-        <b className="text-ink">Admin · Nursing Career BD</b>
+        <Link href="/" className="flex items-center gap-2" title="ওয়েবসাইটের হোম পেজে যান">
+          <LogoMark size={28} />
+          <b className="text-ink">Admin · Nursing Career BD</b>
+        </Link>
         <div className="ml-auto"><LangToggle compact /></div>
       </header>
       <div className="flex">
