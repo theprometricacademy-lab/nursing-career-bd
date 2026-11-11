@@ -7,7 +7,7 @@ import { useL } from '../AdminShell';
 type S = {
   price_lifetime: number; price_single_test: number; default_negative_mark: number; default_duration_minutes: number;
   payment_gateways: { bkash: boolean; nagad: boolean; sslcommerz: boolean }; support_phone: string;
-  manual_payment: { enabled: boolean; bkash: string; nagad: string; account_type: string };
+  manual_payment: { enabled: boolean; bkash: string; nagad: string; account_type: string; bkash_type?: string; nagad_type?: string };
 };
 
 export default function SettingsAdmin() {
@@ -54,25 +54,31 @@ export default function SettingsAdmin() {
         <div className="sm:col-span-2"><label className="label">{L('সাপোর্ট ফোন', 'Support phone')}</label><input className="input" value={s.support_phone} onChange={(e) => setS({ ...s, support_phone: e.target.value })} /></div>
       </section>
       <section className="card space-y-3 p-5">
-        <h2 className="font-semibold text-ink">{L('bKash / Nagad Send Money (হাতে যাচাই)', 'bKash / Nagad Send Money (manual verification)')}</h2>
+        <h2 className="font-semibold text-ink">{L('bKash / Nagad — নম্বরে টাকা পাঠিয়ে TrxID জমা', 'bKash / Nagad — pay to number + TrxID')}</h2>
         <label className="flex items-center gap-3 text-sm font-medium">
           <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={s.manual_payment.enabled}
             onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, enabled: e.target.checked } })} />
-          {L('Send Money পেমেন্ট চালু', 'Enable Send Money payments')}
+          {L('এই পেমেন্ট চালু', 'Enable these payments')}
         </label>
         <div className="grid gap-3 sm:grid-cols-3">
           <div><label className="label">{L('bKash নম্বর', 'bKash number')}</label><input className="input" inputMode="tel" placeholder="01XXXXXXXXX" value={s.manual_payment.bkash} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, bkash: e.target.value.trim() } })} /></div>
           <div><label className="label">{L('Nagad নম্বর', 'Nagad number')}</label><input className="input" inputMode="tel" placeholder="01XXXXXXXXX" value={s.manual_payment.nagad} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, nagad: e.target.value.trim() } })} /></div>
           <div><label className="label">{L('অ্যাকাউন্টের ধরন', 'Account type')}</label>
-            <select className="input" value={s.manual_payment.account_type} onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, account_type: e.target.value } })}>
-              <option>Personal</option><option>Agent</option><option>Merchant</option>
-            </select></div>
+            <div className="grid grid-cols-2 gap-2">
+              {(['bkash', 'nagad'] as const).map((m) => (
+                <select key={m} className="input" title={m === 'bkash' ? 'bKash' : 'Nagad'} value={s.manual_payment[`${m}_type` as 'bkash_type' | 'nagad_type'] ?? 'personal'}
+                  onChange={(e) => setS({ ...s, manual_payment: { ...s.manual_payment, [`${m}_type`]: e.target.value } })}>
+                  <option value="personal">{m === 'bkash' ? 'bKash' : 'Nagad'}: Personal</option>
+                  <option value="merchant">{m === 'bkash' ? 'bKash' : 'Nagad'}: Merchant</option>
+                </select>
+              ))}
+            </div></div>
         </div>
-        <p className="rounded-xl bg-brand-50 p-3 text-xs text-ink-soft">{L('নম্বর খালি রাখলে সেই মাধ্যমটি শিক্ষার্থীরা দেখবে না। জমা পড়া পেমেন্ট "পেমেন্ট" পাতায় অনুমোদন দিন।', 'Leave a number empty to hide that method. Approve submitted payments on the Payments page.')}</p>
+        <p className="rounded-xl bg-brand-50 p-3 text-xs text-ink-soft">{L('Merchant দিলে শিক্ষার্থীকে অ্যাপের "Payment" অপশন, Personal দিলে "Send Money" করতে বলা হবে। নম্বর খালি রাখলে সেই মাধ্যমটি দেখাবে না। জমা পড়া পেমেন্ট "পেমেন্ট" পাতায় মিলিয়ে নিন।', 'Merchant tells students to use the app\'s "Payment" option, Personal tells them to "Send Money". Leave a number empty to hide that method. Check submitted payments on the Payments page.')}</p>
       </section>
       <section className="card space-y-3 p-5">
         <h2 className="font-semibold text-ink">{L('অনলাইন পেমেন্ট গেটওয়ে (মার্চেন্ট অ্যাকাউন্ট লাগবে)', 'Online payment gateways (merchant account required)')}</h2>
-        <p className="rounded-xl bg-red-50 p-3 text-xs font-medium text-red-700">{L('⚠️ Send Money-র জন্য এগুলো চালু করবেন না। bKash/Nagad মার্চেন্ট অ্যাকাউন্টের key Vercel-এ বসানোর পরেই শুধু চালু করবেন — নইলে শিক্ষার্থীরা পেমেন্টে ত্রুটি দেখবে।', '⚠️ Do not switch these on for Send Money. Only enable after bKash/Nagad merchant keys are added in Vercel — otherwise students see an error.')}</p>
+        <p className="rounded-xl bg-red-50 p-3 text-xs font-medium text-red-700">{L('⚠️ উপরের নম্বরে-পাঠানো পেমেন্টের জন্য এগুলো চালু করবেন না। bKash/Nagad মার্চেন্ট অ্যাকাউন্টের key Cloudflare-এ বসানোর পরেই শুধু চালু করবেন — নইলে শিক্ষার্থীরা পেমেন্টে ত্রুটি দেখবে।', '⚠️ Do not switch these on for Send Money. Only enable after bKash/Nagad merchant keys are added in Cloudflare — otherwise students see an error.')}</p>
         {(['bkash', 'nagad', 'sslcommerz'] as const).map((g) => (
           <label key={g} className="flex items-center gap-3 text-sm font-medium">
             <input type="checkbox" className="h-4 w-4 accent-mint-600" checked={s.payment_gateways[g]}
@@ -81,8 +87,8 @@ export default function SettingsAdmin() {
           </label>
         ))}
         <p className="rounded-xl bg-brand-50 p-3 text-xs text-ink-soft">
-          {L('নিরাপত্তার জন্য গেটওয়ের গোপন key/password ডাটাবেসে নয়, Vercel-এর Environment Variables-এ রাখা হয় (BKASH_*, NAGAD_*, SSLCZ_*, PAYMENT_MODE=sandbox/live)। এখানে শুধু কোন গেটওয়ে চালু থাকবে তা ঠিক করুন।',
-            'For security, gateway secrets live in Vercel Environment Variables (BKASH_*, NAGAD_*, SSLCZ_*, PAYMENT_MODE=sandbox/live), not in the database. Here you choose which gateways are switched on.')}
+          {L('নিরাপত্তার জন্য গেটওয়ের গোপন key/password ডাটাবেসে নয়, Cloudflare Worker-এর Secrets-এ রাখা হয় (BKASH_*, NAGAD_*, SSLCZ_*, PAYMENT_MODE=sandbox/live)। এখানে শুধু কোন গেটওয়ে চালু থাকবে তা ঠিক করুন।',
+            'For security, gateway secrets live in Cloudflare Worker secrets (BKASH_*, NAGAD_*, SSLCZ_*, PAYMENT_MODE=sandbox/live), not in the database. Here you choose which gateways are switched on.')}
         </p>
       </section>
       {msg && <p className={`rounded-xl p-3 text-sm ${msg.ok ? 'bg-mint-50 text-mint-700' : 'bg-red-50 text-red-700'}`}>{msg.text}</p>}

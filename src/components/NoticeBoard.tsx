@@ -68,7 +68,7 @@ export function NoticeBoard() {
     ...(showWinter ? [{ key: 'w', text: `❄️ শীতের অফার: প্রথম ${bnNum(winter!.limit)} জনের জন্য প্রিমিয়াম মাত্র ৳${bnNum(Number(winter!.price))} · বাকি ${bnNum(winter!.left)} জন`, href: '/premium' }] : []),
     { key: 'pyq', text: '🎁 বিগত সালের সব প্রশ্ন ও সেগুলোর মডেল টেস্ট এখন একদম ফ্রি', href: '/previous-questions' },
     ...(showWinter ? [{ key: 'ref', text: '🤝 বন্ধুর রেফারেল কোডে ৳৫০ ছাড় (মূল দাম ৳৫৯৯ থেকে)', href: '/premium' }] : []),
-    { key: 'fast', text: '⚡ Send Money করে TrxID দিলে ১ মিনিটের মধ্যে প্রিমিয়াম চালু', href: '/premium' },
+    { key: 'fast', text: '⚡ bKash/Nagad-এ পেমেন্ট করে TrxID দিলে ১ মিনিটের মধ্যে প্রিমিয়াম চালু', href: '/premium' },
     ...(showCoupon ? [{ key: 'c', text: `প্রিমিয়ামে ${offText(coupon!)} · কুপন ${coupon!.code}`, href: `/premium?coupon=${encodeURIComponent(coupon!.code)}` }] : []),
     ...notices.map((n) => ({ key: `n${n.id}`, text: pick(n, 'title') })),
   ];

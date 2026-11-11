@@ -171,8 +171,8 @@ function PremiumView() {
       });
       const j = await res.json().catch(() => ({} as Record<string, string>));
       if (!res.ok || !j) throw new Error(j?.error || (lang === 'bn'
-        ? 'অনলাইন পেমেন্ট এখন চালু নেই। উপরের bKash/Nagad Send Money ব্যবহার করুন।'
-        : 'Online payment is not available right now. Please use bKash/Nagad Send Money above.'));
+        ? 'অনলাইন পেমেন্ট এখন চালু নেই। উপরের bKash/Nagad অপশন ব্যবহার করুন।'
+        : 'Online payment is not available right now. Please use the bKash/Nagad option above.'));
       if (j.free) { router.push(`/payment/result?status=success&id=${j.paymentId}`); return; }
       window.location.href = j.url;
     } catch (e) {

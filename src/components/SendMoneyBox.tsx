@@ -5,7 +5,7 @@ import { Copy, Check, Smartphone, Clock } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 
-export type ManualCfg = { enabled: boolean; bkash: string; nagad: string; account_type?: string };
+export type ManualCfg = { enabled: boolean; bkash: string; nagad: string; account_type?: string; bkash_type?: 'personal' | 'merchant'; nagad_type?: 'personal' | 'merchant' };
 
 const ERR: Record<string, [string, string]> = {
   bad_trx: ['সঠিক TrxID দিন (৮–১২ অক্ষরের ইংরেজি অক্ষর ও সংখ্যা)।', 'Enter a valid TrxID (8–12 letters and digits).'],
@@ -47,6 +47,10 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
   const number = cfg[method];
   const label = method === 'bkash' ? 'bKash' : 'Nagad';
   const color = method === 'bkash' ? 'bg-[#e2136e]' : 'bg-[#f6921e]';
+  // a merchant number takes the app's "Payment" option; a personal number takes "Send Money"
+  const merchant = (method === 'bkash' ? cfg.bkash_type : cfg.nagad_type) === 'merchant';
+  const action = merchant ? 'Payment' : 'Send Money';
+  const anyMerchant = methods.some((m) => cfg[`${m}_type` as 'bkash_type' | 'nagad_type'] === 'merchant');
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -73,7 +77,7 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
   return (
     <div className="space-y-3 rounded-2xl border border-brand-100 bg-brand-50/40 p-4">
       <p className="flex items-center gap-2 text-sm font-semibold text-ink"><Smartphone className="h-4 w-4 text-brand-600" />
-        {bn ? 'bKash / Nagad Send Money দিয়ে পেমেন্ট' : 'Pay by bKash / Nagad Send Money'}</p>
+        {anyMerchant ? (bn ? 'bKash / Nagad দিয়ে পেমেন্ট' : 'Pay with bKash / Nagad') : (bn ? 'bKash / Nagad Send Money দিয়ে পেমেন্ট' : 'Pay by bKash / Nagad Send Money')}</p>
 
       {methods.length > 1 && (
         <div className="grid grid-cols-2 gap-2">
@@ -87,14 +91,18 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
       )}
 
       <ol className="space-y-2 text-sm text-ink">
-        <li>১. {bn ? `${label} অ্যাপ থেকে "Send Money" করুন এই নম্বরে:` : `Open ${label} and "Send Money" to:`}
+        <li>১. {merchant
+            ? (bn ? `${label} অ্যাপে "Payment" অপশনে গিয়ে এই মার্চেন্ট নম্বরে পেমেন্ট করুন:` : `Open ${label}, choose "Payment" and pay this merchant number:`)
+            : (bn ? `${label} অ্যাপ থেকে "Send Money" করুন এই নম্বরে:` : `Open ${label} and "Send Money" to:`)}
           <div className="mt-1 flex items-center gap-2">
             <span className={`rounded-lg ${color} px-3 py-1.5 font-mono text-base font-bold tracking-wider text-white`}>{number}</span>
             <button type="button" className="btn-ghost !px-2 !py-1.5 text-xs" onClick={() => { navigator.clipboard?.writeText(number); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? (bn ? 'কপি হয়েছে' : 'Copied') : (bn ? 'কপি' : 'Copy')}
             </button>
           </div>
-          {cfg.account_type && <span className="text-xs text-ink-soft">({cfg.account_type})</span>}
+          <span className="text-xs text-ink-soft">{merchant
+            ? (bn ? `(মার্চেন্ট অ্যাকাউন্ট — "Send Money" নয়, "${action}" অপশন ব্যবহার করুন। Reference-এ আপনার মোবাইল নম্বর লিখতে পারেন।)` : `(Merchant account — use "${action}", not "Send Money". You may put your mobile number as reference.)`)
+            : (bn ? '(পার্সোনাল নম্বর — "Send Money" করুন)' : '(Personal number — use "Send Money")')}</span>
         </li>
         <li>২. {bn ? 'টাকার পরিমাণ:' : 'Amount:'} <b className="text-lg">৳{num(amount)}</b></li>
         <li>৩. {bn ? 'টাকা পাঠানোর পর মেসেজে আসা Transaction ID (TrxID) নিচে লিখুন।' : 'Enter the Transaction ID (TrxID) from the confirmation message below.'}</li>
