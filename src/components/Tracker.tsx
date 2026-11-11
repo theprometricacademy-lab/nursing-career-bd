@@ -42,6 +42,15 @@ function source() {
   } catch { return null; }
 }
 
+/** Record an in-page action (e.g. '/quiz/start') as a view, so engaged visitors don't look like bounces. */
+export function trackEvent(path: string) {
+  try {
+    if ((navigator as Navigator & { webdriver?: boolean }).webdriver) return;
+    supabaseBrowser().rpc('track_view', { p_visitor: stored('localStorage', 'ncbd_vid'), p_session: stored('sessionStorage', 'ncbd_sid'),
+      p_path: path, p_ref: null, p_device: device() }).then(() => {});
+  } catch { /* ignore */ }
+}
+
 export function Tracker() {
   const path = usePathname();
   const cur = useRef<{ id: number | null; session: string }>({ id: null, session: '' });

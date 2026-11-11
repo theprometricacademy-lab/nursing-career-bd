@@ -95,6 +95,8 @@ export default function HomePage() {
     <div className="space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <div className="-mt-2"><NoticeBoard /></div>
+      {/* new visitors: something to do on the first screen */}
+      {ready && !user && <QuickQuiz autoStart />}
 
       {/* Hero */}
       {premium ? (
@@ -156,7 +158,6 @@ export default function HomePage() {
       </section>
       )}
 
-      {ready && !user && <QuickQuiz />}
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">

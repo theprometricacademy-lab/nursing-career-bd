@@ -5,36 +5,43 @@ import { CheckCircle2, XCircle, Sparkles, RotateCcw, UserPlus } from 'lucide-rea
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 import { ShareButtons } from './ShareResult';
+import { trackEvent } from './Tracker';
 
 type QQ = { id: number; question_bn: string; options_bn: string[]; correct_option: number; explanation_bn: string; subject_bn: string };
 const LET = ['ক', 'খ', 'গ', 'ঘ'];
 
 /** No-login 5-question quiz for visitors: instant feedback, then a sign-up nudge with the score. */
-export function QuickQuiz() {
+export function QuickQuiz({ autoStart = false }: { autoStart?: boolean }) {
   const { num } = useApp();
   const [qs, setQs] = useState<QQ[] | null>(null);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(autoStart);
+  const [offer, setOffer] = useState<{ active: boolean; price: number; left?: number } | null>(null);
   const [round, setRound] = useState(0);
 
   useEffect(() => {
     supabaseBrowser().rpc('public_quick_quiz', { p_count: 5 }).then(({ data }) => setQs((data as QQ[]) ?? []));
   }, [round]);
+  useEffect(() => { supabaseBrowser().rpc('winter_offer_status').then(({ data }) => setOffer((data as typeof offer) ?? null)); }, []);
 
   if (qs && qs.length === 0) return null;
   const done = qs && i >= qs.length;
   const q = qs && !done ? qs[i] : null;
-  const choose = (k: number) => { if (pick !== null || !q) return; setPick(k); if (k === q.correct_option) setScore((s) => s + 1); };
-  const next = () => { setPick(null); setI((x) => x + 1); };
+  const choose = (k: number) => {
+    if (pick !== null || !q) return;
+    if (i === 0) trackEvent(`/quiz/start${round ? '-again' : ''}`);
+    setPick(k); if (k === q.correct_option) setScore((s) => s + 1);
+  };
+  const next = () => { if (qs && i + 1 >= qs.length) trackEvent('/quiz/done'); setPick(null); setI((x) => x + 1); };
   const again = () => { setQs(null); setI(0); setPick(null); setScore(0); setRound((r) => r + 1); };
 
   return (
     <section id="quick-quiz" className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-card">
       <div className="flex items-center gap-2 bg-gradient-to-r from-brand-600 to-blush-500 px-4 py-3 text-white">
         <Sparkles className="h-5 w-5" />
-        <b className="flex-1">৫ প্রশ্নের ফ্রি কুইজ · লগইন লাগবে না</b>
+        <b className="flex-1">{autoStart ? 'সরকারি নার্সিং পরীক্ষার প্রশ্ন — আপনি কতটা পারেন?' : '৫ প্রশ্নের ফ্রি কুইজ · লগইন লাগবে না'}</b>
         {qs && !done && started && <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-sm font-bold">{num(i + 1)}/{num(qs.length)}</span>}
       </div>
 
@@ -53,15 +60,25 @@ export function QuickQuiz() {
             {score === qs!.length ? 'দারুণ! সবগুলো সঠিক 🎉' : score >= 3 ? 'ভালো করেছেন! আরেকটু অনুশীলন করলেই পারফেক্ট।' : 'চিন্তা নেই, নিয়মিত অনুশীলনেই উন্নতি হবে।'}
           </p>
           <p className="mt-1 text-sm text-ink-soft">ফ্রি অ্যাকাউন্ট খুলে ১০,০০০+ ব্যাখ্যাসহ প্রশ্ন, বিগত ১০ বছরের সরকারি পরীক্ষার প্রশ্ন আর দৈনিক কুইজ দিন।</p>
+          {offer?.active && (
+            <Link href="/premium" className="mx-auto mt-3 block max-w-md rounded-2xl bg-gradient-to-r from-blush-600 to-blush-500 p-3 text-sm text-white">
+              <b>❄️ শীতের অফার:</b> লাইফটাইম প্রিমিয়াম মাত্র ৳{num(Number(offer.price))}{typeof offer.left === 'number' ? ` · বাকি ${num(offer.left)} জন` : ''} →
+            </Link>
+          )}
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Link href="/signup" className="btn-success !py-3 text-base"><UserPlus className="h-5 w-5" />ফ্রি অ্যাকাউন্ট খুলুন</Link>
             <button onClick={again} className="btn-ghost !py-3"><RotateCcw className="h-4 w-4" />আরও ৫টা প্রশ্ন</button>
           </div>
           <div className="mt-4"><ShareButtons text={`আমি নার্সিং কুইজে ৫-এ ${num(score)} পেয়েছি! তুমি কত পাও দেখো 👇`} path="/" /></div>
         </div>
+      ) : !qs ? (
+        <div className="space-y-2 p-4 md:p-5" aria-busy="true">
+          <div className="h-5 w-3/4 animate-pulse rounded bg-brand-100" />
+          {[0, 1, 2, 3].map((k) => <div key={k} className="h-12 animate-pulse rounded-xl bg-brand-50" />)}
+        </div>
       ) : q ? (
         <div className="p-4 md:p-5">
-          <p className="mb-1 text-xs font-semibold text-brand-600">{q.subject_bn}</p>
+          <p className="mb-1 flex justify-between text-xs font-semibold text-brand-600"><span>{q.subject_bn}</span>{autoStart && i === 0 && pick === null && <span className="text-ink-soft">লগইন লাগবে না · ৫টা প্রশ্ন</span>}</p>
           <h3 className="mb-3 text-base font-semibold leading-relaxed text-ink md:text-lg">{q.question_bn}</h3>
           <div className="grid gap-2">
             {q.options_bn.map((o, k) => {
