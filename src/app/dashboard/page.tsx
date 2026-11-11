@@ -5,6 +5,7 @@ import { ClipboardCheck, ListChecks, CheckCircle2, Percent, Trophy, Bookmark, Ro
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Progress, Spinner, Stat } from '@/components/ui';
+import { ReviewForm } from '@/components/Reviews';
 
 type MyStats = {
   tests_completed: number; questions_attempted: number; correct_answers: number; unique_questions: number; total_questions: number;
@@ -39,6 +40,8 @@ export default function DashboardPage() {
         right={s.premium
           ? <span className="chip bg-blush-100 py-1.5 text-sm text-blush-700"><Crown className="h-4 w-4" />{t('premium')}: {t('active')}</span>
           : <Link href="/premium" className="btn-pink"><Crown className="h-4 w-4" />{t('upgrade')}</Link>} />
+
+      {s.premium && <ReviewForm />}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <Stat label={t('testsCompleted')} value={num(s.tests_completed)} icon={<ClipboardCheck className="h-5 w-5" />} />

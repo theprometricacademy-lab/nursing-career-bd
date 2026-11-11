@@ -6,6 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
 import { SendMoneyBox, type ManualCfg } from '@/components/SendMoneyBox';
+import { ReviewForm, ReviewList } from '@/components/Reviews';
 
 type Gateways = { bkash?: boolean; nagad?: boolean; sslcommerz?: boolean };
 type Quote = { base: number; discount: number; amount: number; coupon_valid: boolean; offer: 'winter' | 'referral' | null };
@@ -284,6 +285,7 @@ function PremiumView() {
         )}
       </section>
       <ReferralCard />
+      {premium ? <ReviewForm /> : <ReviewList />}
     </div>
   );
 }

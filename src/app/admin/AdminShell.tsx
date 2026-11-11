@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard, FileQuestion, Upload, FolderTree, Timer, Users, CreditCard, Ticket, Megaphone, Settings, ArrowLeft, Menu, X,
-  BellRing, Activity, Flag, ImagePlus,
+  BellRing, Activity, Flag, ImagePlus, MessageSquareHeart,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { LangToggle } from '@/components/AppShell';
@@ -28,6 +28,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     { href: '/admin/mock-tests', icon: Timer, label: L('মক টেস্ট', 'Mock tests') },
     { href: '/admin/users', icon: Users, label: L('ইউজার ও প্রিমিয়াম', 'Users & premium') },
     { href: '/admin/payments', icon: CreditCard, label: L('পেমেন্ট', 'Payments') },
+    { href: '/admin/reviews', icon: MessageSquareHeart, label: L('রিভিউ', 'Reviews') },
     { href: '/admin/coupons', icon: Ticket, label: L('কুপন', 'Coupons') },
     { href: '/admin/daily-post', icon: ImagePlus, label: L('আজকের প্রশ্ন (পোস্ট)', 'Daily post maker') },
     { href: '/admin/notices', icon: Megaphone, label: L('নোটিশ', 'Notices') },

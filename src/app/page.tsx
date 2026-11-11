@@ -3,13 +3,14 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, GraduationCap,
-  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages, ChevronRight,
+  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages, ChevronRight, Star,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { GuideLinks } from '@/components/SeoBlocks';
 import { QuickQuiz } from '@/components/QuickQuiz';
+import { ReviewList } from '@/components/Reviews';
 import { NoticeBoard } from '@/components/NoticeBoard';
 import { InstallBanner } from '@/components/InstallApp';
 import { SEO_SUBJECTS } from '@/lib/seoSubjects';
@@ -109,11 +110,12 @@ export default function HomePage() {
               {L('স্বাগতম', 'Welcome')}{profile?.full_name ? <>, <span className="gold-text">{profile.full_name.split(' ')[0]}</span></> : ''}!
             </h1>
             <p className="mt-2 text-sm text-white/80 md:text-base">{L('আপনার জন্য সব প্রশ্ন, সব মডেল টেস্ট আর বিস্তারিত ফলাফল বিশ্লেষণ খোলা। আজ কোথা থেকে শুরু করবেন?', 'Every question, every mock test and full analysis are unlocked for you. Where do you want to start today?')}</p>
-            <div className="mt-6 grid gap-2.5 sm:grid-cols-3">
+            <div className="mt-6 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 ['/mock-tests', Timer, L('মডেল টেস্ট দিন', 'Take a mock test')],
                 ['/wrong-answers', Target, L('ভুলগুলো আবার করুন', 'Retry mistakes')],
                 ['/leaderboard', Trophy, L('সাপ্তাহিক মেধাতালিকা', 'Weekly leaderboard')],
+                ['/dashboard#review', Star, L('রিভিউ দিন', 'Write a review')],
               ].map(([href, Icon, label]) => {
                 const I = Icon as typeof Timer;
                 return (
@@ -269,6 +271,8 @@ export default function HomePage() {
           ))}
         </section>
       )}
+
+      {!premium && <ReviewList />}
 
       {/* Premium band */}
       {!premium && (
