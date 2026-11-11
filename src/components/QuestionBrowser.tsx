@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
-import { QuestionCard, type BankQuestion } from './QuestionCard';
+import { QuestionCard, type BankQuestion, type AnswerKey } from './QuestionCard';
 import { Empty, Spinner, useExams, useSubjects, type Topic } from './ui';
 
 const PAGE = 20;
@@ -13,6 +13,7 @@ export function QuestionBrowser({ filter = 'all', showExamFilters = false, empty
   filter?: 'all' | 'bookmarked' | 'wrong'; showExamFilters?: boolean; emptyText?: string;
 }) {
   const { t, pick, num, user, errMsg } = useApp();
+  const [keys, setKeys] = useState<Map<number, AnswerKey>>(new Map());
   const params = useSearchParams();
   const subjects = useSubjects();
   const exams = useExams();
@@ -52,7 +53,17 @@ export function QuestionBrowser({ filter = 'all', showExamFilters = false, empty
     if (error) { setErr(errMsg(error)); return; }
     setTotal(data.total);
     setItems((prev) => (offset === 0 ? data.items : [...prev, ...data.items]));
-  }, [f, filter, errMsg, seed]);
+    // fetch the answers for these questions right away, so tapping an option shows the result instantly
+    if (user) {
+      const ids = (data.items as BankQuestion[]).map((x) => x.id);
+      for (let i = 0; i < ids.length; i += 50) {
+        supabaseBrowser().rpc('answer_keys', { p_ids: ids.slice(i, i + 50) }).then(({ data: k }) => {
+          if (!k) return;
+          setKeys((m) => { const n = new Map(m); (k as AnswerKey[]).forEach((r) => n.set(r.id, r)); return n; });
+        });
+      }
+    }
+  }, [f, filter, errMsg, seed, user]);
 
   // debounce filter changes
   useEffect(() => {
@@ -115,7 +126,7 @@ export function QuestionBrowser({ filter = 'all', showExamFilters = false, empty
       ) : (
         <div className="space-y-3">
           {items.map((q, i) => (
-            <QuestionCard key={q.id} q={q} index={i + 1} subjectName={subjectName[q.subject_id]}
+            <QuestionCard key={q.id} q={q} index={i + 1} subjectName={subjectName[q.subject_id]} answerKey={keys.get(q.id)}
               onBookmarkChange={filter === 'bookmarked' ? (id, v) => { if (!v) { setItems((p) => p.filter((x) => x.id !== id)); setTotal((n) => n - 1); } } : undefined} />
           ))}
         </div>

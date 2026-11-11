@@ -17,8 +17,10 @@ export type BankQuestion = {
 const LETTERS_EN = ['A', 'B', 'C', 'D'];
 const LETTERS_BN = ['ক', 'খ', 'গ', 'ঘ'];
 
-export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
-  q: BankQuestion; index: number; subjectName?: string; onBookmarkChange?: (id: number, v: boolean) => void;
+export type AnswerKey = { id: number; correct_option: number; explanation_en: string | null; explanation_bn: string | null };
+
+export function QuestionCard({ q, index, subjectName, onBookmarkChange, answerKey }: {
+  q: BankQuestion; index: number; subjectName?: string; onBookmarkChange?: (id: number, v: boolean) => void; answerKey?: AnswerKey;
 }) {
   const { t, lang, num, user, errMsg } = useApp();
   const [view, setView] = useState<'bn' | 'en'>(q.translatable ? lang : q.exam_lang);
@@ -53,6 +55,14 @@ export function QuestionCard({ q, index, subjectName, onBookmarkChange }: {
     // (otherwise a retry after seeing the answer would drop it from "wrong answer practice").
     if (known) { setResult({ ...known, correct: i === known.correct_option }); return; }
     if (!user) { setErr(t('loginRequired')); return; }
+    if (answerKey) {
+      // answer already on the phone: show it at once, record the attempt in the background
+      const r = { correct: i === answerKey.correct_option, correct_option: answerKey.correct_option,
+        explanation_en: answerKey.explanation_en, explanation_bn: answerKey.explanation_bn };
+      setResult(r); setKnown(r); setErr('');
+      supabaseBrowser().rpc('check_answer', { p_question: q.id, p_option: i }).then(() => {});
+      return;
+    }
     setBusy(true); setErr('');
     const { data, error } = await supabaseBrowser().rpc('check_answer', { p_question: q.id, p_option: i });
     setBusy(false);
