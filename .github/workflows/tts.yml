@@ -9,25 +9,13 @@ permissions:
 jobs:
   tts:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
-      - run: pip install --quiet git+https://github.com/huggingface/parler-tts.git soundfile
-      - name: CPU-only torch + torchaudio (matching versions)
-        run: |
-          pip uninstall -y torch torchaudio
-          pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -c "import torch, torchaudio; print(torch.__version__, torchaudio.__version__)"
-      - run: pip install --quiet -U "protobuf>=5" sentencepiece
-      - run: python tts/gen.py
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      - name: Fetch Bangla font (OFL)
-        run: |
-          curl -sSL -o out/NotoSansBengali.ttf "https://github.com/google/fonts/raw/main/ofl/notosansbengali/NotoSansBengali%5Bwdth%2Cwght%5D.ttf"
-          curl -sSL -o out/HindSiliguri-Bold.ttf "https://github.com/google/fonts/raw/main/ofl/hindsiliguri/HindSiliguri-Bold.ttf"
+      - run: pip install --quiet edge-tts
+      - run: python tts/gen_edge.py
       - name: Commit outputs
         run: |
           git config user.name "github-actions[bot]"
