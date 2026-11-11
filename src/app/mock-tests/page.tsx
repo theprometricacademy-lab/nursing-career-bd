@@ -6,6 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Empty, PageHeader, PremiumChip, Spinner } from '@/components/ui';
 import { useStartExam } from '@/components/useStartExam';
+import { useCached, sbData } from '@/lib/cache';
 
 type MockTest = {
   id: number; title_en: string; title_bn: string; description_en: string | null; description_bn: string | null;
@@ -16,14 +17,12 @@ type MockTest = {
 
 export default function MockTestsPage() {
   const { t, pick, num, premium, user, lang } = useApp();
-  const [tests, setTests] = useState<MockTest[] | null>(null);
+  const tests = useCached<MockTest[]>('mock_tests', () => sbData(supabaseBrowser().from('mock_tests').select('*').eq('is_published', true).order('sort_order').order('id'))) ?? null;
   const [owned, setOwned] = useState<Set<number>>(new Set());
   const { start, busy, err } = useStartExam();
 
   useEffect(() => {
     const sb = supabaseBrowser();
-    sb.from('mock_tests').select('*').eq('is_published', true).order('sort_order').order('id')
-      .then(({ data }) => setTests((data as MockTest[]) ?? []));
     if (user) {
       sb.from('subscriptions').select('mock_test_id').eq('user_id', user.id).eq('plan', 'single_test').eq('status', 'active')
         .then(({ data }) => setOwned(new Set((data ?? []).map((r: { mock_test_id: number }) => r.mock_test_id))));

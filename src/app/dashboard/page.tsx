@@ -6,6 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Progress, Spinner, Stat } from '@/components/ui';
 import { ReviewForm } from '@/components/Reviews';
+import { useCached, sbData } from '@/lib/cache';
 
 type MyStats = {
   tests_completed: number; questions_attempted: number; correct_answers: number; unique_questions: number; total_questions: number;
@@ -14,18 +15,16 @@ type MyStats = {
   recent: { id: string; mode: string; title_en: string; title_bn: string; status: string; started_at: string; score: number | null; max_score: number | null; total_questions: number }[];
 };
 
-function useMyStats() {
-  const [s, setS] = useState<MyStats | null>(null);
+function useMyStats(uid: string | undefined) {
   const [err, setErr] = useState('');
-  useEffect(() => {
-    supabaseBrowser().rpc('my_stats').then(({ data, error }) => (error ? setErr(error.message) : setS(data as MyStats)));
-  }, []);
+  const s = useCached<MyStats>(uid ? `my_stats:${uid}` : null, () =>
+    sbData<MyStats>(supabaseBrowser().rpc('my_stats')).catch((e: Error) => { setErr(e.message); throw e; })) ?? null;
   return { s, err };
 }
 
 export default function DashboardPage() {
   const { t, num, pick, profile, user, lang } = useApp();
-  const { s, err } = useMyStats();
+  const { s, err } = useMyStats(user?.id);
 
   if (err) return <p className="rounded-xl bg-red-50 p-4 text-red-700">{err}</p>;
   if (!s) return <Spinner />;

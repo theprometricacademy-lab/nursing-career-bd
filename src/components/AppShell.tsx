@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   Moon, Sun,
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
+import { NavProgress } from './NavProgress';
+import { warmCatalog } from './ui';
+import { load, sbData } from '@/lib/cache';
 import { InstallMenuItem, registerPwa } from './InstallApp';
 import { useUpdateChecker } from './UpdateChecker';
 import { LegalLinks, SUPPORT_PHONE, SUPPORT_EMAIL, FACEBOOK_URL } from './LegalPage';
@@ -88,6 +91,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('scroll', on);
   }, [path]);
 
+  // App-like tabs: once the site is idle, fetch the main pages and their data in the background,
+  // so tapping a tab opens it at once instead of waiting
+  useEffect(() => {
+    if (!ready) return;
+    const go = () => {
+      NAV.filter((n) => user || !['/dashboard', '/profile', '/bookmarks', '/wrong-answers', '/results', '/daily-quiz'].includes(n.href))
+        .forEach((n) => router.prefetch(n.href));
+      warmCatalog();
+      load('mock_tests', () => sbData(supabaseBrowser().from('mock_tests').select('*').eq('is_published', true).order('sort_order').order('id'))).catch(() => {});
+      if (user) load(`my_stats:${user.id}`, () => sbData(supabaseBrowser().rpc('my_stats'))).catch(() => {});
+    };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number; cancelIdleCallback?: (id: number) => void };
+    const id = w.requestIdleCallback ? w.requestIdleCallback(go) : window.setTimeout(go, 1200);
+    return () => { if (w.cancelIdleCallback && w.requestIdleCallback) w.cancelIdleCallback(id); else clearTimeout(id); };
+  }, [ready, user, router]);
+
   // Exam runner and admin have their own chrome
   if (path.startsWith('/exam/') || path.startsWith('/admin')) return <>{children}</>;
 
@@ -117,6 +136,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] overflow-x-clip">
+      <Suspense fallback={null}><NavProgress /></Suspense>
       <header className={`sticky top-0 z-30 border-b bg-white/90 backdrop-blur ${premium ? 'border-gold-300' : 'border-brand-100'}`}>
         {premium && <div className="h-[3px] bg-gradient-to-r from-gold-300 via-gold-500 to-gold-300" />}
         <div className="mx-auto flex h-14 max-w-7xl items-center 2xl:max-w-[1500px] gap-3 px-4">

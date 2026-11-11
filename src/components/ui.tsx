@@ -23,6 +23,14 @@ export function useSubjects() {
 }
 
 let examCache: Exam[] | null = null;
+
+/** Load subjects and exams in the background so their pages open without a spinner. */
+export function warmCatalog() {
+  const sb = supabaseBrowser();
+  if (!subjectCache) sb.from('subjects').select('*').eq('is_active', true).order('sort_order').then(({ data, error }) => { if (!error && !subjectCache) subjectCache = (data as Subject[]) ?? []; });
+  if (!examCache) sb.from('exams').select('*').eq('is_active', true).order('exam_date', { ascending: false, nullsFirst: false }).order('year', { ascending: false })
+    .then(({ data, error }) => { if (!error && !examCache) examCache = (data as Exam[]) ?? []; });
+}
 export function useExams() {
   const [exams, setExams] = useState<Exam[]>(examCache ?? []);
   useEffect(() => {

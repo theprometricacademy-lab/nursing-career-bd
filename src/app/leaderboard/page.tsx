@@ -6,6 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Spinner } from '@/components/ui';
 import { bnDate, bnNum } from '@/lib/circulars';
+import { useCached, sbData } from '@/lib/cache';
 
 type Row = { rank: number; name: string; pct: number; score: number; max: number; tests: number; me: boolean };
 type Board = { week_start: string; week_end: string; participants: number; rows: Row[]; me: { rank: number; pct: number; tests: number } | null };
@@ -17,12 +18,8 @@ export default function LeaderboardPage() {
   const bn = lang === 'bn';
   const n = (x: number | string) => (bn ? bnNum(x) : String(x));
   const [weeksAgo, setWeeksAgo] = useState(0);
-  const [board, setBoard] = useState<Board | null>(null);
-
-  useEffect(() => {
-    setBoard(null);
-    supabaseBrowser().rpc('weekly_leaderboard', { p_weeks_ago: weeksAgo }).then(({ data }) => setBoard((data as Board) ?? null));
-  }, [weeksAgo, user]);
+  const board = useCached<Board>(`leaderboard:${weeksAgo}:${user?.id ?? ''}`,
+    () => sbData<Board>(supabaseBrowser().rpc('weekly_leaderboard', { p_weeks_ago: weeksAgo }))) ?? null;
 
   const top3 = board?.rows.slice(0, 3) ?? [];
   const rest = board?.rows.slice(3) ?? [];

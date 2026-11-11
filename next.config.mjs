@@ -5,6 +5,8 @@ const BUILD_ID = String(Date.now());
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // keep visited/prefetched pages in the browser so switching tabs is instant (like an app)
+  experimental: { staleTimes: { dynamic: 180, static: 600 } },
   env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   eslint: { ignoreDuringBuilds: true },
   async headers() {
