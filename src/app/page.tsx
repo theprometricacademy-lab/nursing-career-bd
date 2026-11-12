@@ -97,7 +97,9 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <div className="-mt-2"><NoticeBoard /></div>
       {/* new visitors: something to do on the first screen */}
-      {!ready ? <div className="h-[340px] rounded-3xl border border-brand-100 bg-white shadow-card" aria-hidden /> : !user && <QuickQuiz autoStart />}
+      {/* rendered in the first HTML (before login state is known) so the first screen shows the quiz at once and never jumps;
+          it is removed only for visitors who turn out to be logged in */}
+      {(!ready || !user) && <QuickQuiz autoStart />}
 
       {/* Hero */}
       {premium ? (
