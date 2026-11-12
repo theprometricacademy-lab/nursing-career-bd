@@ -72,7 +72,7 @@ function avatar(x: CanvasRenderingContext2D, font: string, img: HTMLImageElement
 
 function footer(x: CanvasRenderingContext2D, font: string, line: string) {
   x.textAlign = 'center'; x.fillStyle = '#fde68a'; x.font = `800 40px ${font}`; x.fillText(line, 540, 1200);
-  x.fillStyle = '#fff'; x.beginPath(); x.roundRect(200, 1235, 680, 78, 39); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.roundRect(160, 1235, 760, 78, 39); x.fill();
   x.fillStyle = '#1f7ad6'; x.font = `800 38px ${font}`; x.fillText('nursingcareerbd.com/weekly-test', 540, 1287);
 }
 
@@ -92,7 +92,7 @@ export async function drawTop3(c: HTMLCanvasElement, d: { weekStart: string; par
   x.textAlign = 'left'; x.fillStyle = '#fff'; x.font = `800 44px ${font}`; x.fillText('Nursing Career BD', 70, 105);
   x.textAlign = 'right'; x.font = `600 32px ${font}`; x.fillStyle = '#cfe3ff'; x.fillText('সাপ্তাহিক ফ্রি মডেল টেস্ট', 1010, 105);
   x.textAlign = 'center';
-  x.fillStyle = '#fff'; x.font = `800 72px ${font}`; x.fillText('এই সপ্তাহের সেরা ৩ জন 🏆', 540, 245);
+  x.fillStyle = '#fff'; x.font = `800 72px ${font}`; x.fillText('সপ্তাহের সেরা ৩ জন 🏆', 540, 245);
   x.font = `600 36px ${font}`; x.fillStyle = '#e0f2fe';
   x.fillText(`${weekLabel(d.weekStart)} · অংশ নিয়েছেন ${bnNum(d.participants)} জন`, 540, 310);
 
@@ -100,7 +100,7 @@ export async function drawTop3(c: HTMLCanvasElement, d: { weekStart: string; par
   const slots = [{ i: 1, cx: 205, cy: 600, r: 108 }, { i: 0, cx: 540, cy: 530, r: 140 }, { i: 2, cx: 875, cy: 600, r: 108 }];
   for (const s of slots) {
     const w = top[s.i]; if (!w) continue; const m = MEDAL[s.i];
-    const boxTop = s.cy + s.r + 30, boxH = s.i === 0 ? 430 : 360;
+    const boxTop = s.cy + s.r + 30, boxH = s.i === 0 ? 400 : 360;
     x.fillStyle = 'rgba(255,255,255,.96)'; x.beginPath(); x.roundRect(s.cx - 160, boxTop - 40, 320, boxH, 32); x.fill();
     avatar(x, font, imgs[s.i], w.name, s.cx, s.cy, s.r, m.ring);
     x.font = `${s.i === 0 ? 76 : 62}px ${font}`; x.fillText(m.label, s.cx + s.r * 0.72, s.cy - s.r * 0.55);
@@ -127,8 +127,10 @@ export async function drawMyCard(c: HTMLCanvasElement, d: { name: string; avatar
 
   avatar(x, font, img, d.name, 540, 440, 150, m?.ring ?? '#ffffff');
   if (m) { x.font = `96px ${font}`; x.fillText(m.label, 540 + 118, 440 - 92); }
-  x.textAlign = 'center'; x.fillStyle = '#fff'; x.font = `800 60px ${font}`;
-  wrap(x, d.name, 900, 1).forEach((l) => x.fillText(l, 540, 680));
+  x.textAlign = 'center'; x.fillStyle = '#fff';
+  let size = 60; x.font = `800 ${size}px ${font}`;
+  while (size > 40 && x.measureText(d.name).width > 940) { size -= 4; x.font = `800 ${size}px ${font}`; }
+  wrap(x, d.name, 940, 1).forEach((l) => x.fillText(l, 540, 680));
 
   x.fillStyle = 'rgba(255,255,255,.96)'; x.beginPath(); x.roundRect(110, 730, 860, 400, 40); x.fill();
   x.fillStyle = m?.deep ?? '#1f7ad6'; x.font = `800 112px ${font}`;
