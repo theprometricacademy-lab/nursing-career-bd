@@ -7,7 +7,7 @@ import { PageHeader, Spinner } from '@/components/ui';
 import { useL } from '../AdminShell';
 
 type U = { id: string; full_name: string | null; phone: string | null; role: string; created_at: string; email: string; last_sign_in_at: string | null; premium: boolean; tests: number;
-  practiced: number; practice_correct: number; last_practice: string | null };
+  practiced: number; practice_correct: number; last_practice: string | null; hospital: string | null };
 
 export default function UsersAdmin() {
   const L = useL();
@@ -64,6 +64,7 @@ export default function UsersAdmin() {
                     <div className="flex items-center gap-1.5 font-medium text-ink">{u.full_name || '—'}
                       {u.premium && <Crown className="h-4 w-4 text-blush-600" />}
                       {u.role === 'admin' && <span className="chip bg-ink text-white">admin</span>}
+                      {u.hospital && <span className="chip bg-mint-100 text-mint-700" title={u.hospital}>🏥 হাসপাতাল</span>}
                     </div>
                     <div className="text-xs text-ink-soft">{u.email}</div>
                   </td>

@@ -11,6 +11,7 @@ type Hospital = { id: number; name: string; district: string | null; address: st
   website: string | null; contact_person: string | null; about: string | null; status: string; created_at: string };
 type Tab = 'review' | 'jobs' | 'hospitals' | 'reports' | 'add';
 type Lic = { hospital_id: number; license_no: string; trade_license: string | null; license_doc: string | null; terms_accepted_at: string | null };
+type Acct = { id: number; login: string; last_sign_in_at: string | null; owner_name: string | null; owner_phone: string | null; jobs: number; live_jobs: number; applications: number };
 type Report = { id: number; job_id: number; reason: string; note: string | null; resolved: boolean; created_at: string };
 const REASON_BN: Record<string, string> = { money: 'টাকা চাইছে', fake: 'ভুয়া মনে হচ্ছে', wrong_info: 'তথ্য ভুল', closed: 'নিয়োগ শেষ', other: 'অন্য কারণ' };
 const EMPTY = { hospital_name: '', post_title: 'স্টাফ নার্স', vacancies: '', district: '', location: '', salary: '', job_type: 'ফুল টাইম',
@@ -26,6 +27,7 @@ export default function AdminJobs() {
   const [msg, setMsg] = useState('');
   const [lics, setLics] = useState<Record<number, Lic>>({});
   const [reports, setReports] = useState<Report[]>([]);
+  const [accts, setAccts] = useState<Record<number, Acct>>({});
 
   const load = useCallback(async () => {
     const [{ data: j }, { data: h }, { data: a }, { data: v }, { data: r }] = await Promise.all([
@@ -37,6 +39,8 @@ export default function AdminJobs() {
     ]);
     setLics(Object.fromEntries(((v as Lic[]) ?? []).map((x) => [x.hospital_id, x])));
     setReports((r as Report[]) ?? []);
+    const { data: ac } = await sb.rpc('admin_hospital_accounts');
+    setAccts(Object.fromEntries(((ac as Acct[]) ?? []).map((x) => [x.id, x])));
     setJobs((j as Job[]) ?? []); setHospitals((h as Hospital[]) ?? []);
     const c: Record<number, number> = {}; for (const r of (a as { job_id: number }[]) ?? []) c[r.job_id] = (c[r.job_id] ?? 0) + 1;
     setCounts(c);
@@ -98,7 +102,7 @@ export default function AdminJobs() {
     <div className="space-y-4">
       <PageHeader title="প্রাইভেট চাকরি" sub="হাসপাতাল ও তাদের বিজ্ঞপ্তি যাচাই করুন, অন্য জায়গার বিজ্ঞপ্তি যোগ করুন।" />
       <div className="flex flex-wrap gap-2">
-        {([['review', `যাচাই বাকি (${bnNum(pendingJobs.length + pendingH.length)})`], ['jobs', 'সব বিজ্ঞপ্তি'], ['hospitals', 'হাসপাতাল'], ['reports', `রিপোর্ট (${bnNum(reports.filter((r) => !r.resolved).length)})`], ['add', 'নতুন বিজ্ঞপ্তি যোগ']] as [Tab, string][])
+        {([['review', `যাচাই বাকি (${bnNum(pendingJobs.length + pendingH.length)})`], ['jobs', 'সব বিজ্ঞপ্তি'], ['hospitals', `হাসপাতালের অ্যাকাউন্ট (${bnNum(hospitals.length)})`], ['reports', `রিপোর্ট (${bnNum(reports.filter((r) => !r.resolved).length)})`], ['add', 'নতুন বিজ্ঞপ্তি যোগ']] as [Tab, string][])
           .map(([k, l]) => <button key={k} className={tab === k ? 'btn-primary' : 'btn-ghost'} onClick={() => { setTab(k); if (k === 'add' && !f.id) setF({ ...EMPTY }); }}>{l}</button>)}
       </div>
       {msg && <p className="rounded-xl bg-brand-50 p-3 text-sm">{msg}</p>}
@@ -185,7 +189,14 @@ export default function AdminJobs() {
           {hospitals.map((h) => (
             <div key={h.id} className="card flex flex-wrap items-center gap-2 p-3 text-sm">
               <b className="text-ink">{h.name}</b><span className="text-ink-soft">{h.district} · {h.phone}</span><span className="chip bg-brand-50 text-brand-700">{h.status}</span>
-              <div className="w-full">{licBox(h.id)}</div>
+              <div className="w-full space-y-1">
+                {accts[h.id] && (
+                  <p className="text-xs text-ink-soft">লগইন: <b className="text-ink">{accts[h.id].login.endsWith('nursingjob.online') ? accts[h.id].login.split('@')[0] : accts[h.id].login}</b>
+                    {accts[h.id].owner_name ? ` · ${accts[h.id].owner_name}` : ''} · শেষ লগইন {accts[h.id].last_sign_in_at ? bnDate(accts[h.id].last_sign_in_at) : '—'}
+                    {' '}· বিজ্ঞপ্তি {bnNum(accts[h.id].jobs)} (চালু {bnNum(accts[h.id].live_jobs)}) · আবেদন {bnNum(accts[h.id].applications)}</p>
+                )}
+                {licBox(h.id)}
+              </div>
               <span className="ml-auto flex gap-1">
                 {h.status !== 'approved' && <button className="btn-ghost !px-2 !py-1 text-xs" onClick={() => setHospital(h, 'approved')}>অনুমোদন</button>}
                 {h.status !== 'suspended' && <button className="btn-ghost !px-2 !py-1 text-xs text-red-600" onClick={() => setHospital(h, 'suspended')}>স্থগিত</button>}

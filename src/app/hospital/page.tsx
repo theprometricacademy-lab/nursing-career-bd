@@ -64,10 +64,33 @@ export default function HospitalPortal() {
 
   useEffect(() => {
     if (!ready) return;
-    if (!user) { router.replace('/login?next=/hospital'); return; }
+    if (!user) return;
     load();
   }, [ready, user, load, router]);
 
+  if (ready && !user) return (
+    <div className="mx-auto max-w-2xl space-y-4">
+      <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-600 to-mint-500 p-6 text-white shadow-card">
+        <p className="flex items-center gap-2 text-sm font-semibold text-white/85"><Building2 className="h-5 w-5" />হাসপাতাল ও ক্লিনিকের জন্য</p>
+        <h1 className="mt-1 text-2xl font-extrabold md:text-3xl">ফ্রিতে নার্স নিয়োগ বিজ্ঞপ্তি দিন</h1>
+        <p className="mt-1 text-sm text-white/90">শুধু নার্সরাই দেখেন — আবেদন আসে সিভিসহ সরাসরি আপনার প্যানেলে। একবার অ্যাকাউন্ট খুলুন, এরপর শুধু লগইন করে বিজ্ঞপ্তি দিন।</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href="/signup?next=/hospital" className="btn bg-white text-brand-700 hover:bg-brand-50"><Plus className="h-4 w-4" />হাসপাতালের অ্যাকাউন্ট খুলুন</Link>
+          <Link href="/login?next=/hospital" className="btn border border-white/50 bg-white/10 text-white hover:bg-white/20">আগে অ্যাকাউন্ট খোলা? লগইন</Link>
+        </div>
+      </header>
+      <section className="card p-5 text-sm text-ink">
+        <h2 className="mb-2 font-semibold">কীভাবে কাজ করে</h2>
+        <ol className="list-decimal space-y-1 pl-5 text-ink-soft">
+          <li>হাসপাতালের অ্যাকাউন্ট খুলুন (মোবাইল নম্বর বা ইমেইল দিয়ে)।</li>
+          <li>হাসপাতালের তথ্য ও লাইসেন্স নম্বর দিন — আমরা যাচাই করি (লাইসেন্সের তথ্য প্রকাশ হয় না)।</li>
+          <li>বিজ্ঞপ্তি দিন — যাচাইয়ের পর “✓ যাচাইকৃত হাসপাতাল” চিহ্নসহ প্রকাশ হয়।</li>
+          <li>নার্সদের আবেদন, সিভি ও ফোন নম্বর দেখে বাছাই করুন।</li>
+        </ol>
+        <p className="mt-3 rounded-xl bg-mint-50 p-3 text-mint-800">এখন সম্পূর্ণ ফ্রি।</p>
+      </section>
+    </div>
+  );
   if (h === undefined) return <Spinner />;
   const setField = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setHf({ ...hf, [k]: e.target.value });
 

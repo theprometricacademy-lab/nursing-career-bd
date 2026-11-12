@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ClipboardCheck, ListChecks, CheckCircle2, Percent, Trophy, Bookmark, RotateCcw, Crown, ArrowRight, PlayCircle } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
@@ -27,6 +28,13 @@ function useMyStats(uid: string | undefined) {
 export default function DashboardPage() {
   const { t, num, pick, profile, user, lang } = useApp();
   const { s, err } = useMyStats(user?.id);
+  const router = useRouter();
+  // hospital accounts are separate: their home is the hospital panel, not the student dashboard
+  useEffect(() => {
+    if (!user) return;
+    supabaseBrowser().from('hospitals').select('id').eq('owner_id', user.id).maybeSingle()
+      .then(({ data }) => { if (data) router.replace('/hospital'); });
+  }, [user, router]);
   const { start, busy, err: startErr } = useStartExam();
 
   if (err) return <p className="rounded-xl bg-red-50 p-4 text-red-700">{err}</p>;

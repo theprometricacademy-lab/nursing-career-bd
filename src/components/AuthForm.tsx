@@ -14,6 +14,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get('next') || '/dashboard';
+  const forHospital = next.startsWith('/hospital');
   const [form, setForm] = useState({ name: '', phone: '', email: '', password: '' });
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -88,17 +89,17 @@ export function AuthForm({ mode }: { mode: Mode }) {
           if (!r.ok) throw new Error(j.error || 'Error');
           const { error: le } = await sb.auth.signInWithPassword({ email: id.email, password: form.password });
           if (le) throw le;
-          window.location.assign('/dashboard');
+          window.location.assign(next.startsWith('/') ? next : '/dashboard');
           return;
         }
         const extraPhone = form.phone.trim() ? normalizeBdPhone(form.phone) : null;
         if (form.phone.trim() && !extraPhone) throw new Error(lang === 'bn' ? 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (01XXXXXXXXX)' : 'Enter a valid Bangladeshi mobile number (01XXXXXXXXX)');
         const { data, error } = await sb.auth.signUp({
           email: id.email, password: form.password,
-          options: { data: { full_name: form.name.trim(), phone: extraPhone ?? '' }, emailRedirectTo: `${origin}/auth/callback?next=/dashboard` },
+          options: { data: { full_name: form.name.trim(), phone: extraPhone ?? '' }, emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next.startsWith('/') ? next : '/dashboard')}` },
         });
         if (error) throw error;
-        if (data.session) window.location.assign('/dashboard');
+        if (data.session) window.location.assign(next.startsWith('/') ? next : '/dashboard');
         else setMsg({ ok: true, text: t('checkEmail') });
       } else if (mode === 'forgot') {
         const id = ident();
@@ -133,7 +134,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <div className="card p-6">
         <div className="mb-5 flex flex-col items-center text-center">
           <LogoMark size={48} />
-          <h1 className="mt-3 text-xl font-bold text-ink">{title}</h1>
+          <h1 className="mt-3 text-xl font-bold text-ink">{forHospital && (mode === 'login' || mode === 'signup') ? (mode === 'signup' ? 'হাসপাতালের অ্যাকাউন্ট খুলুন' : 'হাসপাতাল লগইন') : title}</h1>
+          {forHospital && (mode === 'login' || mode === 'signup') && (
+            <p className="mt-1 rounded-xl bg-brand-50 px-3 py-2 text-sm text-ink">🏥 {mode === 'signup' ? 'একবার অ্যাকাউন্ট খুলুন — এরপর শুধু লগইন করে বিজ্ঞপ্তি দেবেন ও আবেদন দেখবেন। নাম হিসেবে দায়িত্বপ্রাপ্ত ব্যক্তির নাম দিন; হাসপাতালের তথ্য পরের ধাপে।' : 'লগইন করলে সরাসরি আপনার হাসপাতাল প্যানেলে যাবেন।'}</p>
+          )}
           <p className="text-sm text-ink-soft">{mode === 'signup'
             ? (lang === 'bn' ? 'Google, Gmail অথবা মোবাইল নম্বর — যেকোনো একটা দিয়ে ১ মিনিটে ফ্রি অ্যাকাউন্ট খুলুন' : 'Sign up free in a minute with Google, Gmail or your mobile number')
             : mode === 'login' ? (lang === 'bn' ? 'Google, মোবাইল নম্বর বা ইমেইল দিয়ে লগইন করুন' : 'Log in with Google, mobile number or email') : t('tagline')}</p>
@@ -190,7 +194,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
               <p>{t('noAccount')} <Link href={`/signup${next ? `?next=${encodeURIComponent(next)}` : ''}`} className="font-semibold text-blush-600 hover:underline">{t('signup')}</Link></p>
             </>
           )}
-          {mode === 'signup' && <p>{t('haveAccount')} <Link href="/login" className="font-semibold text-brand-700 hover:underline">{t('login')}</Link></p>}
+          {mode === 'signup' && <p>{t('haveAccount')} <Link href={`/login${next !== '/dashboard' ? `?next=${encodeURIComponent(next)}` : ''}`} className="font-semibold text-brand-700 hover:underline">{t('login')}</Link></p>}
           {mode === 'forgot' && <p><Link href="/login" className="text-brand-700 hover:underline">{t('back')}</Link></p>}
         </div>
       </div>
