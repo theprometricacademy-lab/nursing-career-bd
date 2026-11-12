@@ -4,7 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { dictionaries, errorText, toBnDigits, type DictKey, type Lang } from '@/lib/i18n';
 
-export type Profile = { id: string; full_name: string | null; phone: string | null; role: 'student' | 'admin'; language: Lang };
+export type Profile = { id: string; full_name: string | null; phone: string | null; role: 'student' | 'admin'; language: Lang; show_on_board?: boolean; avatar_path?: string | null };
 
 type Ctx = {
   lang: Lang;
@@ -47,7 +47,7 @@ export function AppProvider({ initialLang, children }: { initialLang: Lang; chil
         return;
       }
       const [{ data: p }, { data: subs }] = await Promise.all([
-        sb.from('profiles').select('id, full_name, phone, role, language').eq('id', u.id).maybeSingle(),
+        sb.from('profiles').select('id, full_name, phone, role, language, show_on_board, avatar_path').eq('id', u.id).maybeSingle(),
         sb.from('subscriptions').select('id').eq('user_id', u.id).eq('plan', 'lifetime').eq('status', 'active').limit(1),
       ]);
       setProfile((p as Profile) ?? null);

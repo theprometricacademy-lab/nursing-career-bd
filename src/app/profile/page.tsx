@@ -6,6 +6,8 @@ import { Crown, LogOut, Shield } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
+import { ProfilePhoto } from '@/components/ProfilePhoto';
+import { BoardConsent } from '@/components/BoardConsent';
 
 export default function ProfilePage() {
   const { t, lang, setLang, user, profile, premium, isAdmin, refresh, ready } = useApp();
@@ -50,6 +52,7 @@ export default function ProfilePage() {
 
       <section className="card p-5">
         <h2 className="mb-3 font-semibold text-ink">{t('accountInfo')}</h2>
+        <div className="mb-4"><ProfilePhoto /></div>
         <form onSubmit={save} className="space-y-3">
           <div><label className="label">{t('email')}</label><input className="input bg-brand-50/50" value={user.email ?? ''} disabled /></div>
           <div><label className="label">{t('fullName')}</label><input className="input" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
@@ -57,6 +60,11 @@ export default function ProfilePage() {
           {msg && <p className="rounded-xl bg-mint-50 p-2 text-sm text-mint-700">{msg}</p>}
           <button className="btn-primary" disabled={busy}>{busy ? t('loading') : t('save')}</button>
         </form>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="mb-2 font-semibold text-ink">{lang === 'bn' ? 'সাপ্তাহিক টেস্টের বিজয়ী পোস্ট' : 'Weekly test winner post'}</h2>
+        <BoardConsent />
       </section>
 
       <section className="card flex items-center justify-between p-5">

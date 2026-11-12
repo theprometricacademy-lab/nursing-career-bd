@@ -7,6 +7,8 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Spinner } from '@/components/ui';
 import { trackEvent } from '@/components/Tracker';
+import { BoardConsent } from '@/components/BoardConsent';
+import { MyWeeklyCard } from '@/components/MyWeeklyCard';
 import { bnNum } from '@/lib/circulars';
 
 type Row = { rank: number; name: string; score: number; max: number; mins: number; me?: boolean };
@@ -89,6 +91,7 @@ export default function WeeklyTestPage() {
             {me.rank && <p className="mt-1 text-lg font-bold text-ink">{bn ? `অবস্থান: ${n(me.rank)} / ${n(s.participants)} জনের মধ্যে` : `Rank ${me.rank} of ${s.participants}`}</p>}
             <p className="mt-1 text-sm text-ink-soft">{bn ? 'পরের শনিবার নতুন টেস্ট আসবে। এর মধ্যে আরও যারা দেবেন, তাদের সাথে অবস্থান বদলাতে পারে।' : 'A new test arrives next Saturday. Your rank can change as more people sit this one.'}</p>
             <Link href={`/result/${me.id}`} className="btn-primary mt-3">{bn ? 'উত্তর ও ব্যাখ্যা দেখুন' : 'See answers & explanations'}</Link>
+            <BoardConsent className="mt-4 text-left" />
           </div>
         ) : (
           <div>
@@ -104,11 +107,14 @@ export default function WeeklyTestPage() {
                 : !user ? (bn ? 'লগইন করে পরীক্ষা দিন' : 'Log in to take the test')
                 : (bn ? 'এখনই পরীক্ষা দিন' : 'Start the test')}
             </button>
+            {user && <BoardConsent className="mt-3" />}
             <p className="mt-2 text-center text-xs text-ink-soft">{bn ? `শুরু করলে ${n(s.minutes)} মিনিটের মধ্যে শেষ করতে হবে — সময় নিয়ে বসুন।` : `Once started you have ${s.minutes} minutes — sit down when you have the time.`}</p>
             {err && <p className="mt-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p>}
           </div>
         )}
       </section>
+
+      {bn && <MyWeeklyCard />}
 
       <section className="card p-5">
         <h2 className="flex items-center gap-2 font-semibold text-ink"><Trophy className="h-5 w-5 text-gold-500" />{bn ? 'এই সপ্তাহের মেধাতালিকা' : "This week's ranking"}</h2>

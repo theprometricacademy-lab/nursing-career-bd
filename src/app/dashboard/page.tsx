@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { MyWeeklyCard } from '@/components/MyWeeklyCard';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ClipboardCheck, ListChecks, CheckCircle2, Percent, Trophy, Bookmark, RotateCcw, Crown, ArrowRight, PlayCircle } from 'lucide-react';
@@ -75,6 +76,8 @@ export default function DashboardPage() {
         </div>
         <ArrowRight className="h-5 w-5 text-blush-600" />
       </Link>
+
+      {lang === 'bn' && <MyWeeklyCard compact />}
 
       {s.premium && <ReviewForm />}
 
