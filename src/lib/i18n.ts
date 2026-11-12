@@ -5,7 +5,7 @@ const en = {
   tagline: 'Smart Preparation for Nursing Jobs in Bangladesh',
   // nav
   home: 'Home', questionBank: 'Question Bank', subjectPractice: 'Subject Practice', mockTest: 'Mock Test',
-  previousYear: 'Previous Year Questions', dailyQuiz: 'Daily Quiz', weeklyTest: 'Free Weekly Test', bookmarks: 'Bookmarks',
+  previousYear: 'Previous Year Questions', dailyQuiz: 'Daily Quiz', weeklyTest: 'Free Weekly Test', privateJobs: 'Private Hospital Jobs', bookmarks: 'Bookmarks',
   wrongAnswers: 'Wrong Answer Practice', results: 'Results & Performance', circulars: 'Job circulars', leaderboard: 'Weekly leaderboard', premium: 'Premium',
   dashboard: 'Dashboard', profile: 'Profile & Settings', admin: 'Admin Panel', menu: 'Menu', more: 'More',
   // auth
@@ -72,7 +72,7 @@ const bn: Record<DictKey, string> = {
   appName: 'Nursing Career BD',
   tagline: 'বাংলাদেশে নার্সিং চাকরির স্মার্ট প্রস্তুতি',
   home: 'হোম', questionBank: 'প্রশ্ন ব্যাংক', subjectPractice: 'বিষয়ভিত্তিক অনুশীলন', mockTest: 'মক টেস্ট',
-  previousYear: 'বিগত বছরের প্রশ্ন', dailyQuiz: 'ডেইলি কুইজ', weeklyTest: 'সাপ্তাহিক ফ্রি টেস্ট', bookmarks: 'বুকমার্ক',
+  previousYear: 'বিগত বছরের প্রশ্ন', dailyQuiz: 'ডেইলি কুইজ', weeklyTest: 'সাপ্তাহিক ফ্রি টেস্ট', privateJobs: 'প্রাইভেট হাসপাতালে চাকরি', bookmarks: 'বুকমার্ক',
   wrongAnswers: 'ভুল উত্তর অনুশীলন', results: 'ফলাফল ও পারফরম্যান্স', circulars: 'চাকরির সার্কুলার', leaderboard: 'সাপ্তাহিক মেধাতালিকা', premium: 'প্রিমিয়াম',
   dashboard: 'ড্যাশবোর্ড', profile: 'প্রোফাইল ও সেটিংস', admin: 'অ্যাডমিন প্যানেল', menu: 'মেনু', more: 'আরও',
   login: 'লগইন', logout: 'লগআউট', signup: 'অ্যাকাউন্ট খুলুন', email: 'ইমেইল', password: 'পাসওয়ার্ড',

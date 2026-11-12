@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard, FileQuestion, Upload, FolderTree, Timer, Users, CreditCard, Ticket, Megaphone, Settings, ArrowLeft, Menu, X,
-  BellRing, Activity, Flag, ImagePlus, MessageSquareHeart, FileUp,
+  BellRing, Activity, Flag, ImagePlus, MessageSquareHeart, FileUp, Briefcase,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { LangToggle } from '@/components/AppShell';
@@ -34,6 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     { href: '/admin/daily-post', icon: ImagePlus, label: L('আজকের প্রশ্ন (পোস্ট)', 'Daily post maker') },
     { href: '/admin/notices', icon: Megaphone, label: L('নোটিশ', 'Notices') },
     { href: '/admin/circulars', icon: BellRing, label: L('চাকরির সার্কুলার', 'Job circulars') },
+    { href: '/admin/jobs', icon: Briefcase, label: L('প্রাইভেট চাকরি ও হাসপাতাল', 'Private jobs & hospitals') },
     { href: '/admin/visitors', icon: Activity, label: L('লাইভ ভিজিটর', 'Live visitors') },
     { href: '/admin/settings', icon: Settings, label: L('সেটিংস ও মূল্য', 'Settings & prices') },
   ];

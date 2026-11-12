@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   Moon, Sun,
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
-  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy, Award,
+  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy, Award, Briefcase,
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
@@ -32,6 +32,7 @@ const NAV: { href: string; key: DictKey; icon: React.ComponentType<{ className?:
   { href: '/wrong-answers', key: 'wrongAnswers', icon: RotateCcw },
   { href: '/results', key: 'results', icon: BarChart3 },
   { href: '/circulars', key: 'circulars', icon: BellRing },
+  { href: '/jobs', key: 'privateJobs', icon: Briefcase },
   { href: '/premium', key: 'premium', icon: Crown },
   { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard },
   { href: '/profile', key: 'profile', icon: UserCog },

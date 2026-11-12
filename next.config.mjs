@@ -35,6 +35,11 @@ const nextConfig = {
         { key: 'X-Content-Type-Options', value: 'nosniff' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        // HTTPS only, for a year (including subdomains)
+        { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+        // no framing by other sites, no <base> hijack, forms only post to this site, http assets upgraded to https
+        { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" },
+        { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
       ],
     }];
   },

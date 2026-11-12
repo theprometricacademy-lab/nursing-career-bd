@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 
 // Runs ONLY on pages that need a logged-in user (see matcher below), so public pages
 // load without waiting for an auth round-trip.
-const PROTECTED = ['/dashboard', '/exam', '/result', '/results', '/bookmarks', '/wrong-answers', '/profile', '/daily-quiz', '/admin', '/payment'];
+const PROTECTED = ['/dashboard', '/exam', '/result', '/results', '/bookmarks', '/wrong-answers', '/profile', '/daily-quiz', '/admin', '/payment', '/jobs/my-cv'];
 const OLD_HOSTS = ['nursingjob.online', 'www.nursingjob.online', 'www.nursingcareerbd.com'];
 const CANONICAL_HOST = 'nursingcareerbd.com';
 
