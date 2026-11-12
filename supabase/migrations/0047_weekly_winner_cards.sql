@@ -80,3 +80,4 @@ begin
 end $$;
 revoke all on function public.my_weekly_results() from public, anon;
 grant execute on function public.my_weekly_results() to authenticated;
+alter function public.mask_name(text) set search_path = public;
