@@ -229,13 +229,13 @@ function PremiumView() {
         <section className="rounded-2xl border border-mint-200 bg-mint-50/60 p-4">
           <h2 className="font-semibold text-ink">{lang === 'bn' ? '🔍 কেনার আগে ফ্রিতে নিজে যাচাই করে দেখুন' : '🔍 Try it free before you buy'}</h2>
           <ul className="mt-2 space-y-1 text-sm text-ink">
-            <li>✅ {lang === 'bn' ? '১,০০০+ প্রশ্ন ব্যাখ্যাসহ — একদম ফ্রি' : '1,000+ questions with explanations — free'}</li>
-            <li>✅ {lang === 'bn' ? 'বিগত সালের সব সরকারি পরীক্ষার প্রশ্ন, আসল পরীক্ষার মতো টাইমারসহ — ফ্রি' : 'All previous-year govt papers, timed like the real exam — free'}</li>
+            <li>✅ {lang === 'bn' ? '৩০০ বাছাই করা প্রশ্ন ব্যাখ্যাসহ — ফ্রি' : '300 hand-picked questions with explanations — free'}</li>
+            <li>✅ {lang === 'bn' ? 'বিগত সালের সরকারি পরীক্ষার প্রশ্নের সমাধান পড়া — ফ্রি' : 'Read previous-year govt paper solutions — free'}</li>
             <li>✅ {lang === 'bn' ? 'মান ভালো লাগলে তারপর প্রিমিয়াম নিন' : 'Like the quality? Then go Premium'}</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
             <Link href="/question-bank" className="btn-success !py-2">{lang === 'bn' ? 'ফ্রি প্রশ্ন দেখুন' : 'See free questions'}</Link>
-            <Link href="/previous-questions" className="btn-ghost !py-2">{lang === 'bn' ? 'বিগত সালের প্রশ্নে পরীক্ষা দিন' : 'Take a past paper'}</Link>
+            <Link href="/question-solution" className="btn-ghost !py-2">{lang === 'bn' ? 'বিগত সালের প্রশ্নের সমাধান' : 'Past paper solutions'}</Link>
           </div>
         </section>
       )}

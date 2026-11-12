@@ -59,7 +59,7 @@ export function QuickQuiz({ autoStart = false }: { autoStart?: boolean }) {
           <p className="mt-3 text-lg font-bold text-ink">
             {score === qs!.length ? 'দারুণ! সবগুলো সঠিক 🎉' : score >= 3 ? 'ভালো করেছেন! আরেকটু অনুশীলন করলেই পারফেক্ট।' : 'চিন্তা নেই, নিয়মিত অনুশীলনেই উন্নতি হবে।'}
           </p>
-          <p className="mt-1 text-sm text-ink-soft">ফ্রি অ্যাকাউন্ট খুলে ১০,০০০+ ব্যাখ্যাসহ প্রশ্ন, বিগত ১০ বছরের সরকারি পরীক্ষার প্রশ্ন আর দৈনিক কুইজ দিন।</p>
+          <p className="mt-1 text-sm text-ink-soft">ফ্রি অ্যাকাউন্টে ৩০০ বাছাই করা প্রশ্ন ও দৈনিক কুইজ। প্রিমিয়ামে ১১,০০০+ ব্যাখ্যাসহ প্রশ্ন, বিগত সালের সরকারি পরীক্ষা ও মডেল টেস্ট।</p>
           {offer?.active && (
             <Link href="/premium" className="mx-auto mt-3 block max-w-md rounded-2xl bg-gradient-to-r from-blush-600 to-blush-500 p-3 text-sm text-white">
               <b>❄️ শীতের অফার:</b> লাইফটাইম প্রিমিয়াম মাত্র ৳{num(Number(offer.price))}{typeof offer.left === 'number' ? ` · বাকি ${num(offer.left)} জন` : ''} →

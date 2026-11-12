@@ -62,11 +62,11 @@ export function NoticeBoard() {
   const showWinter = !!winter?.active;
   // while the winter offer runs it is the better deal, so the coupon isn't advertised
   const showCoupon = !!coupon && !premium && !showWinter;
-  if (!loaded) return null;
+  if (!loaded) return <div className="h-[38px] rounded-full bg-brand-50/70 ring-1 ring-brand-100" aria-hidden />;
 
   const items: { key: string; text: string; href?: string }[] = [
     ...(showWinter ? [{ key: 'w', text: `❄️ শীতের অফার: প্রথম ${bnNum(winter!.limit)} জনের জন্য প্রিমিয়াম মাত্র ৳${bnNum(Number(winter!.price))} · বাকি ${bnNum(winter!.left)} জন`, href: '/premium' }] : []),
-    { key: 'pyq', text: '🎁 বিগত সালের সব প্রশ্ন ও সেগুলোর মডেল টেস্ট এখন একদম ফ্রি', href: '/previous-questions' },
+    { key: 'pyq', text: '📘 বিগত সালের সরকারি পরীক্ষার প্রশ্নের সমাধান — ফ্রিতে পড়ুন', href: '/question-solution' },
     ...(showWinter ? [{ key: 'ref', text: '🤝 বন্ধুর রেফারেল কোডে ৳৫০ ছাড় (মূল দাম ৳৫৯৯ থেকে)', href: '/premium' }] : []),
     { key: 'fast', text: '💳 bKash/Nagad-এ পেমেন্ট করে TrxID দিন — যাচাইয়ের পর প্রিমিয়াম চালু', href: '/premium' },
     ...(showCoupon ? [{ key: 'c', text: `প্রিমিয়ামে ${offText(coupon!)} · কুপন ${coupon!.code}`, href: `/premium?coupon=${encodeURIComponent(coupon!.code)}` }] : []),
@@ -111,7 +111,7 @@ export function NoticeBoard() {
                   <div className="mt-1 text-2xl font-extrabold">প্রিমিয়াম মাত্র ৳{bnNum(Number(winter!.price))}</div>
                   <p className="mt-1 text-sm text-white/90">প্রথম {bnNum(winter!.limit)} জনের জন্য · বাকি {bnNum(winter!.left)} জন · আজীবন অ্যাক্সেস</p>
                   <ul className="mt-2 space-y-1 text-sm text-white/95">
-                    <li>🎁 বিগত সালের সব প্রশ্ন ও মডেল টেস্ট ফ্রি</li>
+                    <li>📘 ১১,০০০+ ব্যাখ্যাসহ প্রশ্ন, বিগত সালের সব প্রশ্নে পরীক্ষা ও সব মডেল টেস্ট</li>
                     <li>🤝 রেফারেল কোডে ৳৫০ ছাড় (মূল দাম ৳৫৯৯ থেকে; তখন শীতের অফার প্রযোজ্য নয়)</li>
                     <li>💳 bKash / Nagad-এ সহজ পেমেন্ট</li>
                   </ul>

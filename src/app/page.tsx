@@ -97,7 +97,7 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <div className="-mt-2"><NoticeBoard /></div>
       {/* new visitors: something to do on the first screen */}
-      {ready && !user && <QuickQuiz autoStart />}
+      {!ready ? <div className="h-[340px] rounded-3xl border border-brand-100 bg-white shadow-card" aria-hidden /> : !user && <QuickQuiz autoStart />}
 
       {/* Hero */}
       {premium ? (
@@ -303,10 +303,10 @@ export default function HomePage() {
                 )}
               </Link>
             )}
-            <Link href="/previous-questions" className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/25 transition hover:bg-white/25">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/80">{L('একদম ফ্রি', 'Totally free')}</p>
-              <p className="mt-0.5 font-bold">🎁 {L('বিগত সালের সব প্রশ্ন', 'All previous-year papers')}</p>
-              <p className="text-xs text-white/90">{L('সাথে সেগুলোর মডেল টেস্টও ফ্রি', 'plus their mock tests, free')}</p>
+            <Link href="/question-solution" className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/25 transition hover:bg-white/25">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/80">{L('ফ্রিতে পড়ুন', 'Free to read')}</p>
+              <p className="mt-0.5 font-bold">📘 {L('বিগত সালের প্রশ্নের সমাধান', 'Previous-year paper solutions')}</p>
+              <p className="text-xs text-white/90">{L('সঠিক উত্তর ও ব্যাখ্যাসহ', 'with answers and explanations')}</p>
             </Link>
             {refOff ? (
               <Link href="/premium" className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/25 transition hover:bg-white/25">
