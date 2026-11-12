@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Building2, CalendarClock, MapPin, Users, Wallet } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Building2, CalendarClock, Info, MapPin, ShieldAlert, Users, Wallet } from 'lucide-react';
 import { Crumbs } from '@/components/SeoBlocks';
 import { ApplyBox } from '@/components/ApplyBox';
+import { JobReport } from '@/components/JobReport';
 import { bnDate, bnNum } from '@/lib/circulars';
 import { bdToday, fetchJobs, safeUrl, type Job } from '@/lib/jobs';
 
@@ -67,7 +68,12 @@ export default async function JobPage({ params }: Props) {
 
       <header className="card overflow-hidden">
         <div className="bg-gradient-to-r from-brand-700 to-mint-500 p-5 text-white">
-          <span className="chip bg-white text-brand-700">{closed ? 'আবেদন শেষ' : 'আবেদন চলছে'}</span>
+          <div className="flex flex-wrap gap-2">
+            <span className="chip bg-white text-brand-700">{closed ? 'আবেদন শেষ' : 'আবেদন চলছে'}</span>
+            {j.hospital_id
+              ? <span className="chip bg-mint-100 text-mint-800"><BadgeCheck className="h-3.5 w-3.5" />যাচাইকৃত হাসপাতাল</span>
+              : <span className="chip bg-white/20 text-white"><Info className="h-3.5 w-3.5" />অন্য উৎস থেকে সংগৃহীত</span>}
+          </div>
           <h1 className="mt-2 text-xl font-bold leading-snug md:text-2xl">{j.post_title} নিয়োগ</h1>
           <p className="mt-1 flex items-center gap-1.5 font-semibold text-white/95"><Building2 className="h-4 w-4" />{j.hospital_name}</p>
         </div>
@@ -78,6 +84,15 @@ export default async function JobPage({ params }: Props) {
           <div className="flex items-start gap-2"><CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-blush-600" /><span><span className="block text-xs text-ink-soft">আবেদনের শেষ তারিখ</span><b className="text-ink">{j.deadline ? bnDate(j.deadline) : 'উল্লেখ নেই'}</b></span></div>
         </div>
       </header>
+
+      <section className="rounded-2xl border border-gold-300 bg-gold-50 p-4 text-sm text-ink">
+        <p className="flex items-center gap-2 font-bold"><ShieldAlert className="h-5 w-5 text-gold-600" />নিরাপদ থাকুন</p>
+        <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-ink-soft">
+          <li>চাকরির জন্য কাউকে টাকা দেবেন না — জামানত, “নিয়োগ খরচ”, প্রশিক্ষণ ফি চাইলে সেটা প্রতারণা।</li>
+          <li>ইন্টারভিউ হাসপাতালের ঠিকানাতেই হয়; অচেনা জায়গা বা ব্যক্তিগত বাসায় ডাকলে সাবধান।</li>
+          <li>{j.hospital_id ? 'এই হাসপাতালের লাইসেন্স ও যোগাযোগ Nursing Career BD যাচাই করেছে।' : 'এই বিজ্ঞপ্তি অন্য উৎস থেকে নেওয়া — আবেদনের আগে হাসপাতালে ফোন করে নিশ্চিত হোন।'}</li>
+        </ul>
+      </section>
 
       <ApplyBox job={{ id: j.id, slug: j.slug, apply_mode: j.apply_mode, apply_url: safeUrl(j.apply_url), apply_info: j.apply_info, closed }} />
 
@@ -99,6 +114,8 @@ export default async function JobPage({ params }: Props) {
         <p className="mt-1 text-sm text-white/90">প্রতি সপ্তাহে ফ্রি মডেল টেস্ট — ডিউটির ফাঁকে সপ্তাহের যেকোনো সময় দিন।</p>
         <Link href="/weekly-test" className="btn mt-3 bg-white text-brand-700 hover:bg-brand-50">সাপ্তাহিক ফ্রি টেস্ট <ArrowRight className="h-4 w-4" /></Link>
       </aside>
+
+      <JobReport jobId={j.id} slug={j.slug} />
 
       <p className="text-xs leading-5 text-ink-soft">
         {source ? <>সূত্র: <a href={source} target="_blank" rel="noopener noreferrer nofollow" className="underline">মূল বিজ্ঞপ্তি</a>। </> : null}

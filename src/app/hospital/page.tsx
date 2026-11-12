@@ -1,8 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, ChevronDown, ChevronUp, FileText, Pencil, Phone, Plus, XCircle } from 'lucide-react';
+import { Building2, CheckCircle2, ChevronDown, ChevronUp, FileText, Pencil, Phone, Plus, ShieldCheck, Upload, XCircle } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
@@ -28,6 +28,7 @@ const ERR: Record<string, string> = {
   name_required: 'হাসপাতালের নাম লিখুন।', phone_required: 'যোগাযোগের নম্বর লিখুন।', title_required: 'পদের নাম লিখুন।',
   bad_deadline: 'শেষ তারিখ আজকের আগে হতে পারে না।', rate_limited: 'অনেকবার চেষ্টা হয়েছে, পরে আবার চেষ্টা করুন।',
   hospital_blocked: 'অ্যাকাউন্টটি এখন বিজ্ঞপ্তি দিতে পারবে না।', suspended: 'অ্যাকাউন্টটি স্থগিত।',
+  license_required: 'হাসপাতালের লাইসেন্স নম্বর দিন।', terms_required: 'নিয়মগুলোতে সম্মতি দিন।', bad_file: 'ফাইলটি আবার আপলোড করুন।',
 };
 const errText = (m: string) => { const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? ERR[k] : 'সেভ হয়নি, আবার চেষ্টা করুন।'; };
 const EMPTY_JOB = { id: '', post_title: 'স্টাফ নার্স', vacancies: '', district: '', location: '', salary: '', job_type: 'ফুল টাইম', qualifications: '', description: '', deadline: '', apply_info: '' };
@@ -46,11 +47,15 @@ export default function HospitalPortal() {
   const [open, setOpen] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
+  const [lic, setLic] = useState<{ has_license: boolean; has_doc: boolean; terms: boolean } | null>(null);
+  const [upBusy, setUpBusy] = useState(false);
+  const docInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     if (!user) return;
     const { data } = await sb.from('hospitals').select('*').eq('owner_id', user.id).maybeSingle();
     setH((data as Hospital) ?? null);
+    if (data) sb.rpc('my_hospital_license_status').then(({ data: l }) => setLic((l as typeof lic) ?? null));
     if (data) {
       const { data: j } = await sb.from('jobs').select('*').eq('hospital_id', (data as Hospital).id).order('created_at', { ascending: false });
       setJobs((j as Job[]) ?? []);
@@ -66,9 +71,20 @@ export default function HospitalPortal() {
   if (h === undefined) return <Spinner />;
   const setField = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setHf({ ...hf, [k]: e.target.value });
 
+  async function uploadDoc(list: FileList | null) {
+    const x = list?.[0]; if (!x || !user) return;
+    if (!['application/pdf', 'image/jpeg', 'image/png'].includes(x.type) || x.size > 5 * 1024 * 1024) { setMsg({ ok: false, t: 'PDF বা ছবি দিন, ৫ MB-এর কম।' }); return; }
+    setUpBusy(true);
+    const path = `${user.id}/license-${Date.now()}.${x.type === 'application/pdf' ? 'pdf' : x.type === 'image/png' ? 'png' : 'jpg'}`;
+    const { error } = await sb.storage.from('hospital-docs').upload(path, x, { contentType: x.type, upsert: false });
+    setUpBusy(false);
+    if (error) { setMsg({ ok: false, t: 'ফাইল আপলোড হয়নি, আবার চেষ্টা করুন।' }); return; }
+    setHf((cur) => ({ ...cur, license_doc: path }));
+  }
+
   async function saveHospital(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null);
-    const { error } = await sb.rpc('register_hospital', { p: hf });
+    const { error } = await sb.rpc('register_hospital', { p: { ...hf, terms: hf.terms === 'yes' } });
     setBusy(false);
     if (error) { setMsg({ ok: false, t: errText(error.message) }); return; }
     setEditH(false); setMsg({ ok: true, t: 'হাসপাতালের তথ্য সেভ হয়েছে।' }); load();
@@ -114,7 +130,29 @@ export default function HospitalPortal() {
         <div className="sm:col-span-2"><label className="label">ওয়েবসাইট / ফেসবুক পেজ</label><input className="input" type="url" maxLength={300} value={hf.website ?? ''} onChange={setField('website')} placeholder="https://" /></div>
         <div className="sm:col-span-2"><label className="label">হাসপাতাল সম্পর্কে</label><textarea className="input min-h-[70px]" maxLength={1000} value={hf.about ?? ''} onChange={setField('about')} placeholder="বেড সংখ্যা, বিভাগ ইত্যাদি" /></div>
       </div>
-      <p className="text-xs text-ink-soft">যাচাইয়ের জন্য আমরা দেওয়া নম্বর বা ইমেইলে যোগাযোগ করতে পারি। ভুয়া তথ্য দিলে অ্যাকাউন্ট বন্ধ করা হবে।</p>
+      <div className="space-y-3 rounded-2xl border border-brand-200 bg-brand-50/50 p-4">
+        <p className="flex items-center gap-2 font-semibold text-ink"><ShieldCheck className="h-5 w-5 text-mint-600" />লাইসেন্স ও যাচাই</p>
+        <p className="text-xs text-ink-soft">লাইসেন্সের তথ্য শুধু Nursing Career BD-এর অ্যাডমিন যাচাইয়ের জন্য দেখবেন — ওয়েবসাইটে কোথাও প্রকাশ হবে না।</p>
+        {lic?.has_license && <p className="flex items-center gap-1.5 text-sm text-mint-700"><CheckCircle2 className="h-4 w-4" />লাইসেন্স নম্বর জমা আছে{lic.has_doc ? ' · কপিও জমা আছে' : ''}। বদলাতে চাইলে নতুন নম্বর লিখুন, না হলে খালি রাখুন।</p>}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div><label className="label">স্বাস্থ্য অধিদপ্তরের (DGHS) লাইসেন্স নম্বর {lic?.has_license ? '' : '*'}</label>
+            <input className="input" required={!lic?.has_license} maxLength={60} value={hf.license_no ?? ''} onChange={setField('license_no')} autoComplete="off" /></div>
+          <div><label className="label">ট্রেড লাইসেন্স নম্বর</label><input className="input" maxLength={60} value={hf.trade_license ?? ''} onChange={setField('trade_license')} autoComplete="off" /></div>
+        </div>
+        <div>
+          <input ref={docInput} type="file" accept="application/pdf,image/jpeg,image/png" className="hidden" onChange={(e) => { uploadDoc(e.target.files); e.target.value = ''; }} />
+          <button type="button" className="btn-ghost" disabled={upBusy} onClick={() => docInput.current?.click()}>
+            <Upload className="h-4 w-4" />{upBusy ? 'আপলোড হচ্ছে…' : hf.license_doc ? 'লাইসেন্সের কপি যোগ হয়েছে ✓ (বদলাতে চাপুন)' : 'লাইসেন্সের কপি দিন (PDF/ছবি) — দ্রুত যাচাইয়ের জন্য'}
+          </button>
+        </div>
+        {!lic?.terms && (
+          <label className="flex items-start gap-2 text-sm text-ink">
+            <input type="checkbox" className="mt-1 h-4 w-4" required checked={hf.terms === 'yes'} onChange={(e) => setHf({ ...hf, terms: e.target.checked ? 'yes' : '' })} />
+            <span>আমি নিশ্চিত করছি: দেওয়া তথ্য সত্য; আবেদনকারীর কাছ থেকে কোনো টাকা (জামানত, “নিয়োগ খরচ” ইত্যাদি) নেওয়া হবে না; আবেদনকারীর তথ্য শুধু নিয়োগের কাজে ব্যবহার হবে। ভুয়া তথ্য বা প্রতারণার প্রমাণ পেলে অ্যাকাউন্ট স্থায়ীভাবে বন্ধ হবে।</span>
+          </label>
+        )}
+      </div>
+      <p className="text-xs text-ink-soft">যাচাইয়ের জন্য আমরা দেওয়া নম্বর বা ইমেইলে যোগাযোগ করতে পারি।</p>
       <div className="flex gap-2">
         <button className="btn-success" disabled={busy}>{busy ? 'সেভ হচ্ছে…' : 'সেভ করুন'}</button>
         {h && <button type="button" className="btn-ghost" onClick={() => setEditH(false)}>বাতিল</button>}

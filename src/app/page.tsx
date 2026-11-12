@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   BookOpen, Timer, History, BarChart3, CalendarCheck, ArrowRight, GraduationCap,
-  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages, ChevronRight, Star, Briefcase,
+  CheckCircle2, Crown, UserPlus, Target, TrendingUp, Trophy, ChevronDown, Smartphone, Languages, ChevronRight, Star,
 } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { useSubjects } from '@/components/ui';
@@ -117,7 +117,6 @@ export default function HomePage() {
                 ['/mock-tests', Timer, L('মডেল টেস্ট দিন', 'Take a mock test')],
                 ['/wrong-answers', Target, L('ভুলগুলো আবার করুন', 'Retry mistakes')],
                 ['/leaderboard', Trophy, L('সাপ্তাহিক মেধাতালিকা', 'Weekly leaderboard')],
-                ['/jobs', Briefcase, L('প্রাইভেট হাসপাতালে চাকরি', 'Private hospital jobs')],
                 ['/dashboard#review', Star, L('রিভিউ দিন', 'Write a review')],
               ].map(([href, Icon, label]) => {
                 const I = Icon as typeof Timer;
@@ -189,15 +188,6 @@ export default function HomePage() {
           <div className="text-sm text-ink-soft">{L('প্রতি সপ্তাহে নতুন · যেকোনো সময় দিন · সবার মধ্যে র‍্যাংকিং', 'New every week · any time · ranked among everyone')}</div>
         </div>
         <ArrowRight className="h-5 w-5 text-blush-600" />
-      </Link>
-
-      <Link href="/jobs" className="card flex items-center gap-4 border-brand-200 bg-gradient-to-r from-brand-50 to-white p-4 transition hover:shadow-md">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-700 to-mint-500 text-white"><Briefcase className="h-6 w-6" /></span>
-        <div className="flex-1">
-          <div className="font-semibold text-ink">{L('প্রাইভেট হাসপাতালে নার্স নিয়োগ', 'Private hospital nurse jobs')}</div>
-          <div className="text-sm text-ink-soft">{L('একবার সিভি তৈরি করুন, এখান থেকেই আবেদন করুন', 'Make your CV once and apply from here')}</div>
-        </div>
-        <ArrowRight className="h-5 w-5 text-brand-600" />
       </Link>
 
       <Link href="/daily-quiz" className="card flex items-center gap-4 border-mint-200 bg-gradient-to-r from-mint-50 to-white p-4 transition hover:shadow-md">

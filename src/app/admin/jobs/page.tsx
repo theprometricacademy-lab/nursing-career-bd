@@ -9,7 +9,10 @@ import { bnDate, bnNum } from '@/lib/circulars';
 
 type Hospital = { id: number; name: string; district: string | null; address: string | null; phone: string | null; email: string | null;
   website: string | null; contact_person: string | null; about: string | null; status: string; created_at: string };
-type Tab = 'review' | 'jobs' | 'hospitals' | 'add';
+type Tab = 'review' | 'jobs' | 'hospitals' | 'reports' | 'add';
+type Lic = { hospital_id: number; license_no: string; trade_license: string | null; license_doc: string | null; terms_accepted_at: string | null };
+type Report = { id: number; job_id: number; reason: string; note: string | null; resolved: boolean; created_at: string };
+const REASON_BN: Record<string, string> = { money: 'টাকা চাইছে', fake: 'ভুয়া মনে হচ্ছে', wrong_info: 'তথ্য ভুল', closed: 'নিয়োগ শেষ', other: 'অন্য কারণ' };
 const EMPTY = { hospital_name: '', post_title: 'স্টাফ নার্স', vacancies: '', district: '', location: '', salary: '', job_type: 'ফুল টাইম',
   qualifications: '', description: '', deadline: '', apply_url: '', apply_info: '', source_url: '' };
 
@@ -21,13 +24,19 @@ export default function AdminJobs() {
   const [counts, setCounts] = useState<Record<number, number>>({});
   const [f, setF] = useState<typeof EMPTY & { id?: number }>({ ...EMPTY });
   const [msg, setMsg] = useState('');
+  const [lics, setLics] = useState<Record<number, Lic>>({});
+  const [reports, setReports] = useState<Report[]>([]);
 
   const load = useCallback(async () => {
-    const [{ data: j }, { data: h }, { data: a }] = await Promise.all([
+    const [{ data: j }, { data: h }, { data: a }, { data: v }, { data: r }] = await Promise.all([
       sb.from('jobs').select('*').order('created_at', { ascending: false }).limit(300),
       sb.from('hospitals').select('*').order('created_at', { ascending: false }).limit(300),
       sb.from('job_applications').select('job_id').limit(5000),
+      sb.from('hospital_verifications').select('*'),
+      sb.from('job_reports').select('*').order('created_at', { ascending: false }).limit(300),
     ]);
+    setLics(Object.fromEntries(((v as Lic[]) ?? []).map((x) => [x.hospital_id, x])));
+    setReports((r as Report[]) ?? []);
     setJobs((j as Job[]) ?? []); setHospitals((h as Hospital[]) ?? []);
     const c: Record<number, number> = {}; for (const r of (a as { job_id: number }[]) ?? []) c[r.job_id] = (c[r.job_id] ?? 0) + 1;
     setCounts(c);
@@ -43,6 +52,26 @@ export default function AdminJobs() {
     const { error } = await sb.from('hospitals').update({ status, updated_at: new Date().toISOString() }).eq('id', h.id);
     setMsg(error ? error.message : 'হালনাগাদ হয়েছে'); load();
   }
+  async function openDoc(path: string) {
+    const { data } = await sb.storage.from('hospital-docs').createSignedUrl(path, 300);
+    if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener');
+  }
+  async function resolveReports(jobId: number) {
+    const { error } = await sb.from('job_reports').update({ resolved: true }).eq('job_id', jobId).eq('resolved', false);
+    setMsg(error ? error.message : 'রিপোর্টগুলো মীমাংসিত হিসেবে চিহ্নিত হয়েছে'); load();
+  }
+  const licBox = (id: number) => {
+    const l = lics[id];
+    if (!l) return <p className="text-xs text-red-600">লাইসেন্সের তথ্য নেই</p>;
+    return (
+      <div className="rounded-xl bg-brand-50 p-2 text-xs text-ink">
+        <b>লাইসেন্স (শুধু আপনি দেখছেন):</b> DGHS: {l.license_no}{l.trade_license ? ` · ট্রেড: ${l.trade_license}` : ''}
+        {l.license_doc && <button className="ml-2 text-brand-700 underline" onClick={() => openDoc(l.license_doc!)}>কপি দেখুন</button>}
+        {l.terms_accepted_at && <span className="ml-2 text-mint-700">· নিয়মে সম্মতি দিয়েছে</span>}
+      </div>
+    );
+  };
+
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!f.apply_url && !f.apply_info) { setMsg('আবেদনের লিংক বা আবেদনের নিয়ম — অন্তত একটি দিন।'); return; }
@@ -69,7 +98,7 @@ export default function AdminJobs() {
     <div className="space-y-4">
       <PageHeader title="প্রাইভেট চাকরি" sub="হাসপাতাল ও তাদের বিজ্ঞপ্তি যাচাই করুন, অন্য জায়গার বিজ্ঞপ্তি যোগ করুন।" />
       <div className="flex flex-wrap gap-2">
-        {([['review', `যাচাই বাকি (${bnNum(pendingJobs.length + pendingH.length)})`], ['jobs', 'সব বিজ্ঞপ্তি'], ['hospitals', 'হাসপাতাল'], ['add', 'নতুন বিজ্ঞপ্তি যোগ']] as [Tab, string][])
+        {([['review', `যাচাই বাকি (${bnNum(pendingJobs.length + pendingH.length)})`], ['jobs', 'সব বিজ্ঞপ্তি'], ['hospitals', 'হাসপাতাল'], ['reports', `রিপোর্ট (${bnNum(reports.filter((r) => !r.resolved).length)})`], ['add', 'নতুন বিজ্ঞপ্তি যোগ']] as [Tab, string][])
           .map(([k, l]) => <button key={k} className={tab === k ? 'btn-primary' : 'btn-ghost'} onClick={() => { setTab(k); if (k === 'add' && !f.id) setF({ ...EMPTY }); }}>{l}</button>)}
       </div>
       {msg && <p className="rounded-xl bg-brand-50 p-3 text-sm">{msg}</p>}
@@ -82,7 +111,8 @@ export default function AdminJobs() {
               <p className="text-ink-soft">{[h.district, h.address].filter(Boolean).join(', ')} · ফোন {h.phone} {h.email ? `· ${h.email}` : ''} {h.contact_person ? `· ${h.contact_person}` : ''}</p>
               {safeUrl(h.website) && <a href={safeUrl(h.website)!} target="_blank" rel="noopener noreferrer nofollow" className="text-brand-700 underline">{h.website}</a>}
               {h.about && <p className="text-ink-soft">{h.about}</p>}
-              <p className="text-xs text-ink-soft">যাচাই: ফোন করে বা ওয়েবসাইট/ফেসবুক পেজ দেখে নিশ্চিত হোন যে এটি আসল হাসপাতাল।</p>
+              {licBox(h.id)}
+              <p className="text-xs text-ink-soft">যাচাই: লাইসেন্স নম্বর মিলিয়ে দেখুন, হাসপাতালে ফোন করে বা ওয়েবসাইট/ফেসবুক পেজ দেখে নিশ্চিত হোন যে এটি আসল হাসপাতাল।</p>
               <div className="flex gap-2 pt-1">
                 <button className="btn-success !py-1.5" onClick={() => setHospital(h, 'approved')}><Check className="h-4 w-4" />অনুমোদন</button>
                 <button className="btn-ghost !py-1.5 text-red-600" onClick={() => setHospital(h, 'rejected')}><X className="h-4 w-4" />বাতিল</button>
@@ -128,12 +158,34 @@ export default function AdminJobs() {
             </tbody>
           </table>
         </div>
+      ) : tab === 'reports' ? (
+        <div className="space-y-2">
+          {reports.filter((r) => !r.resolved).length === 0 && <p className="card p-6 text-center text-ink-soft">কোনো নতুন রিপোর্ট নেই</p>}
+          {Array.from(new Set(reports.filter((r) => !r.resolved).map((r) => r.job_id))).map((jid) => {
+            const j = jobs.find((x) => x.id === jid); const rs = reports.filter((r) => r.job_id === jid && !r.resolved);
+            return (
+              <div key={jid} className="card space-y-1 p-4 text-sm">
+                <div className="flex flex-wrap items-center gap-2"><b className="text-ink">{j ? `${j.post_title} — ${j.hospital_name}` : `#${jid}`}</b>
+                  <span className="chip bg-red-100 text-red-700">{bnNum(rs.length)}টি রিপোর্ট</span>{j && <span className="chip bg-brand-50 text-brand-700">{j.status}</span>}</div>
+                {rs.map((r) => <p key={r.id} className="text-ink-soft">• {REASON_BN[r.reason] ?? r.reason}{r.note ? ` — “${r.note}”` : ''}</p>)}
+                <p className="text-xs text-ink-soft">৩টি রিপোর্ট হলে বিজ্ঞপ্তি নিজে থেকেই বন্ধ হয়ে “যাচাই বাকি”-তে আসে।</p>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {j && j.status !== 'published' && <button className="btn-success !py-1.5" onClick={async () => { await resolveReports(jid); setJob(j, 'published'); }}>সব ঠিক — আবার প্রকাশ করুন</button>}
+                  {j && <button className="btn-ghost !py-1.5 text-red-600" onClick={async () => { await resolveReports(jid); setJob(j, 'rejected'); }}>বিজ্ঞপ্তি বাতিল</button>}
+                  {j?.hospital_id && <button className="btn-ghost !py-1.5 text-red-600" onClick={() => { const h = hospitals.find((x) => x.id === j.hospital_id); if (h && confirm(`${h.name} স্থগিত করবেন?`)) setHospital(h, 'suspended'); }}>হাসপাতাল স্থগিত</button>}
+                  <button className="btn-ghost !py-1.5" onClick={() => resolveReports(jid)}>রিপোর্ট মীমাংসিত</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : tab === 'hospitals' ? (
         <div className="space-y-2">
           {hospitals.length === 0 && <p className="card p-6 text-center text-ink-soft">এখনো কোনো হাসপাতাল নিবন্ধন করেনি</p>}
           {hospitals.map((h) => (
             <div key={h.id} className="card flex flex-wrap items-center gap-2 p-3 text-sm">
               <b className="text-ink">{h.name}</b><span className="text-ink-soft">{h.district} · {h.phone}</span><span className="chip bg-brand-50 text-brand-700">{h.status}</span>
+              <div className="w-full">{licBox(h.id)}</div>
               <span className="ml-auto flex gap-1">
                 {h.status !== 'approved' && <button className="btn-ghost !px-2 !py-1 text-xs" onClick={() => setHospital(h, 'approved')}>অনুমোদন</button>}
                 {h.status !== 'suspended' && <button className="btn-ghost !px-2 !py-1 text-xs text-red-600" onClick={() => setHospital(h, 'suspended')}>স্থগিত</button>}

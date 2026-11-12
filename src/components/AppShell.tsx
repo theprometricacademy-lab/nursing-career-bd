@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   Moon, Sun,
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
-  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy, Award, Briefcase,
+  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy, Award,
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
@@ -32,7 +32,6 @@ const NAV: { href: string; key: DictKey; icon: React.ComponentType<{ className?:
   { href: '/wrong-answers', key: 'wrongAnswers', icon: RotateCcw },
   { href: '/results', key: 'results', icon: BarChart3 },
   { href: '/circulars', key: 'circulars', icon: BellRing },
-  { href: '/jobs', key: 'privateJobs', icon: Briefcase },
   { href: '/premium', key: 'premium', icon: Crown },
   { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard },
   { href: '/profile', key: 'profile', icon: UserCog },
@@ -112,7 +111,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Exam runner and admin have their own chrome
   if (path.startsWith('/exam/') || path.startsWith('/admin')) return <>{children}</>;
 
-  const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+  // private-hospital jobs live inside "circulars", so that menu item stays lit there too
+  const active = (href: string) => (href === '/' ? path === '/'
+    : path === href || path.startsWith(href + '/') || (href === '/circulars' && /^\/(jobs|hospital)(\/|$)/.test(path)));
   // Go to the previous page; if the visitor landed here directly (e.g. from Google), go home instead
   const goBack = () => { if (visited.current > 1) router.back(); else router.push('/'); };
   const logout = async () => { await supabaseBrowser().auth.signOut(); setOpen(false); router.push('/'); router.refresh(); };

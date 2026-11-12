@@ -64,6 +64,7 @@ export default async function JobsPage({ searchParams }: Props) {
                     {j.apply_mode === 'site' ? 'এখান থেকেই আবেদন' : 'হাসপাতালের লিংকে আবেদন'}
                   </span>
                   {j.job_type && <span className="chip bg-slate-100 text-slate-700">{j.job_type}</span>}
+                  {j.hospital_id && <span className="chip bg-mint-600 text-white">✓ যাচাইকৃত হাসপাতাল</span>}
                 </div>
                 <h2 className="mt-1.5 text-lg font-bold text-ink">{j.post_title}</h2>
                 <p className="flex items-center gap-1.5 font-semibold text-brand-700"><Building2 className="h-4 w-4" />{j.hospital_name}</p>
