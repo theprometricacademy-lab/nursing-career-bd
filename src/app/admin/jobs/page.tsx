@@ -11,7 +11,7 @@ type Hospital = { id: number; name: string; district: string | null; address: st
   website: string | null; contact_person: string | null; about: string | null; status: string; created_at: string };
 type Tab = 'review' | 'jobs' | 'hospitals' | 'reports' | 'add';
 type Lic = { hospital_id: number; license_no: string; trade_license: string | null; license_doc: string | null; terms_accepted_at: string | null };
-type Acct = { id: number; login: string; last_sign_in_at: string | null; owner_name: string | null; owner_phone: string | null; jobs: number; live_jobs: number; applications: number };
+type Acct = { id: number; login: string; email_verified: boolean; official_email: boolean; last_sign_in_at: string | null; owner_name: string | null; owner_phone: string | null; jobs: number; live_jobs: number; applications: number };
 type Report = { id: number; job_id: number; reason: string; note: string | null; resolved: boolean; created_at: string };
 const REASON_BN: Record<string, string> = { money: 'টাকা চাইছে', fake: 'ভুয়া মনে হচ্ছে', wrong_info: 'তথ্য ভুল', closed: 'নিয়োগ শেষ', other: 'অন্য কারণ' };
 const EMPTY = { hospital_name: '', post_title: 'স্টাফ নার্স', vacancies: '', district: '', location: '', salary: '', job_type: 'ফুল টাইম',
@@ -193,6 +193,8 @@ export default function AdminJobs() {
                 {accts[h.id] && (
                   <p className="text-xs text-ink-soft">লগইন: <b className="text-ink">{accts[h.id].login.endsWith('nursingjob.online') ? accts[h.id].login.split('@')[0] : accts[h.id].login}</b>
                     {accts[h.id].owner_name ? ` · ${accts[h.id].owner_name}` : ''} · শেষ লগইন {accts[h.id].last_sign_in_at ? bnDate(accts[h.id].last_sign_in_at) : '—'}
+                    {' '}{accts[h.id].official_email ? <span className="chip bg-mint-100 text-mint-700">অফিসিয়াল ইমেইল</span> : <span className="chip bg-slate-100 text-slate-600">সাধারণ ইমেইল</span>}
+                    {accts[h.id].email_verified ? <span className="chip bg-mint-100 text-mint-700">ইমেইল নিশ্চিত</span> : <span className="chip bg-red-100 text-red-700">ইমেইল নিশ্চিত নয়</span>}
                     {' '}· বিজ্ঞপ্তি {bnNum(accts[h.id].jobs)} (চালু {bnNum(accts[h.id].live_jobs)}) · আবেদন {bnNum(accts[h.id].applications)}</p>
                 )}
                 {licBox(h.id)}

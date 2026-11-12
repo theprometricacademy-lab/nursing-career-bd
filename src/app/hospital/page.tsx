@@ -28,6 +28,7 @@ const ERR: Record<string, string> = {
   name_required: 'হাসপাতালের নাম লিখুন।', phone_required: 'যোগাযোগের নম্বর লিখুন।', title_required: 'পদের নাম লিখুন।',
   bad_deadline: 'শেষ তারিখ আজকের আগে হতে পারে না।', rate_limited: 'অনেকবার চেষ্টা হয়েছে, পরে আবার চেষ্টা করুন।',
   hospital_blocked: 'অ্যাকাউন্টটি এখন বিজ্ঞপ্তি দিতে পারবে না।', suspended: 'অ্যাকাউন্টটি স্থগিত।',
+  email_required: 'হাসপাতালের অ্যাকাউন্ট ইমেইল দিয়ে খুলতে হবে (মোবাইল নম্বরের অ্যাকাউন্টে নয়)।',
   license_required: 'হাসপাতালের লাইসেন্স নম্বর দিন।', terms_required: 'নিয়মগুলোতে সম্মতি দিন।', bad_file: 'ফাইলটি আবার আপলোড করুন।',
 };
 const errText = (m: string) => { const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? ERR[k] : 'সেভ হয়নি, আবার চেষ্টা করুন।'; };
@@ -82,7 +83,7 @@ export default function HospitalPortal() {
       <section className="card p-5 text-sm text-ink">
         <h2 className="mb-2 font-semibold">কীভাবে কাজ করে</h2>
         <ol className="list-decimal space-y-1 pl-5 text-ink-soft">
-          <li>হাসপাতালের অ্যাকাউন্ট খুলুন (মোবাইল নম্বর বা ইমেইল দিয়ে)।</li>
+          <li>হাসপাতালের অফিসিয়াল ইমেইল বা HR-এর ইমেইল দিয়ে অ্যাকাউন্ট খুলুন (Gmail-ও চলবে; অফিসিয়াল ডোমেইনের ইমেইল হলে যাচাই দ্রুত হয়)।</li>
           <li>হাসপাতালের তথ্য ও লাইসেন্স নম্বর দিন — আমরা যাচাই করি (লাইসেন্সের তথ্য প্রকাশ হয় না)।</li>
           <li>বিজ্ঞপ্তি দিন — যাচাইয়ের পর “✓ যাচাইকৃত হাসপাতাল” চিহ্নসহ প্রকাশ হয়।</li>
           <li>নার্সদের আবেদন, সিভি ও ফোন নম্বর দেখে বাছাই করুন।</li>
@@ -190,6 +191,11 @@ export default function HospitalPortal() {
 
       {!h || editH ? (
         <>
+          {!h && user?.email?.endsWith('@phone.nursingjob.online') && (
+            <section className="rounded-2xl border border-gold-300 bg-gold-50 p-4 text-sm text-ink">
+              আপনি মোবাইল নম্বরের অ্যাকাউন্টে আছেন। <b>হাসপাতালের অ্যাকাউন্ট আলাদা এবং ইমেইল দিয়ে খুলতে হয়</b> — লগআউট করে হাসপাতালের অফিসিয়াল বা HR-এর ইমেইল দিয়ে নতুন অ্যাকাউন্ট খুলুন।
+            </section>
+          )}
           {!h && (
             <section className="rounded-2xl bg-brand-50 p-4 text-sm text-ink">
               <b>কীভাবে কাজ করে:</b> ১) হাসপাতালের তথ্য দিন ২) বিজ্ঞপ্তি জমা দিন ৩) আমরা যাচাই করে প্রকাশ করি ৪) নার্সরা সিভিসহ আবেদন করেন, আপনি এখানে দেখেন ও বাছাই করেন। <b>এখন সম্পূর্ণ ফ্রি।</b>

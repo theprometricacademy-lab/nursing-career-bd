@@ -81,6 +81,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         const id = ident();
         if (id.bad) throw badIdent();
         if (form.password.length < 8) throw new Error(lang === 'bn' ? 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে' : 'Password must be at least 8 characters');
+        if (forHospital && id.phone) throw new Error('হাসপাতালের অ্যাকাউন্ট ইমেইল দিয়ে খুলতে হবে — হাসপাতালের অফিসিয়াল বা HR-এর ইমেইল দিন।');
         if (id.phone) {
           // Mobile-number account: created on the server (no email, no verification), then signed in right away
           const r = await fetch('/api/auth/phone-signup', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -136,7 +137,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <LogoMark size={48} />
           <h1 className="mt-3 text-xl font-bold text-ink">{forHospital && (mode === 'login' || mode === 'signup') ? (mode === 'signup' ? 'হাসপাতালের অ্যাকাউন্ট খুলুন' : 'হাসপাতাল লগইন') : title}</h1>
           {forHospital && (mode === 'login' || mode === 'signup') && (
-            <p className="mt-1 rounded-xl bg-brand-50 px-3 py-2 text-sm text-ink">🏥 {mode === 'signup' ? 'একবার অ্যাকাউন্ট খুলুন — এরপর শুধু লগইন করে বিজ্ঞপ্তি দেবেন ও আবেদন দেখবেন। নাম হিসেবে দায়িত্বপ্রাপ্ত ব্যক্তির নাম দিন; হাসপাতালের তথ্য পরের ধাপে।' : 'লগইন করলে সরাসরি আপনার হাসপাতাল প্যানেলে যাবেন।'}</p>
+            <p className="mt-1 rounded-xl bg-brand-50 px-3 py-2 text-sm text-ink">🏥 {mode === 'signup' ? 'হাসপাতালের অফিসিয়াল ইমেইল বা HR-এর ইমেইল দিয়ে একবার অ্যাকাউন্ট খুলুন (ইমেইলে আসা লিংকে চেপে নিশ্চিত করতে হবে) — এরপর শুধু লগইন করে বিজ্ঞপ্তি দেবেন। নাম হিসেবে দায়িত্বপ্রাপ্ত ব্যক্তির নাম দিন; হাসপাতালের তথ্য পরের ধাপে।' : 'লগইন করলে সরাসরি আপনার হাসপাতাল প্যানেলে যাবেন।'}</p>
           )}
           <p className="text-sm text-ink-soft">{mode === 'signup'
             ? (lang === 'bn' ? 'Google, Gmail অথবা মোবাইল নম্বর — যেকোনো একটা দিয়ে ১ মিনিটে ফ্রি অ্যাকাউন্ট খুলুন' : 'Sign up free in a minute with Google, Gmail or your mobile number')
