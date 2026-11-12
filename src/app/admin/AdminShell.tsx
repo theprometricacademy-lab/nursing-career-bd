@@ -1,4 +1,5 @@
 'use client';
+import { ScrollToTop } from '@/components/ScrollToTop';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -55,6 +56,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   );
   return (
     <div className="min-h-[100dvh] overflow-x-clip bg-brand-50/40">
+      <ScrollToTop />
       <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-brand-100 bg-white px-4">
         <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="menu"><Menu className="h-5 w-5" /></button>
         <Link href="/" className="flex items-center gap-2" title="ওয়েবসাইটের হোম পেজে যান">

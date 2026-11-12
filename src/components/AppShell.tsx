@@ -1,4 +1,5 @@
 'use client';
+import { ScrollToTop } from '@/components/ScrollToTop';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
@@ -139,6 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] overflow-x-clip">
+      <ScrollToTop />
       <Suspense fallback={null}><NavProgress /></Suspense>
       <header className={`sticky top-0 z-30 border-b bg-white/90 backdrop-blur ${premium ? 'border-gold-300' : 'border-brand-100'}`}>
         {premium && <div className="h-[3px] bg-gradient-to-r from-gold-300 via-gold-500 to-gold-300" />}
