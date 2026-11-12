@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BellRing, Building2, CalendarClock, Users } from 'lucide-react';
 import { Crumbs } from '@/components/SeoBlocks';
+import { JobTabs } from '@/components/JobTabs';
 import { bnDate, bnNum, fetchCirculars, JOB_TYPE_BN, status, type Circular } from '@/lib/circulars';
 
 export const dynamic = 'force-dynamic';
@@ -43,6 +44,7 @@ export default async function CircularsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <Crumbs items={[['/', 'হোম'], ['/circulars', 'চাকরির সার্কুলার']]} />
+      <JobTabs active="govt" />
       <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blush-600 to-blush-500 p-6 text-white">
         <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-white/15 blur-2xl" />
         <div className="relative">

@@ -189,6 +189,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-brand-700">
               <Link href="/question-solution">সিনিয়র স্টাফ নার্স প্রশ্ন সমাধান</Link>
               <Link href="/circulars">নার্সিং চাকরির সার্কুলার</Link>
+              <Link href="/jobs">প্রাইভেট হাসপাতালে নার্স নিয়োগ</Link>
               <Link href="/senior-staff-nurse">সিনিয়র স্টাফ নার্স প্রস্তুতি</Link>
               <Link href="/nursing-job-preparation">নার্সিং চাকরির প্রস্তুতি</Link>
               <Link href="/nursing-mcq">নার্সিং MCQ প্রশ্ন ও উত্তর</Link>

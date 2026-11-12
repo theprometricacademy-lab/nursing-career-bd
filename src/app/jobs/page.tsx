@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, Building2, CalendarClock, FileUser, MapPin, Search, Users } from 'lucide-react';
 import { Crumbs } from '@/components/SeoBlocks';
+import { JobTabs } from '@/components/JobTabs';
 import { bnDate, bnNum } from '@/lib/circulars';
 import { DISTRICTS, fetchJobs, openJobsQuery } from '@/lib/jobs';
 
@@ -27,6 +28,7 @@ export default async function JobsPage({ searchParams }: Props) {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <Crumbs items={[['/', 'হোম'], ['/jobs', 'প্রাইভেট চাকরি']]} />
+      <JobTabs active="private" />
       <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-600 to-mint-500 p-6 text-white shadow-card">
         <div className="flex items-center gap-2 text-sm font-semibold text-white/85"><Briefcase className="h-5 w-5" />শুধু নার্সদের জন্য</div>
         <h1 className="mt-1 text-2xl font-extrabold md:text-3xl">প্রাইভেট হাসপাতালে নার্স নিয়োগ</h1>

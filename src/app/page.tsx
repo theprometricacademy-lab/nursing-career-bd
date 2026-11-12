@@ -117,6 +117,7 @@ export default function HomePage() {
                 ['/mock-tests', Timer, L('মডেল টেস্ট দিন', 'Take a mock test')],
                 ['/wrong-answers', Target, L('ভুলগুলো আবার করুন', 'Retry mistakes')],
                 ['/leaderboard', Trophy, L('সাপ্তাহিক মেধাতালিকা', 'Weekly leaderboard')],
+                ['/jobs', Briefcase, L('প্রাইভেট হাসপাতালে চাকরি', 'Private hospital jobs')],
                 ['/dashboard#review', Star, L('রিভিউ দিন', 'Write a review')],
               ].map(([href, Icon, label]) => {
                 const I = Icon as typeof Timer;

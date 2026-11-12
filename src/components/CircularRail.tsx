@@ -65,13 +65,18 @@ export function CircularStrip() {
   if (!items) return <div className="mb-4 h-[38px]" aria-hidden />;
   const open = items.filter((c) => status(c).key !== 'closed');
   if (open.length === 0) return null;
-  const row = (dup: boolean) => open.map((c) => (
+  const row = (dup: boolean) => [
+    <Link key={(dup ? 'd' : '') + 'jobs'} href="/jobs" aria-hidden={dup || undefined} tabIndex={dup ? -1 : undefined}
+      className="mx-1.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-300 bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700">
+      💼 নতুন: প্রাইভেট হাসপাতালে নার্স নিয়োগ — এখান থেকেই আবেদন
+    </Link>,
+    ...open.map((c) => (
     <Link key={(dup ? 'd' : '') + c.id} href={`/circulars/${c.slug}`} aria-hidden={dup || undefined} tabIndex={dup ? -1 : undefined}
       className="mx-1.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-blush-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-blush-50">
       <span className="h-1.5 w-1.5 rounded-full bg-blush-500" />{c.title_bn}
       <span className="text-blush-700">· {status(c).label} · শেষ {bnDate(c.apply_end)}</span>
     </Link>
-  ));
+  ))];
   return (
     <div className="mb-4 flex items-center gap-2 overflow-hidden rounded-full bg-blush-50/70 py-1 pl-1 pr-0 ring-1 ring-blush-100">
       <Link href="/circulars" className="chip z-10 shrink-0 bg-blush-600 py-1.5 text-white"><BellRing className="h-3.5 w-3.5" />সার্কুলার</Link>
