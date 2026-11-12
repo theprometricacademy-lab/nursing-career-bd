@@ -57,6 +57,13 @@ function ResultView() {
 
   return (
     <div className="space-y-4">
+      {a.mode === 'weekly' && (
+        <Link href="/weekly-test" className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-600 to-blush-500 p-4 text-white">
+          <Trophy className="h-6 w-6 shrink-0" />
+          <span className="flex-1 font-semibold">{lang === 'bn' ? 'সাপ্তাহিক টেস্টে সবার মধ্যে আপনার অবস্থান দেখুন' : 'See your rank in the weekly test'}</span>
+          <span className="rounded-full bg-white/20 px-3 py-1 text-sm">{lang === 'bn' ? 'মেধাতালিকা →' : 'Ranking →'}</span>
+        </Link>
+      )}
       {search.get('auto') && (
         <p className="flex items-center gap-2 rounded-xl bg-blush-50 p-3 text-sm text-blush-700"><AlarmClock className="h-4 w-4" />{t('timeUp')}</p>
       )}

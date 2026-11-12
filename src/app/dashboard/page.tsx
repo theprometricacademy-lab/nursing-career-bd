@@ -59,6 +59,15 @@ export default function DashboardPage() {
         </section>
       )}
 
+      <Link href="/weekly-test" className="card flex items-center gap-3 border-blush-200 bg-gradient-to-r from-blush-50 to-white p-4 hover:shadow-md">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-blush-500 text-white"><Trophy className="h-5 w-5" /></span>
+        <div className="flex-1">
+          <div className="font-semibold text-ink">{lang === 'bn' ? 'সাপ্তাহিক ফ্রি মডেল টেস্ট' : 'Free weekly model test'}</div>
+          <div className="text-sm text-ink-soft">{lang === 'bn' ? 'এই সপ্তাহের টেস্ট দিন, দেখুন সবার মধ্যে আপনি কততম' : "Sit this week's test and see your rank"}</div>
+        </div>
+        <ArrowRight className="h-5 w-5 text-blush-600" />
+      </Link>
+
       {s.premium && <ReviewForm />}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">

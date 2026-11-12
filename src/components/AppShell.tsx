@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   Moon, Sun,
   Home, BookOpen, Layers, Timer, History, CalendarCheck, Bookmark, RotateCcw, BarChart3,
-  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy,
+  Crown, LayoutDashboard, UserCog, Shield, Menu, X, LogIn, LogOut, BellRing, ArrowLeft, Trophy, Award,
 } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { LogoMark } from './Logo';
@@ -23,6 +23,7 @@ const NAV: { href: string; key: DictKey; icon: React.ComponentType<{ className?:
   { href: '/', key: 'home', icon: Home },
   { href: '/question-bank', key: 'questionBank', icon: BookOpen },
   { href: '/subject-practice', key: 'subjectPractice', icon: Layers },
+  { href: '/weekly-test', key: 'weeklyTest', icon: Award },
   { href: '/mock-tests', key: 'mockTest', icon: Timer },
   { href: '/leaderboard', key: 'leaderboard', icon: Trophy },
   { href: '/previous-questions', key: 'previousYear', icon: History },

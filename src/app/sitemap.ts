@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const BASE = 'https://nursingcareerbd.com';
 const PAGES: [path: string, priority: number][] = [
   ['/', 1], ['/question-solution', 0.95], ['/written-questions', 0.85], ['/circulars', 0.95], ['/senior-staff-nurse', 0.95], ['/nursing-job-preparation', 0.9], ['/nursing-mcq', 0.9],
-  ['/question-bank', 0.9], ['/mock-tests', 0.9], ['/leaderboard', 0.7], ['/subject-practice', 0.8], ['/previous-questions', 0.8],
+  ['/question-bank', 0.9], ['/mock-tests', 0.9], ['/leaderboard', 0.7], ['/weekly-test', 0.85], ['/subject-practice', 0.8], ['/previous-questions', 0.8],
   ['/premium', 0.8], ['/contact', 0.4], ['/terms', 0.3], ['/privacy', 0.3], ['/refund', 0.3],
 ];
 

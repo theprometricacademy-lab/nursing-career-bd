@@ -27,7 +27,7 @@ export default function ResultsPage() {
   const trend = useMemo(() => done.slice(0, 12).reverse().map((r) => Math.round((Number(r.score) / Number(r.max_score)) * 100)), [done]);
 
   if (!rows) return <Spinner />;
-  const modeLabel = (m: string) => ({ mock: t('mockTest'), daily: t('dailyQuiz'), pyq: t('previousYear'), custom: t('practiceTest') }[m] ?? m);
+  const modeLabel = (m: string) => ({ mock: t('mockTest'), daily: t('dailyQuiz'), pyq: t('previousYear'), custom: t('practiceTest'), weekly: t('weeklyTest') }[m] ?? m);
 
   return (
     <div className="space-y-4">

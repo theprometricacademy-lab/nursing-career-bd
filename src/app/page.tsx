@@ -181,6 +181,15 @@ export default function HomePage() {
         })}
       </section>
 
+      <Link href="/weekly-test" className="card flex items-center gap-4 border-blush-200 bg-gradient-to-r from-blush-50 to-white p-4 transition hover:shadow-md">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-blush-500 text-white"><Trophy className="h-6 w-6" /></span>
+        <div className="flex-1">
+          <div className="font-semibold text-ink">{L('সাপ্তাহিক ফ্রি মডেল টেস্ট', 'Free weekly model test')}</div>
+          <div className="text-sm text-ink-soft">{L('প্রতি সপ্তাহে নতুন · যেকোনো সময় দিন · সবার মধ্যে র‍্যাংকিং', 'New every week · any time · ranked among everyone')}</div>
+        </div>
+        <ArrowRight className="h-5 w-5 text-blush-600" />
+      </Link>
+
       <Link href="/daily-quiz" className="card flex items-center gap-4 border-mint-200 bg-gradient-to-r from-mint-50 to-white p-4 transition hover:shadow-md">
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-mint-500 text-white"><CalendarCheck className="h-6 w-6" /></span>
         <div className="flex-1">
