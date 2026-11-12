@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="bn" className={bnFont.variable} suppressHydrationWarning>
       <head>
         {/* apply the saved light/dark choice before the first paint (no white flash); keep an early app-install prompt */}
-        <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bip=e});" }} />
+        <script dangerouslySetInnerHTML={{ __html: "try{if(/Android/i.test(navigator.userAgent))document.documentElement.classList.add('android');if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bip=e});" }} />
       </head>
       <body className="font-sans antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />
