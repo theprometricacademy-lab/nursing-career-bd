@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ClipboardCheck, ListChecks, CheckCircle2, Percent, Trophy, Bookmark, RotateCcw, Crown, ArrowRight } from 'lucide-react';
+import { ClipboardCheck, ListChecks, CheckCircle2, Percent, Trophy, Bookmark, RotateCcw, Crown, ArrowRight, PlayCircle } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Progress, Spinner, Stat } from '@/components/ui';
 import { ReviewForm } from '@/components/Reviews';
 import { useCached, sbData } from '@/lib/cache';
+import { useStartExam } from '@/components/useStartExam';
+import { trackEvent } from '@/components/Tracker';
 
 type MyStats = {
   tests_completed: number; questions_attempted: number; correct_answers: number; unique_questions: number; total_questions: number;
@@ -25,6 +27,7 @@ function useMyStats(uid: string | undefined) {
 export default function DashboardPage() {
   const { t, num, pick, profile, user, lang } = useApp();
   const { s, err } = useMyStats(user?.id);
+  const { start, busy, err: startErr } = useStartExam();
 
   if (err) return <p className="rounded-xl bg-red-50 p-4 text-red-700">{err}</p>;
   if (!s) return <Spinner />;
@@ -39,6 +42,22 @@ export default function DashboardPage() {
         right={s.premium
           ? <span className="chip bg-blush-100 py-1.5 text-sm text-blush-700"><Crown className="h-4 w-4" />{t('premium')}: {t('active')}</span>
           : <Link href="/premium" className="btn-pink"><Crown className="h-4 w-4" />{t('upgrade')}</Link>} />
+
+      {/* new users: one obvious first step — a 10-question practice from the free questions, nothing locked */}
+      {s.questions_attempted < 10 && (
+        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-600 to-blush-500 p-5 text-white shadow-card md:p-7">
+          <p className="text-sm font-semibold text-white/85">{lang === 'bn' ? 'শুরু করুন এখান থেকে 👇' : 'Start here 👇'}</p>
+          <h2 className="mt-1 text-2xl font-extrabold md:text-3xl">{lang === 'bn' ? `ফ্রি ${num(10)}টি প্রশ্নে এখনই পরীক্ষা দিন` : 'Take a free 10-question test now'}</h2>
+          <p className="mt-1 text-sm text-white/90">{lang === 'bn'
+            ? 'সরকারি নার্সিং পরীক্ষার ধরনের মিডিয়াম ও কঠিন প্রশ্ন · ১০ মিনিট · শেষে সঠিক উত্তর ও ব্যাখ্যা দেখবেন'
+            : 'Medium and hard govt nursing exam-style questions · 10 minutes · answers and explanations at the end'}</p>
+          <button className="btn mt-4 w-full bg-white !py-3.5 text-lg font-bold text-brand-700 hover:bg-brand-50 sm:w-auto sm:px-10"
+            disabled={!!busy} onClick={() => { trackEvent('/first-test/start'); start({ mode: 'custom', count: 10, minutes: 10 }, 'first'); }}>
+            <PlayCircle className="h-6 w-6" />{busy ? (lang === 'bn' ? 'শুরু হচ্ছে…' : 'Starting…') : (lang === 'bn' ? 'পরীক্ষা শুরু করুন' : 'Start the test')}
+          </button>
+          {startErr && <p className="mt-2 rounded-xl bg-white/15 p-2 text-sm">{startErr}</p>}
+        </section>
+      )}
 
       {s.premium && <ReviewForm />}
 
