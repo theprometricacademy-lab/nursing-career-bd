@@ -1,0 +1,18 @@
+name: ci-check
+on:
+  push:
+    branches: [ci-check]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+      - run: pip install -q gdown faster-whisper
+      - run: bash .vid/prep.sh
+      - run: |
+          git config user.name ci && git config user.email ci@example.com
+          git checkout -b video-src && git add -f src && git commit -qm src && git push -f origin video-src
