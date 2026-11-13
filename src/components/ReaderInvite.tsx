@@ -15,6 +15,9 @@ export function ReaderInvite() {
   const [show, setShow] = useState(false);
   const reading = path.startsWith('/question-solution/');
 
+  // close it as soon as the visitor moves to another page (e.g. taps "create account")
+  useEffect(() => { setShow(false); }, [path]);
+
   useEffect(() => {
     if (!ready || user || !reading) return;
     try { if (localStorage.getItem(KEY)) return; } catch { return; }
@@ -40,8 +43,8 @@ export function ReaderInvite() {
             <li key={x} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-mint-600" />{x}</li>
           ))}
         </ul>
-        <Link href={`/signup?next=${next}`} onClick={() => trackEvent('/invite/signup')} className="btn-primary mt-4 w-full !py-3 text-base">ফ্রি অ্যাকাউন্ট খুলুন — ১ মিনিট</Link>
-        <p className="mt-2 text-center text-xs text-ink-soft">মোবাইল নম্বর বা Google দিয়ে · কোনো টাকা লাগে না · <Link href={`/login?next=${next}`} className="text-brand-700 underline">আগে থেকে অ্যাকাউন্ট আছে?</Link></p>
+        <Link href={`/signup?next=${next}`} onClick={() => { setShow(false); trackEvent('/invite/signup'); }} className="btn-primary mt-4 w-full !py-3 text-base">ফ্রি অ্যাকাউন্ট খুলুন — ১ মিনিট</Link>
+        <p className="mt-2 text-center text-xs text-ink-soft">মোবাইল নম্বর বা Google দিয়ে · কোনো টাকা লাগে না · <Link href={`/login?next=${next}`} onClick={() => setShow(false)} className="text-brand-700 underline">আগে থেকে অ্যাকাউন্ট আছে?</Link></p>
       </div>
     </div>
   );
