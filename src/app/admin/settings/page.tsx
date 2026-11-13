@@ -8,6 +8,7 @@ type S = {
   price_lifetime: number; price_single_test: number; default_negative_mark: number; default_duration_minutes: number;
   payment_gateways: { bkash: boolean; nagad: boolean; sslcommerz: boolean }; support_phone: string;
   manual_payment: { enabled: boolean; bkash: string; nagad: string; account_type: string; auto_approve?: boolean; bkash_type?: string; nagad_type?: string };
+  winter_offer: { enabled: boolean; price: number; limit: number };
 };
 
 export default function SettingsAdmin() {
@@ -16,6 +17,7 @@ export default function SettingsAdmin() {
   const [s, setS] = useState<S | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [used, setUsed] = useState<number | null>(null);
 
   useEffect(() => {
     sb.from('app_settings').select('key, value').then(({ data }) => {
@@ -26,13 +28,16 @@ export default function SettingsAdmin() {
         payment_gateways: { bkash: false, nagad: false, sslcommerz: false, ...(m.payment_gateways as object) },
         support_phone: String(m.support_phone ?? ''),
         manual_payment: { enabled: true, bkash: '', nagad: '', account_type: 'Personal', ...(m.manual_payment as object) },
+        winter_offer: { enabled: false, price: 399, limit: 100, ...(m.winter_offer as object) },
       });
     });
+    sb.rpc('winter_offer_status').then(({ data }) => setUsed((data as { used?: number } | null)?.used ?? 0));
   }, [sb]);
 
   async function save() {
     if (!s) return;
     if (s.price_lifetime < 0 || s.price_single_test < 0 || s.default_negative_mark < 0) { setMsg({ ok: false, text: L('ঋণাত্মক মান দেওয়া যাবে না', 'Values cannot be negative') }); return; }
+    if (s.winter_offer.enabled && (s.winter_offer.price <= 0 || s.winter_offer.price >= s.price_lifetime || s.winter_offer.limit < 1)) { setMsg({ ok: false, text: L('অফার মূল্য ০-এর বেশি আর আসল দামের কম হতে হবে, সংখ্যা অন্তত ১', 'Offer price must be above 0 and below the full price; limit at least 1') }); return; }
     setBusy(true); setMsg(null);
     const rows = Object.entries(s).map(([key, value]) => ({ key, value, is_public: true, updated_at: new Date().toISOString() }));
     const { error } = await sb.from('app_settings').upsert(rows, { onConflict: 'key' });
@@ -52,6 +57,21 @@ export default function SettingsAdmin() {
         <div><label className="label">{L('ডিফল্ট নেগেটিভ মার্ক (প্র্যাকটিস/বিগত)', 'Default negative mark (practice/PYQ)')}</label><input className="input" type="number" step="0.05" min={0} value={s.default_negative_mark} onChange={num('default_negative_mark')} /></div>
         <div><label className="label">{L('ডিফল্ট সময় (মিনিট)', 'Default duration (minutes)')}</label><input className="input" type="number" min={1} value={s.default_duration_minutes} onChange={num('default_duration_minutes')} /></div>
         <div className="sm:col-span-2"><label className="label">{L('সাপোর্ট ফোন', 'Support phone')}</label><input className="input" value={s.support_phone} onChange={(e) => setS({ ...s, support_phone: e.target.value })} /></div>
+      </section>
+      <section className="card space-y-3 p-5">
+        <h2 className="font-semibold text-ink">{L('শীতকালীন অফার (আজীবন প্রিমিয়াম)', 'Winter offer (lifetime premium)')}</h2>
+        <label className="flex items-center gap-3 text-sm font-medium">
+          <input type="checkbox" checked={s.winter_offer.enabled} onChange={(e) => setS({ ...s, winter_offer: { ...s.winter_offer, enabled: e.target.checked } })} />
+          {L('অফার চালু', 'Offer on')}
+        </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div><label className="label">{L('অফার মূল্য (৳)', 'Offer price (৳)')}</label><input className="input" type="number" min={1} value={s.winter_offer.price} onChange={(e) => setS({ ...s, winter_offer: { ...s.winter_offer, price: Number(e.target.value) } })} /></div>
+          <div><label className="label">{L('প্রথম কতজন পাবেন', 'For the first … buyers')}</label><input className="input" type="number" min={1} value={s.winter_offer.limit} onChange={(e) => setS({ ...s, winter_offer: { ...s.winter_offer, limit: Number(e.target.value) } })} /></div>
+        </div>
+        <p className="text-xs text-ink-soft">
+          {L(`আসল দাম ৳${s.price_lifetime} · ছাড় ৳${Math.max(0, s.price_lifetime - s.winter_offer.price)}`, `Full price ৳${s.price_lifetime} · saving ৳${Math.max(0, s.price_lifetime - s.winter_offer.price)}`)}
+          {used !== null && L(` · এ পর্যন্ত অফারে কিনেছেন ${used} জন, বাকি ${Math.max(0, s.winter_offer.limit - used)} জন`, ` · sold at offer so far: ${used}, left: ${Math.max(0, s.winter_offer.limit - used)}`)}
+        </p>
       </section>
       <section className="card space-y-3 p-5">
         <h2 className="font-semibold text-ink">{L('bKash / Nagad — নম্বরে টাকা পাঠিয়ে TrxID জমা', 'bKash / Nagad — pay to number + TrxID')}</h2>
