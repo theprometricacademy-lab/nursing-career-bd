@@ -7,7 +7,7 @@ import { PageHeader, Spinner } from '@/components/ui';
 import { useL } from '../AdminShell';
 
 type U = { id: string; full_name: string | null; phone: string | null; role: string; created_at: string; email: string; last_sign_in_at: string | null; premium: boolean; tests: number;
-  practiced: number; practice_correct: number; last_practice: string | null; hospital: string | null };
+  practiced: number; practice_correct: number; last_practice: string | null; hospital: string | null; last_active: string | null };
 
 export default function UsersAdmin() {
   const L = useL();
@@ -16,6 +16,16 @@ export default function UsersAdmin() {
   const lastSeen = (iso: string) => {
     const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
     return d <= 0 ? L('আজ', 'today') : d === 1 ? L('গতকাল', 'yesterday') : L(`${num(d)} দিন আগে`, `${d}d ago`);
+  };
+  // e.g. 'আজ ১০:৩২ PM' / 'গতকাল ৯:০৫ PM' / '১২ নভেম্বর ৮:১০ AM' (Bangladesh time)
+  const when = (iso: string) => {
+    const d = new Date(iso);
+    const day = (x: Date) => x.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+    const time = d.toLocaleTimeString(L('bn-BD', 'en-GB'), { timeZone: 'Asia/Dhaka', hour: 'numeric', minute: '2-digit' });
+    const today = day(new Date()), yest = day(new Date(Date.now() - 86400000));
+    const label = day(d) === today ? L('আজ', 'Today') : day(d) === yest ? L('গতকাল', 'Yesterday')
+      : d.toLocaleDateString(L('bn-BD', 'en-GB'), { timeZone: 'Asia/Dhaka', day: 'numeric', month: 'short' });
+    return `${label} ${time}`;
   };
   const sb = supabaseBrowser();
   const [rows, setRows] = useState<U[] | null>(null);
@@ -55,7 +65,7 @@ export default function UsersAdmin() {
         <div className="card overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-brand-50 text-left text-xs text-ink-soft">
-              <tr><th className="px-3 py-2">{L('ইউজার', 'User')}</th><th className="px-3 py-2">{L('ফোন', 'Phone')}</th><th className="px-3 py-2">{L('প্র্যাকটিস', 'Practised')}</th><th className="px-3 py-2">{L('টেস্ট', 'Tests')}</th><th className="px-3 py-2">{L('যোগদান', 'Joined')}</th><th className="px-3 py-2" /></tr>
+              <tr><th className="px-3 py-2">{L('ইউজার', 'User')}</th><th className="px-3 py-2">{L('ফোন', 'Phone')}</th><th className="px-3 py-2">{L('প্র্যাকটিস', 'Practised')}</th><th className="px-3 py-2">{L('শেষ এসেছিলেন', 'Last active')}</th><th className="px-3 py-2">{L('টেস্ট', 'Tests')}</th><th className="px-3 py-2">{L('যোগদান', 'Joined')}</th><th className="px-3 py-2" /></tr>
             </thead>
             <tbody className="divide-y divide-brand-100">
               {rows.map((u) => (
@@ -80,6 +90,10 @@ export default function UsersAdmin() {
                       </div>
                       {u.last_practice && <div className="text-xs text-ink-soft">{lastSeen(u.last_practice)}</div>}
                     </>) : <span className="text-ink-soft">০</span>}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 text-xs">
+                    {u.last_active ? <div className="font-semibold text-ink">{when(u.last_active)}</div> : <span className="text-ink-soft">—</span>}
+                    {u.last_sign_in_at && <div className="text-ink-soft">{L('লগইন', 'Login')}: {when(u.last_sign_in_at)}</div>}
                   </td>
                   <td className="px-3 py-2">{num(u.tests)}</td>
                   <td className="px-3 py-2 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
