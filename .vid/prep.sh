@@ -8,11 +8,14 @@ for p in $ids; do id=${p%%:*}; n=${p##*:}
   ls -la src/$n.mp4
 done
 python3 - <<'PY'
-import json, glob
+import json, glob, subprocess, numpy as np
 from faster_whisper import WhisperModel
+def pcm(f):
+    raw = subprocess.run(['ffmpeg','-loglevel','error','-i',f,'-ac','1','-ar','16000','-f','s16le','-'], capture_output=True, check=True).stdout
+    return np.frombuffer(raw, np.int16).astype(np.float32) / 32768.0
 m = WhisperModel("medium", device="cpu", compute_type="int8")
 for f in sorted(glob.glob("src/*.mp4")):
-    segs, info = m.transcribe(f, language="bn", word_timestamps=True, vad_filter=False, beam_size=5)
+    segs, info = m.transcribe(pcm(f), language="bn", word_timestamps=True, vad_filter=False, beam_size=5)
     out = [{"start": s.start, "end": s.end, "text": s.text, "words": [[w.start, w.end, w.word] for w in (s.words or [])]} for s in segs]
     json.dump({"duration": info.duration, "segments": out}, open(f[:-4] + ".json", "w"), ensure_ascii=False, indent=0)
     print(f, info.duration, len(out), flush=True)
