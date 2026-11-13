@@ -5,14 +5,27 @@ on:
 permissions:
   contents: write
 jobs:
-  build:
+  asr:
     runs-on: ubuntu-latest
-    timeout-minutes: 80
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        clip: [IMG_3439, IMG_3441, IMG_3442, IMG_3443, IMG_3446, IMG_3448, IMG_3456, IMG_3459, IMG_3460]
     steps:
       - uses: actions/checkout@v4
+      - run: git fetch -q origin video-src && git checkout FETCH_HEAD -- src
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
-      - run: pip install -q gdown faster-whisper
-      - run: bash .vid/prep.sh
+      - run: pip install -q faster-whisper transformers torch --extra-index-url https://download.pytorch.org/whl/cpu
+      - run: mkdir -p asr && python3 .vid/asr.py ${{ matrix.clip }}
+      - uses: actions/upload-artifact@v4
+        with: { name: "asr-${{ matrix.clip }}", path: asr/ }
+  collect:
+    needs: asr
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: asr, merge-multiple: true }
       - run: |
           git config user.name ci && git config user.email ci@example.com
-          git checkout -b video-src && git add -f src && git commit -qm src && git push -f origin video-src
+          git checkout -b video-asr && git add -f asr && git commit -qm asr && git push -f origin video-asr
