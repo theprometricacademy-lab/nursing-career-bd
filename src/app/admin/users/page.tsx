@@ -72,8 +72,13 @@ export default function UsersAdmin() {
                   <td className="whitespace-nowrap px-3 py-2">
                     {u.practiced > 0 ? (<>
                       <div className="font-semibold text-ink">{num(u.practiced)}{L('টি প্রশ্ন', ' Qs')}</div>
-                      <div className="text-xs text-ink-soft">{num(Math.round((u.practice_correct / u.practiced) * 100))}% {L('সঠিক', 'right')}
-                        {u.last_practice && <> · {lastSeen(u.last_practice)}</>}</div>
+                      <div className="text-xs">
+                        <span className="font-semibold text-mint-700">✓ {num(u.practice_correct)} {L('ঠিক', 'right')}</span>
+                        <span className="text-ink-soft"> · </span>
+                        <span className="font-semibold text-red-600">✗ {num(u.practiced - u.practice_correct)} {L('ভুল', 'wrong')}</span>
+                        <span className="text-ink-soft"> · {num(Math.round((u.practice_correct / u.practiced) * 100))}%</span>
+                      </div>
+                      {u.last_practice && <div className="text-xs text-ink-soft">{lastSeen(u.last_practice)}</div>}
                     </>) : <span className="text-ink-soft">০</span>}
                   </td>
                   <td className="px-3 py-2">{num(u.tests)}</td>
