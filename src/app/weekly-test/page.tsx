@@ -7,6 +7,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Spinner } from '@/components/ui';
 import { trackEvent } from '@/components/Tracker';
+import { pixelCustom } from '@/components/MetaPixel';
 import { BoardConsent } from '@/components/BoardConsent';
 import { MyWeeklyCard } from '@/components/MyWeeklyCard';
 import { bnNum } from '@/lib/circulars';
@@ -40,7 +41,7 @@ export default function WeeklyTestPage() {
   async function start() {
     if (!user) { router.push('/login?next=/weekly-test'); return; }
     setBusy(true); setErr('');
-    trackEvent('/weekly-test/start');
+    trackEvent('/weekly-test/start'); pixelCustom('WeeklyTestStart');
     const { data, error } = await supabaseBrowser().rpc('start_weekly_test');
     if (error) {
       setBusy(false);

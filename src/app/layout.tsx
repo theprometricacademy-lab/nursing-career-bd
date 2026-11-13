@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Noto_Sans_Bengali } from 'next/font/google';
 import './globals.css';
 import { AppProvider, HydrationMark } from '@/components/AppProvider';
+import { MetaPixel } from '@/components/MetaPixel';
 import { AppShell } from '@/components/AppShell';
 import { Tracker } from '@/components/Tracker';
 
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />
         <AppProvider initialLang="bn">
           <Suspense fallback={null}><Tracker /></Suspense>
+          <MetaPixel />
           <AppShell><Suspense fallback={null}>{children}<HydrationMark /></Suspense></AppShell>
         </AppProvider>
       </body>

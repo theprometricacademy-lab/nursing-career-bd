@@ -1,4 +1,5 @@
 'use client';
+import { pixel } from './MetaPixel';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Copy, Check, Smartphone, Clock } from 'lucide-react';
@@ -56,6 +57,7 @@ export function SendMoneyBox({ cfg, plan, testId, coupon, amount }: {
     e.preventDefault();
     if (!user) { window.location.href = '/login?next=/premium'; return; }
     setBusy(true); setMsg(null);
+    pixel('InitiateCheckout', { currency: 'BDT', content_name: plan });
     const { error } = await supabaseBrowser().rpc('submit_manual_payment', {
       p_plan: plan, p_test: testId, p_coupon: coupon, p_method: method, p_sender: sender, p_trx: trx,
     });

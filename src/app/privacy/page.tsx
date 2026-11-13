@@ -19,6 +19,9 @@ const S: LegalSection[] = [
   { h: ['৪. কুকি', '4. Cookies'], p: [[
     'লগইন অবস্থা ধরে রাখা ও ভাষা পছন্দ মনে রাখার জন্য প্রয়োজনীয় কুকি ও ব্রাউজার স্টোরেজ ব্যবহার করা হয়।',
     'We use essential cookies and browser storage to keep you signed in and remember your language choice.',
+  ], [
+    'ফেসবুক বিজ্ঞাপনের ফল মাপতে Meta Pixel ব্যবহার করা হয়: কোন পেজ দেখা হলো, অ্যাকাউন্ট খোলা, পরীক্ষা শুরু বা প্রিমিয়াম নেওয়ার মতো ঘটনা Meta পায়। আপনার নাম, ফোন নম্বর, ইমেইল বা উত্তর পাঠানো হয় না।',
+    'We use the Meta Pixel to measure our Facebook ads: Meta receives events such as page views, sign-ups, test starts and premium purchases. Your name, phone number, email and answers are not sent.',
   ]] },
   { h: ['৫. নিরাপত্তা', '5. Security'], p: [[
     'তথ্য এনক্রিপ্টেড সংযোগে (HTTPS) আদান-প্রদান হয় এবং প্রতিটি ব্যবহারকারী শুধু নিজের তথ্য দেখতে পারেন—এমনভাবে ডাটাবেস সুরক্ষিত রাখা হয়েছে।',
