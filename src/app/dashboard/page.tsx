@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { MyWeeklyCard } from '@/components/MyWeeklyCard';
+import { NotifySettings } from '@/components/NotifySettings';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ClipboardCheck, ListChecks, CheckCircle2, Percent, Trophy, Bookmark, RotateCcw, Crown, ArrowRight, PlayCircle } from 'lucide-react';
@@ -78,6 +79,8 @@ export default function DashboardPage() {
       </Link>
 
       {lang === 'bn' && <MyWeeklyCard compact />}
+
+      <section className="card p-4"><NotifySettings /></section>
 
       {s.premium && <ReviewForm />}
 

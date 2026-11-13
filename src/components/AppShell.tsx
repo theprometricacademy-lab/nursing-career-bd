@@ -1,5 +1,6 @@
 'use client';
 import { ScrollToTop } from '@/components/ScrollToTop';
+import { NotificationBell } from '@/components/NotificationBell';
 import { ReaderInvite } from '@/components/ReaderInvite';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -155,6 +156,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="text-base font-bold leading-tight text-ink">Nursing Career <span className="text-blush-600">BD</span></span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
+            <NotificationBell />
             <ThemeToggle />
             <LangToggle compact />
             {premium && <Link href="/premium" className="gold-chip"><Crown className="h-3.5 w-3.5" />{t('premium')}</Link>}

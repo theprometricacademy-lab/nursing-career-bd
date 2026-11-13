@@ -8,6 +8,7 @@ import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
 import { ProfilePhoto } from '@/components/ProfilePhoto';
 import { BoardConsent } from '@/components/BoardConsent';
+import { NotifySettings } from '@/components/NotifySettings';
 
 export default function ProfilePage() {
   const { t, lang, setLang, user, profile, premium, isAdmin, refresh, ready } = useApp();
@@ -60,6 +61,11 @@ export default function ProfilePage() {
           {msg && <p className="rounded-xl bg-mint-50 p-2 text-sm text-mint-700">{msg}</p>}
           <button className="btn-primary" disabled={busy}>{busy ? t('loading') : t('save')}</button>
         </form>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="mb-3 font-semibold text-ink">{lang === 'bn' ? 'নোটিফিকেশন' : 'Notifications'}</h2>
+        <NotifySettings />
       </section>
 
       <section className="card p-5">
