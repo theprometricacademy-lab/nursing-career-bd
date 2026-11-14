@@ -7,7 +7,8 @@ import { PageHeader, Spinner } from '@/components/ui';
 import { useL } from '../AdminShell';
 
 type U = { id: string; full_name: string | null; phone: string | null; role: string; created_at: string; email: string; last_sign_in_at: string | null; premium: boolean; tests: number;
-  practiced: number; practice_correct: number; last_practice: string | null; hospital: string | null; last_active: string | null };
+  practiced: number; practice_correct: number; last_practice: string | null; hospital: string | null; last_active: string | null;
+  premium_since?: string | null; premium_paid?: boolean; premium_amount?: number | null };
 
 export default function UsersAdmin() {
   const L = useL();
@@ -32,11 +33,21 @@ export default function UsersAdmin() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(0);
   const [msg, setMsg] = useState('');
+  // opened from the admin home card: /admin/users?premium=1 lists only premium members
+  const [onlyPremium, setOnlyPremium] = useState(false);
+  useEffect(() => { if (new URLSearchParams(window.location.search).get('premium') === '1') setOnlyPremium(true); }, []);
 
   const load = useCallback(async () => {
+    if (onlyPremium) {
+      const { data, error } = await sb.rpc('admin_premium_users');
+      if (error) { setMsg(error.message); return; }
+      const t = q.trim().toLowerCase();
+      setRows(((data as U[]) ?? []).filter((u) => !t || [u.full_name, u.email, u.phone].some((x) => (x ?? '').toLowerCase().includes(t))));
+      return;
+    }
     const { data, error } = await sb.rpc('admin_list_users', { p_search: q.trim() || null, p_limit: 50, p_offset: page * 50 });
     if (error) setMsg(error.message); else setRows(data as U[]);
-  }, [sb, q, page]);
+  }, [sb, q, page, onlyPremium]);
   useEffect(() => { const id = setTimeout(load, 250); return () => clearTimeout(id); }, [load]);
 
   async function grant(u: U) {
@@ -60,6 +71,11 @@ export default function UsersAdmin() {
       <PageHeader title={L('ইউজার ও প্রিমিয়াম সাবস্ক্রিপশন', 'Users & premium subscriptions')} />
       <div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-ink-soft" />
         <input className="input pl-9" placeholder={L('ইমেইল, নাম বা ফোন', 'Email, name or phone')} value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }} /></div>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <button className={onlyPremium ? 'btn-ghost !px-3 !py-1.5' : 'btn-primary !px-3 !py-1.5'} onClick={() => { setOnlyPremium(false); setPage(0); setRows(null); }}>{L('সব ইউজার', 'All users')}</button>
+        <button className={onlyPremium ? 'btn-pink !px-3 !py-1.5' : 'btn-ghost !px-3 !py-1.5'} onClick={() => { setOnlyPremium(true); setPage(0); setRows(null); }}><Crown className="h-4 w-4" />{L('শুধু প্রিমিয়াম', 'Premium only')}</button>
+        {onlyPremium && rows && <span className="text-ink-soft">{L(`${num(rows.length)} জন প্রিমিয়াম ইউজার`, `${rows.length} premium member(s)`)}</span>}
+      </div>
       {msg && <p className="rounded-xl bg-brand-50 p-3 text-sm">{msg}</p>}
       {!rows ? <Spinner /> : (
         <div className="card overflow-x-auto">
@@ -77,6 +93,9 @@ export default function UsersAdmin() {
                       {u.hospital && <span className="chip bg-mint-100 text-mint-700" title={u.hospital}>🏥 হাসপাতাল</span>}
                     </div>
                     <div className="text-xs text-ink-soft">{u.email}</div>
+                    {u.premium_since && <div className="text-xs font-semibold text-blush-700">
+                      {L('প্রিমিয়াম', 'Premium')}: {when(u.premium_since)} {L('থেকে', '')} · {u.premium_paid ? `${L('পেমেন্ট', 'paid')} ৳${num(Number(u.premium_amount ?? 0))}` : L('অ্যাডমিন দিয়েছেন', 'granted by admin')}
+                    </div>}
                   </td>
                   <td className="px-3 py-2">{u.phone || '—'}</td>
                   <td className="whitespace-nowrap px-3 py-2">
@@ -111,7 +130,7 @@ export default function UsersAdmin() {
           </table>
         </div>
       )}
-      <div className="flex items-center justify-center gap-2">
+      <div className={`items-center justify-center gap-2 ${onlyPremium ? 'hidden' : 'flex'}`}>
         <button className="btn-ghost" disabled={page === 0} onClick={() => setPage(page - 1)}>‹</button>
         <span className="text-sm">{num(page + 1)}</span>
         <button className="btn-ghost" disabled={(rows?.length ?? 0) < 50} onClick={() => setPage(page + 1)}>›</button>

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import {
   LayoutDashboard, FileQuestion, Upload, FolderTree, Timer, Users, CreditCard, Ticket, Megaphone, Settings, ArrowLeft, Menu, X,
   BellRing, Activity, Flag, ImagePlus, Medal, Send, MessageSquareHeart, FileUp, Briefcase,
-} from 'lucide-react';
+ ClipboardCheck } from 'lucide-react';
 import { useApp } from '@/components/AppProvider';
 import { LangToggle } from '@/components/AppShell';
 import { LogoMark } from '@/components/Logo';
@@ -29,6 +29,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     { href: '/admin/catalog', icon: FolderTree, label: L('বিষয়, টপিক ও পরীক্ষা', 'Subjects, topics & exams') },
     { href: '/admin/mock-tests', icon: Timer, label: L('মক টেস্ট', 'Mock tests') },
     { href: '/admin/users', icon: Users, label: L('ইউজার ও প্রিমিয়াম', 'Users & premium') },
+    { href: '/admin/tests', icon: ClipboardCheck, label: L('জমা হওয়া টেস্ট', 'Submitted tests') },
     { href: '/admin/payments', icon: CreditCard, label: L('পেমেন্ট', 'Payments') },
     { href: '/admin/reviews', icon: MessageSquareHeart, label: L('রিভিউ', 'Reviews') },
     { href: '/admin/coupons', icon: Ticket, label: L('কুপন', 'Coupons') },

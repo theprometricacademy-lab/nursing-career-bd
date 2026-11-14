@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Crown, Loader2, Inbox } from 'lucide-react';
+import { ChevronRight, Crown, Loader2, Inbox } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from './AppProvider';
 
@@ -61,23 +61,26 @@ export function Empty({ text, action }: { text?: string; action?: React.ReactNod
   );
 }
 
-export function Stat({ label, value, tone = 'brand', icon }: { label: string; value: React.ReactNode; tone?: 'brand' | 'mint' | 'blush'; icon?: React.ReactNode }) {
+export function Stat({ label, value, tone = 'brand', icon, href }: { label: string; value: React.ReactNode; tone?: 'brand' | 'mint' | 'blush'; icon?: React.ReactNode; href?: string }) {
   const tones = {
     brand: 'bg-brand-50 text-brand-700',
     mint: 'bg-mint-50 text-mint-700',
     blush: 'bg-blush-50 text-blush-700',
   };
-  return (
-    <div className="card p-4">
-      <div className="flex items-center gap-3">
-        {icon && <span className={`grid h-10 w-10 place-items-center rounded-xl ${tones[tone]}`}>{icon}</span>}
-        <div>
-          <div className="text-xl font-bold text-ink">{value}</div>
-          <div className="text-xs text-ink-soft">{label}</div>
-        </div>
+  const body = (
+    <div className="flex items-center gap-3">
+      {icon && <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${tones[tone]}`}>{icon}</span>}
+      <div className="min-w-0 flex-1">
+        <div className="text-xl font-bold text-ink">{value}</div>
+        <div className="text-xs text-ink-soft">{label}</div>
       </div>
+      {href && <ChevronRight className="h-4 w-4 shrink-0 text-ink-soft" />}
     </div>
   );
+  // with href the whole card is a link to the list behind the number
+  return href
+    ? <Link href={href} className="card block p-4 transition hover:border-brand-300 hover:shadow-md">{body}</Link>
+    : <div className="card p-4">{body}</div>;
 }
 
 export function Progress({ value, tone = 'brand' }: { value: number; tone?: 'brand' | 'mint' | 'blush' }) {

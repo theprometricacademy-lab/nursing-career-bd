@@ -53,12 +53,12 @@ export default function AdminHome() {
         </Link>
       )}
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
-        <Stat label={`${L('মোট ইউজার', 'Users')} (+${num(s.new_users_30d)} ${L('৩০ দিনে', 'in 30d')})`} value={num(s.users)} icon={<Users className="h-5 w-5" />} />
-        <Stat label={L('প্রিমিয়াম ইউজার', 'Premium users')} value={num(s.premium_users)} tone="blush" icon={<Crown className="h-5 w-5" />} />
-        <Stat label={`${L('প্রশ্ন', 'Questions')} (${num(s.premium_questions)} ${L('প্রিমিয়াম', 'premium')})`} value={num(s.questions)} icon={<FileQuestion className="h-5 w-5" />} />
-        <Stat label={`${L('জমা হওয়া টেস্ট', 'Tests submitted')} (+${num(s.attempts_7d)} ${L('৭ দিনে', '7d')})`} value={num(s.attempts)} tone="mint" icon={<ClipboardCheck className="h-5 w-5" />} />
-        <Stat label={`${L('মোট আয়', 'Revenue')} (৳${num(s.revenue_30d)} ${L('৩০ দিনে', '30d')})`} value={`৳${num(s.revenue)}`} tone="mint" icon={<Wallet className="h-5 w-5" />} />
-        <Stat label={L('গড় নম্বর', 'Average score')} value={s.avg_percent === null ? '—' : `${num(s.avg_percent)}%`} icon={<Percent className="h-5 w-5" />} />
+        <Stat label={`${L('মোট ইউজার', 'Users')} (+${num(s.new_users_30d)} ${L('৩০ দিনে', 'in 30d')})`} value={num(s.users)} icon={<Users className="h-5 w-5" />} href="/admin/users" />
+        <Stat label={L('প্রিমিয়াম ইউজার', 'Premium users')} value={num(s.premium_users)} tone="blush" icon={<Crown className="h-5 w-5" />} href="/admin/users?premium=1" />
+        <Stat label={`${L('প্রশ্ন', 'Questions')} (${num(s.premium_questions)} ${L('প্রিমিয়াম', 'premium')})`} value={num(s.questions)} icon={<FileQuestion className="h-5 w-5" />} href="/admin/questions" />
+        <Stat label={`${L('জমা হওয়া টেস্ট', 'Tests submitted')} (+${num(s.attempts_7d)} ${L('৭ দিনে', '7d')})`} value={num(s.attempts)} tone="mint" icon={<ClipboardCheck className="h-5 w-5" />} href="/admin/tests" />
+        <Stat label={`${L('মোট আয়', 'Revenue')} (৳${num(s.revenue_30d)} ${L('৩০ দিনে', '30d')})`} value={`৳${num(s.revenue)}`} tone="mint" icon={<Wallet className="h-5 w-5" />} href="/admin/payments?status=paid" />
+        <Stat label={L('গড় নম্বর', 'Average score')} value={s.avg_percent === null ? '—' : `${num(s.avg_percent)}%`} icon={<Percent className="h-5 w-5" />} href="/admin/tests" />
       </div>
       <AppStatsCard />
       <UsageCard />
