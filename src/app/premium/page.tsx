@@ -15,21 +15,26 @@ type Gateways = { bkash?: boolean; nagad?: boolean; sslcommerz?: boolean };
 type Quote = { base: number; discount: number; amount: number; coupon_valid: boolean; offer: 'winter' | 'referral' | null };
 type Winter = { active: boolean; price: number; limit: number; left: number };
 
-/** Each user's referral code: a friend who enters it gets ৳50 off the full price. */
+/** Each user's referral code: a friend who enters it gets the referral discount (app_settings.referral_discount) off. */
 function ReferralCard() {
   const { user, lang, num } = useApp();
   const [code, setCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [off, setOff] = useState(0);
   useEffect(() => {
     if (!user) return;
-    supabaseBrowser().from('profiles').select('referral_code').eq('id', user.id).maybeSingle()
+    const sb = supabaseBrowser();
+    sb.from('app_settings').select('value').eq('key', 'referral_discount').maybeSingle()
+      .then(({ data }) => setOff(Number((data as { value: unknown } | null)?.value ?? 0) || 0));
+    sb.from('profiles').select('referral_code').eq('id', user.id).maybeSingle()
       .then(({ data }) => setCode((data as { referral_code: string | null } | null)?.referral_code ?? null));
   }, [user]);
-  if (!user || !code) return null;
+  // hidden while the referral discount is switched off (app_settings.referral_discount = 0)
+  if (!user || !code || off <= 0) return null;
   const bn = lang === 'bn';
   const link = `https://nursingcareerbd.com/premium?coupon=${code}`;
   const share = () => {
-    const text = bn ? `Nursing Career BD-তে প্রিমিয়াম নিতে আমার রেফারেল কোড ${code} দিন, ৳${num(50)} ছাড় পাবেন: ${link}` : `Use my referral code ${code} on Nursing Career BD for ৳50 off: ${link}`;
+    const text = bn ? `Nursing Career BD-তে প্রিমিয়াম নিতে আমার রেফারেল কোড ${code} দিন, ৳${num(off)} ছাড় পাবেন: ${link}` : `Use my referral code ${code} on Nursing Career BD for ৳${off} off: ${link}`;
     if (navigator.share) navigator.share({ text }).catch(() => {});
     else { navigator.clipboard?.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }
   };
@@ -38,7 +43,7 @@ function ReferralCard() {
       <Gift className="h-6 w-6 shrink-0 text-mint-600" />
       <div className="min-w-0 flex-1 text-sm">
         <b className="text-ink">{bn ? 'বন্ধুকে রেফার করুন' : 'Refer a friend'}</b>
-        <span className="block text-ink-soft">{bn ? `আপনার কোড দিলে বন্ধু ৳${num(50)} ছাড় পাবে।` : 'Your friend gets ৳50 off with your code.'} <span className="font-mono font-bold tracking-wider text-mint-700">{code}</span></span>
+        <span className="block text-ink-soft">{bn ? `আপনার কোড দিলে বন্ধু ৳${num(off)} ছাড় পাবে।` : `Your friend gets ৳${off} off with your code.`} <span className="font-mono font-bold tracking-wider text-mint-700">{code}</span></span>
       </div>
       <button className="btn-ghost !py-2" onClick={share}><Copy className="h-4 w-4" />{copied ? (bn ? 'কপি হয়েছে' : 'Copied') : (bn ? 'শেয়ার করুন' : 'Share')}</button>
     </section>

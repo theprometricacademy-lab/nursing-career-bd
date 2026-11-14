@@ -1,0 +1,17 @@
+name: ci-check
+on:
+  push:
+    branches: [ci-check]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm install --no-audit --no-fund
+      - run: npx tsc --noEmit 2>&1 | head -60
+      - run: npx next build 2>&1 | tail -60
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://pnbuydaeooxjojkzjdby.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy
