@@ -152,7 +152,7 @@ function PremiumView() {
     setQuote(data as Quote);
     const q = data as Quote;
     setCouponMsg(q.coupon_valid
-      ? { ok: true, text: q.offer === 'referral' ? (lang === 'bn' ? 'রেফারেল কোড প্রয়োগ হয়েছে (৳৫০ ছাড়)' : 'Referral code applied (৳50 off)') : t('couponOk') }
+      ? { ok: true, text: q.offer === 'referral' ? (lang === 'bn' ? 'রেফারেল কোড প্রয়োগ হয়েছে' : 'Referral code applied') : t('couponOk') }
       : { ok: false, text: t('couponBad') });
   }
 
