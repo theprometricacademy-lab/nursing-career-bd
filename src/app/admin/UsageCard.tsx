@@ -8,6 +8,9 @@ type Resend = { daily_used?: number | null; daily_limit?: number | null; monthly
 type U = { db_bytes: number; storage_bytes: number; views_today: number; visitors_today: number; max_views_day_7d: number; email_signups_today: number; mau: number;
   resend?: Resend; email_today?: number };
 
+// Supabase Pro plan (since 14 Nov 2026): 8 GB database disk, 100,000 monthly users, 100 GB file storage
+const DB_MB = 8192, MAU = 100000, STORAGE_MB = 102400;
+
 // Rough estimate: one page view ≈ 6 Worker requests (page + data + API calls)
 const REQ_PER_VIEW = 6;
 
@@ -29,16 +32,28 @@ function Meter({ label, used, limit, unit, note }: { label: string; used: number
 
 export function UsageCard() {
   const [u, setU] = useState<U | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [again, setAgain] = useState(0);
   useEffect(() => {
     const sb = supabaseBrowser();
-    const load = () => sb.rpc('admin_usage').then(({ data }) => setU((data as U) ?? null));
+    // keep the last good numbers on a failed reload; say so when nothing could be loaded at all
+    const load = () => sb.rpc('admin_usage').then(({ data, error }) => {
+      if (error || !data) { setFailed(true); return; }
+      setFailed(false); setU(data as U);
+    });
     load();
     // ask Resend for its current numbers, then read them a few seconds later
     let t: ReturnType<typeof setTimeout> | undefined;
     sb.rpc('admin_refresh_resend_usage').then(({ error }) => { if (!error) t = setTimeout(load, 5000); });
     return () => { if (t) clearTimeout(t); };
-  }, []);
-  if (!u) return null;
+  }, [again]);
+  if (!u) return failed ? (
+    <section className="card p-5">
+      <h2 className="mb-2 flex items-center gap-2 font-semibold text-ink"><Gauge className="h-5 w-5 text-brand-600" />কোনটা কত ব্যবহার হলো</h2>
+      <p className="text-sm text-ink-soft">হিসাবটা এখন আনা যায়নি।</p>
+      <button type="button" onClick={() => { setFailed(false); setAgain((n) => n + 1); }} className="mt-3 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white">আবার চেষ্টা করুন</button>
+    </section>
+  ) : null;
   // Email: Resend's own number when it could be read in the last 90 minutes, otherwise what this site sent today
   const r = u.resend ?? {};
   const exact = !r.error && typeof r.daily_used === 'number' && !!r.at && Date.now() - new Date(r.at).getTime() < 90 * 60 * 1000;
@@ -49,22 +64,23 @@ export function UsageCard() {
     : 'সাইটের নিজের গণনা (নোটিফিকেশন ও পাসওয়ার্ড রিসেট) — নতুন অ্যাকাউন্ট খুলতে ইমেইল লাগে না';
   const mb = (b: number) => Math.round(b / 1048576);
   const reqToday = u.views_today * REQ_PER_VIEW, reqPeak = u.max_views_day_7d * REQ_PER_VIEW;
-  const worst = Math.max(reqPeak / 100000, mb(u.db_bytes) / 500, mailUsed / mailLimit, u.mau / 50000, mb(u.storage_bytes) / 1024);
-  const msg = worst >= 0.8 ? { t: 'সীমার খুব কাছে! এখনই পেইড প্ল্যান নেওয়ার কথা ভাবুন।', c: 'bg-red-50 text-red-700' }
+  const worst = Math.max(reqPeak / 100000, mb(u.db_bytes) / DB_MB, mailUsed / mailLimit, u.mau / MAU, mb(u.storage_bytes) / STORAGE_MB);
+  const msg = worst >= 0.8 ? { t: 'কোনো একটা সীমার খুব কাছে! নিচে লাল দাগের ঘরটা দেখুন।', c: 'bg-red-50 text-red-700' }
     : worst >= 0.6 ? { t: 'সীমার কাছাকাছি যাচ্ছে — নজর রাখুন।', c: 'bg-amber-50 text-amber-700' }
-    : { t: 'সব ঠিক আছে — ফ্রি প্ল্যানেই চলবে।', c: 'bg-mint-50 text-mint-700' };
+    : { t: 'সব ঠিক আছে — কোনো সীমার কাছে নেই।', c: 'bg-mint-50 text-mint-700' };
   return (
     <section className="card p-5">
-      <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink"><Gauge className="h-5 w-5 text-brand-600" />সার্ভার ব্যবহার (ফ্রি প্ল্যানের সীমা)</h2>
+      <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink"><Gauge className="h-5 w-5 text-brand-600" />কোনটা কত ব্যবহার হলো</h2>
+      <p className="mb-3 text-xs text-ink-soft">Supabase: Pro প্ল্যান, সার্ভার Small (২ GB) · Cloudflare: ফ্রি · Resend: ফ্রি</p>
       <p className={`mb-4 rounded-xl px-3 py-2 text-sm font-semibold ${msg.c}`}>{msg.t}</p>
       <div className="grid gap-4 md:grid-cols-2">
-        <Meter label="Cloudflare — দিনের রিকোয়েস্ট (৭ দিনের সর্বোচ্চ)" used={reqPeak} limit={100000} unit="/দিন" note={`আজ আনুমানিক ${bnNum(reqToday.toLocaleString('en-US'))}`} />
-        <Meter label="Supabase — ডাটাবেসের আকার" used={mb(u.db_bytes)} limit={500} unit="MB" />
-        <Meter label="Resend — আজ পাঠানো ইমেইল" used={mailUsed} limit={mailLimit} unit="ইমেইল/দিন" note={mailNote} />
-        <Meter label="Supabase — মাসিক সক্রিয় ইউজার" used={u.mau} limit={50000} unit="জন" />
-        <Meter label="Supabase — ফাইল স্টোরেজ (সার্কুলার PDF)" used={mb(u.storage_bytes)} limit={1024} unit="MB" />
+        <Meter label="Cloudflare (ফ্রি) — দিনের রিকোয়েস্ট (৭ দিনের সর্বোচ্চ)" used={reqPeak} limit={100000} unit="/দিন" note={`আজ আনুমানিক ${bnNum(reqToday.toLocaleString('en-US'))}`} />
+        <Meter label="Supabase (Pro) — ডাটাবেসের আকার" used={mb(u.db_bytes)} limit={DB_MB} unit="MB" />
+        <Meter label="Resend (ফ্রি) — আজ পাঠানো ইমেইল" used={mailUsed} limit={mailLimit} unit="ইমেইল/দিন" note={mailNote} />
+        <Meter label="Supabase (Pro) — মাসিক সক্রিয় ইউজার" used={u.mau} limit={MAU} unit="জন" />
+        <Meter label="Supabase (Pro) — ফাইল স্টোরেজ (সার্কুলার PDF)" used={mb(u.storage_bytes)} limit={STORAGE_MB} unit="MB" />
       </div>
-      <p className="mt-4 text-xs text-ink-soft">আজ {bnNum(u.visitors_today)} জন ভিজিটর, {bnNum(u.views_today)} পেজ ভিউ। Cloudflare-এর সংখ্যা পেজ ভিউ থেকে আনুমানিক হিসাব; সঠিক সংখ্যা Cloudflare ড্যাশবোর্ডে দেখা যায়। ৬০% পার হলে Cloudflare Workers Paid ($৫/মাস), ৮০% পার হলে Supabase Pro ($২৫/মাস) নেওয়ার কথা ভাবুন।</p>
+      <p className="mt-4 text-xs text-ink-soft">আজ {bnNum(u.visitors_today)} জন ভিজিটর, {bnNum(u.views_today)} পেজ ভিউ। Cloudflare-এর সংখ্যা পেজ ভিউ থেকে আনুমানিক হিসাব; সঠিক সংখ্যা Cloudflare ড্যাশবোর্ডে দেখা যায়। Cloudflare ৬০% পার হলে Workers Paid ($৫/মাস) নেওয়ার কথা ভাবুন। একসাথে অনেক মানুষ এলে সাইট ধীর হলে Supabase-এর সার্ভার আরও বড় করা যায়।</p>
     </section>
   );
 }
