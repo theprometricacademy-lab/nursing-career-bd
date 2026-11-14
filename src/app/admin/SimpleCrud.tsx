@@ -67,6 +67,8 @@ export function SimpleCrud({ table, fields, defaults, order = 'id', ascending = 
       payload[f.key] = v;
     }
     if (filter) payload[filter.key] = filter.value;
+    // a new row: leave empty boxes out so the database fills in its own default (e.g. a count that starts at 0)
+    if (!edit.id) for (const k of Object.keys(payload)) if (payload[k] === null) delete payload[k];
     const { error } = edit.id
       ? await sb.from(table).update(payload).eq('id', edit.id as string)
       : await sb.from(table).insert(payload);

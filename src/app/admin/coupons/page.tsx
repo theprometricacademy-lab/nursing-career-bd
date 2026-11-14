@@ -8,7 +8,7 @@ export default function CouponsAdmin() {
   return (
     <div className="space-y-4">
       <PageHeader title={L('ডিসকাউন্ট কুপন', 'Discount coupons')} />
-      <SimpleCrud table="coupons" order="created_at" ascending={false} defaults={{ discount_type: 'percent', value: 10, is_active: true }} fields={[
+      <SimpleCrud table="coupons" order="created_at" ascending={false} defaults={{ discount_type: 'percent', value: 10, is_active: true, used_count: 0 }} fields={[
         { key: 'code', label: L('কোড', 'Code'), required: true },
         { key: 'discount_type', label: L('ধরন', 'Type'), type: 'select', required: true, options: [{ value: 'percent', label: '%' }, { value: 'fixed', label: '৳ fixed' }] },
         { key: 'value', label: L('পরিমাণ', 'Value'), type: 'number', required: true },
