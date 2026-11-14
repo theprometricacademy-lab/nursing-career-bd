@@ -50,6 +50,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* apply the saved light/dark choice before the first paint (no white flash); keep an early app-install prompt */}
         <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bip=e});" }} />
+        {/* Google AdSense (site verification + ad loader). Auto ads are off: nothing shows until ad units are placed. */}
+        <meta name="google-adsense-account" content="ca-pub-9239393649467139" />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9239393649467139" crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />

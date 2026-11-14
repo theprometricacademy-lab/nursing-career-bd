@@ -22,6 +22,9 @@ const S: LegalSection[] = [
   ], [
     'ফেসবুক বিজ্ঞাপনের ফল মাপতে Meta Pixel ব্যবহার করা হয়: কোন পেজ দেখা হলো, অ্যাকাউন্ট খোলা, পরীক্ষা শুরু বা প্রিমিয়াম নেওয়ার মতো ঘটনা Meta পায়। আপনার নাম, ফোন নম্বর, ইমেইল বা উত্তর পাঠানো হয় না।',
     'We use the Meta Pixel to measure our Facebook ads: Meta receives events such as page views, sign-ups, test starts and premium purchases. Your name, phone number, email and answers are not sent.',
+  ], [
+    'ফ্রি ব্যবহারকারীদের বিজ্ঞাপন দেখাতে Google AdSense ব্যবহার করা হতে পারে। Google ও তার অংশীদাররা কুকি ব্যবহার করে আপনার এই সাইট ও অন্য সাইটে আগের ভিজিটের ভিত্তিতে বিজ্ঞাপন দেখাতে পারে। ব্যক্তিগতকৃত বিজ্ঞাপন বন্ধ করতে চাইলে Google-এর Ads Settings (adssettings.google.com) থেকে বন্ধ করা যায়। আমরা আপনার নাম, ফোন নম্বর, ইমেইল বা উত্তর Google-কে দিই না।',
+    'We may use Google AdSense to show ads to free users. Google and its partners use cookies to serve ads based on your earlier visits to this and other websites. You can turn off personalised advertising in Google Ads Settings (adssettings.google.com). We do not give Google your name, phone number, email or answers.',
   ]] },
   { h: ['৫. নিরাপত্তা', '5. Security'], p: [[
     'তথ্য এনক্রিপ্টেড সংযোগে (HTTPS) আদান-প্রদান হয় এবং প্রতিটি ব্যবহারকারী শুধু নিজের তথ্য দেখতে পারেন—এমনভাবে ডাটাবেস সুরক্ষিত রাখা হয়েছে।',
@@ -34,6 +37,6 @@ const S: LegalSection[] = [
 ];
 
 export default function PrivacyPage() {
-  return <LegalPage title={['গোপনীয়তা নীতি', 'Privacy Policy']} updated="10 November 2026" sections={S}
+  return <LegalPage title={['গোপনীয়তা নীতি', 'Privacy Policy']} updated="14 November 2026" sections={S}
     intro={['Nursing Career BD আপনার ব্যক্তিগত তথ্যের গোপনীয়তাকে গুরুত্ব দেয়। কোন তথ্য নেওয়া হয় এবং কীভাবে ব্যবহার হয়, তা এখানে বলা হলো।', 'Nursing Career BD respects your privacy. This page explains what we collect and how we use it.']} />;
 }
