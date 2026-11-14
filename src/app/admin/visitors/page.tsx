@@ -6,8 +6,8 @@ import { Modal, PageHeader, Spinner } from '@/components/ui';
 import { bnNum } from '@/lib/circulars';
 
 type Session = {
-  session_id: string; visitor: string; name: string | null; email: string | null; started: string; last_seen: string;
-  views: number; current_path: string; referrer: string | null; device: string | null; online: boolean;
+  session_id: string; visitor: string; visitor_id?: string; name: string | null; email: string | null; started: string; last_seen: string;
+  views: number; visits?: number; seconds?: number; current_path: string; referrer: string | null; device: string | null; online: boolean;
 };
 type Data = {
   online: number; today_visitors: number; today_views: number; today_avg_seconds: number; week_visitors: number;
@@ -55,7 +55,10 @@ export default function VisitorsAdmin() {
 
   async function open(s: Session) {
     setSel(s); setViews(null);
-    const { data } = await sb.rpc('admin_session_views', { p_session: s.session_id });
+    // everything this person did in the last 24 hours, across all their tab visits
+    const { data } = s.visitor_id
+      ? await sb.rpc('admin_visitor_views', { p_visitor: s.visitor_id })
+      : await sb.rpc('admin_session_views', { p_session: s.session_id });
     setViews((data as View[]) ?? []);
   }
 
@@ -72,7 +75,7 @@ export default function VisitorsAdmin() {
 
   return (
     <div className="space-y-4" data-tick={tick}>
-      <PageHeader title="লাইভ ভিজিটর" sub="প্রতি ১৫ সেকেন্ডে নিজে থেকে হালনাগাদ হয়। গত ২ মিনিটে সক্রিয় থাকলে 'অনলাইন' ধরা হয়।"
+      <PageHeader title="লাইভ ভিজিটর" sub="প্রতি ১৫ সেকেন্ডে নিজে থেকে হালনাগাদ হয়। গত ২ মিনিটে সক্রিয় থাকলে 'অনলাইন' ধরা হয়। একজন মানুষ একটাই সারিতে দেখায়।"
         right={<button className="btn-ghost" onClick={load}><RefreshCw className="h-4 w-4" />রিফ্রেশ</button>} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
@@ -96,7 +99,7 @@ export default function VisitorsAdmin() {
         {list.length === 0 ? <p className="p-6 text-center text-sm text-ink-soft">এখনো কোনো ভিজিটর নেই।</p> : (
           <ul className="divide-y divide-brand-100">
             {list.map((s) => (
-              <li key={s.session_id}>
+              <li key={s.visitor_id ?? s.session_id}>
                 <button onClick={() => open(s)} className="flex w-full flex-wrap items-center gap-3 p-4 text-left hover:bg-brand-50/60">
                   <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.online ? 'bg-mint-500' : 'bg-slate-300'}`} />
                   <span className="min-w-[10rem] flex-1">
@@ -105,7 +108,8 @@ export default function VisitorsAdmin() {
                   </span>
                   <span className="text-xs text-ink-soft">
                     <span className="mr-3 inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{bnNum(s.views)} পেজ</span>
-                    <span className="mr-3 inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{dur((new Date(s.last_seen).getTime() - new Date(s.started).getTime()) / 1000)}</span>
+                    <span className="mr-3 inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{dur(s.seconds ?? (new Date(s.last_seen).getTime() - new Date(s.started).getTime()) / 1000)}</span>
+                    {(s.visits ?? 1) > 1 && <span className="mr-3 inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700"><RefreshCw className="h-3 w-3" />{bnNum(s.visits ?? 1)} বার এসেছেন</span>}
                     {s.device && <span className="mr-3 inline-flex items-center gap-1"><Smartphone className="h-3.5 w-3.5" />{s.device}</span>}
                     <span className="inline-flex items-center gap-1"><Globe className="h-3.5 w-3.5" />{s.referrer || 'সরাসরি'}</span>
                   </span>
@@ -143,7 +147,7 @@ export default function VisitorsAdmin() {
         {sel && (
           <div className="space-y-3">
             <h3 className="text-lg font-bold text-ink">{sel.name || sel.email || `অতিথি #${sel.visitor}`}</h3>
-            <p className="text-sm text-ink-soft">{sel.device || ''} · উৎস: {sel.referrer || 'সরাসরি'} · শুরু {timeBn(sel.started)}</p>
+            <p className="text-sm text-ink-soft">{sel.device || ''} · উৎস: {sel.referrer || 'সরাসরি'} · শুরু {timeBn(sel.started)}{(sel.visits ?? 1) > 1 && ` · গত ২৪ ঘণ্টায় ${bnNum(sel.visits ?? 1)} বার এসেছেন`}</p>
             {!views ? <Spinner /> : (
               <ol className="max-h-[60vh] space-y-2 overflow-y-auto">
                 {views.map((v, i) => (

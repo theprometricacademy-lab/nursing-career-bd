@@ -71,9 +71,17 @@ export function Tracker() {
     const session = stored('sessionStorage', 'ncbd_sid');
     const ref = first.current ? source() : null;
     first.current = false;
-    let alive = true;
-    sb.rpc('track_view', { p_visitor: visitor, p_session: session, p_path: path + (location.search || ''), p_ref: ref, p_device: device() })
-      .then(({ data }) => { if (alive) cur.current = { id: (data as number) ?? null, session }; });
+    let alive = true, started = false;
+    const view = path + (location.search || '');
+    // A page loaded in the background (new tab not opened yet, "save page", prerender) is not a visit:
+    // it is recorded only once the visitor actually sees it.
+    const start = () => {
+      if (started || !alive) return;
+      started = true;
+      sb.rpc('track_view', { p_visitor: visitor, p_session: session, p_path: view, p_ref: ref, p_device: device() })
+        .then(({ data }) => { if (alive) cur.current = { id: (data as number) ?? null, session }; });
+    };
+    if (document.visibilityState === 'visible') start();
 
     // Heartbeats: early ones catch short visits, then every 30 s while the page is visible
     const ping = () => {
@@ -92,7 +100,7 @@ export function Tracker() {
     };
     const early = [5000, 15000, 30000].map((ms) => setTimeout(ping, ms));
     const t = setInterval(ping, 30000);
-    const onVis = () => { if (document.visibilityState === 'visible') ping(); else finalPing(); };
+    const onVis = () => { if (document.visibilityState === 'visible') { if (started) ping(); else start(); } else finalPing(); };
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('pagehide', finalPing);
     return () => {
