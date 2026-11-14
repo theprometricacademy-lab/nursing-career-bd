@@ -11,4 +11,4 @@ jobs:
       - run: curl -sL https://github.com/grafana/k6/releases/download/v0.55.0/k6-v0.55.0-linux-amd64.tar.gz | tar xz --strip-components=1
       - run: ulimit -n 65535 && ./k6 run --quiet loadtest/test.js 2>&1 | tail -150
         env:
-          MODE: smoke
+          MODE: full
