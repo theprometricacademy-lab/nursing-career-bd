@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Users, Crown, FileQuestion, ClipboardCheck, Wallet, Percent } from 'lucide-react';
+import Link from 'next/link';
+import { Users, Crown, FileQuestion, ClipboardCheck, Wallet, Percent, Hourglass, ChevronRight } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Progress, Spinner, Stat } from '@/components/ui';
@@ -20,12 +21,37 @@ export default function AdminHome() {
   const { num, pick } = useApp();
   const [s, setS] = useState<S | null>(null);
   const [err, setErr] = useState('');
+  // payments waiting for the admin: not yet approved, and auto-activated ones not yet matched in bKash/Nagad
+  const [pay, setPay] = useState<{ pending: number; toCheck: number } | null>(null);
   useEffect(() => { supabaseBrowser().rpc('admin_stats').then(({ data, error }) => (error ? setErr(error.message) : setS(data))); }, []);
+  useEffect(() => {
+    const sb = supabaseBrowser();
+    Promise.all([
+      sb.from('payments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      sb.from('payments').select('id', { count: 'exact', head: true }).eq('status', 'paid').eq('gateway', 'manual')
+        .eq('gateway_payload->>auto_approved', 'true').is('gateway_payload->>checked_at', null),
+    ]).then(([a, b]) => setPay({ pending: a.count ?? 0, toCheck: b.count ?? 0 })).catch(() => {});
+  }, []);
   if (err) return <p className="rounded-xl bg-red-50 p-4 text-red-700">{err}</p>;
   if (!s) return <Spinner />;
   return (
     <div className="space-y-4">
       <PageHeader title={L('প্ল্যাটফর্ম পরিসংখ্যান', 'Platform analytics')} />
+      <Link href="/admin/payments?status=pending"
+        className={`card flex items-center gap-3 p-4 transition hover:shadow-md ${pay && pay.pending > 0 ? 'border-amber-300 bg-amber-50' : ''}`}>
+        <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${pay && pay.pending > 0 ? 'bg-amber-200 text-amber-800' : 'bg-brand-50 text-brand-700'}`}><Hourglass className="h-5 w-5" /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-xl font-bold text-ink">{pay ? num(pay.pending) : '…'}</span>
+          <span className="block text-xs text-ink-soft">{L('অপেক্ষমাণ পেমেন্ট (অনুমোদন বাকি) — চাপ দিয়ে দেখুন', 'Pending payments (awaiting approval) — tap to open')}</span>
+        </span>
+        <ChevronRight className="h-5 w-5 shrink-0 text-ink-soft" />
+      </Link>
+      {pay && pay.toCheck > 0 && (
+        <Link href="/admin/payments" className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 ring-1 ring-amber-200">
+          <span className="flex-1">{L(`${num(pay.toCheck)}টি স্বয়ংক্রিয়ভাবে চালু হওয়া পেমেন্ট বিকাশ/নগদে মিলিয়ে দেখা বাকি`, `${pay.toCheck} auto-activated payment(s) still to match in bKash/Nagad`)}</span>
+          <ChevronRight className="h-4 w-4 shrink-0" />
+        </Link>
+      )}
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
         <Stat label={`${L('মোট ইউজার', 'Users')} (+${num(s.new_users_30d)} ${L('৩০ দিনে', 'in 30d')})`} value={num(s.users)} icon={<Users className="h-5 w-5" />} />
         <Stat label={L('প্রিমিয়াম ইউজার', 'Premium users')} value={num(s.premium_users)} tone="blush" icon={<Crown className="h-5 w-5" />} />

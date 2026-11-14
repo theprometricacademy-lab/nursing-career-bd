@@ -23,6 +23,11 @@ export default function PaymentsAdmin() {
   const sb = supabaseBrowser();
   const [rows, setRows] = useState<P[] | null>(null);
   const [status, setStatus] = useState('');
+  // opened from the admin home card: /admin/payments?status=pending
+  useEffect(() => {
+    const st = new URLSearchParams(window.location.search).get('status') ?? '';
+    if (st in TONE) setStatus(st);
+  }, []);
   const [err, setErr] = useState('');
   const [search, setSearch] = useState('');
   const [term, setTerm] = useState('');
