@@ -9,6 +9,8 @@ type U = { db_bytes: number; storage_bytes: number; views_today: number; visitor
   resend?: Resend; email_today?: number };
 
 // Supabase Pro plan (since 14 Nov 2026): 8 GB database disk, 100,000 monthly users, 100 GB file storage
+// Cloudflare Workers Paid (since 14 Nov 2026): 10 million requests a month included, no daily cap
+const CF_MONTH = 10000000;
 const DB_MB = 8192, MAU = 100000, STORAGE_MB = 102400;
 
 // Rough estimate: one page view ≈ 6 Worker requests (page + data + API calls)
@@ -64,23 +66,23 @@ export function UsageCard() {
     : 'সাইটের নিজের গণনা (নোটিফিকেশন ও পাসওয়ার্ড রিসেট) — নতুন অ্যাকাউন্ট খুলতে ইমেইল লাগে না';
   const mb = (b: number) => Math.round(b / 1048576);
   const reqToday = u.views_today * REQ_PER_VIEW, reqPeak = u.max_views_day_7d * REQ_PER_VIEW;
-  const worst = Math.max(reqPeak / 100000, mb(u.db_bytes) / DB_MB, mailUsed / mailLimit, u.mau / MAU, mb(u.storage_bytes) / STORAGE_MB);
+  const worst = Math.max((reqPeak * 30) / CF_MONTH, mb(u.db_bytes) / DB_MB, mailUsed / mailLimit, u.mau / MAU, mb(u.storage_bytes) / STORAGE_MB);
   const msg = worst >= 0.8 ? { t: 'কোনো একটা সীমার খুব কাছে! নিচে লাল দাগের ঘরটা দেখুন।', c: 'bg-red-50 text-red-700' }
     : worst >= 0.6 ? { t: 'সীমার কাছাকাছি যাচ্ছে — নজর রাখুন।', c: 'bg-amber-50 text-amber-700' }
     : { t: 'সব ঠিক আছে — কোনো সীমার কাছে নেই।', c: 'bg-mint-50 text-mint-700' };
   return (
     <section className="card p-5">
       <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink"><Gauge className="h-5 w-5 text-brand-600" />কোনটা কত ব্যবহার হলো</h2>
-      <p className="mb-3 text-xs text-ink-soft">Supabase: Pro প্ল্যান, সার্ভার Small (২ GB) · Cloudflare: ফ্রি · Resend: ফ্রি</p>
+      <p className="mb-3 text-xs text-ink-soft">Supabase: Pro প্ল্যান, সার্ভার Small (২ GB) · Cloudflare: Workers Paid · Resend: ফ্রি</p>
       <p className={`mb-4 rounded-xl px-3 py-2 text-sm font-semibold ${msg.c}`}>{msg.t}</p>
       <div className="grid gap-4 md:grid-cols-2">
-        <Meter label="Cloudflare (ফ্রি) — দিনের রিকোয়েস্ট (৭ দিনের সর্বোচ্চ)" used={reqPeak} limit={100000} unit="/দিন" note={`আজ আনুমানিক ${bnNum(reqToday.toLocaleString('en-US'))}`} />
+        <Meter label="Cloudflare (Workers Paid) — মাসের রিকোয়েস্ট, সবচেয়ে ব্যস্ত দিনের হারে" used={reqPeak * 30} limit={CF_MONTH} unit="/মাস" note={`আজ আনুমানিক ${bnNum(reqToday.toLocaleString('en-US'))}`} />
         <Meter label="Supabase (Pro) — ডাটাবেসের আকার" used={mb(u.db_bytes)} limit={DB_MB} unit="MB" />
         <Meter label="Resend (ফ্রি) — আজ পাঠানো ইমেইল" used={mailUsed} limit={mailLimit} unit="ইমেইল/দিন" note={mailNote} />
         <Meter label="Supabase (Pro) — মাসিক সক্রিয় ইউজার" used={u.mau} limit={MAU} unit="জন" />
         <Meter label="Supabase (Pro) — ফাইল স্টোরেজ (সার্কুলার PDF)" used={mb(u.storage_bytes)} limit={STORAGE_MB} unit="MB" />
       </div>
-      <p className="mt-4 text-xs text-ink-soft">আজ {bnNum(u.visitors_today)} জন ভিজিটর, {bnNum(u.views_today)} পেজ ভিউ। Cloudflare-এর সংখ্যা পেজ ভিউ থেকে আনুমানিক হিসাব; সঠিক সংখ্যা Cloudflare ড্যাশবোর্ডে দেখা যায়। Cloudflare ৬০% পার হলে Workers Paid ($৫/মাস) নেওয়ার কথা ভাবুন। একসাথে অনেক মানুষ এলে সাইট ধীর হলে Supabase-এর সার্ভার আরও বড় করা যায়।</p>
+      <p className="mt-4 text-xs text-ink-soft">আজ {bnNum(u.visitors_today)} জন ভিজিটর, {bnNum(u.views_today)} পেজ ভিউ। Cloudflare-এর সংখ্যা পেজ ভিউ থেকে আনুমানিক হিসাব; সঠিক সংখ্যা Cloudflare ড্যাশবোর্ডে দেখা যায়। Cloudflare-এ মাসে ১ কোটি রিকোয়েস্ট পর্যন্ত $৫-এর মধ্যে; তার বেশি হলে বাড়তি বিল আসে, সাইট বন্ধ হয় না। একসাথে অনেক মানুষ এলে সাইট ধীর হলে Supabase-এর সার্ভার আরও বড় করা যায়।</p>
     </section>
   );
 }
