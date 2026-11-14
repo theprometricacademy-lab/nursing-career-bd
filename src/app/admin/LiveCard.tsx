@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Radio, Smartphone, UserCheck } from 'lucide-react';
+import { Radio, UserCheck } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { Stat } from '@/components/ui';
@@ -30,11 +30,9 @@ export function LiveCard() {
         <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" /></span>
         {L('এখন লাইভ', 'Live now')}
       </h2>
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3">
         <Stat tone="mint" icon={<Radio className="h-5 w-5" />} value={num(v.live)} href="/admin/visitors"
           label={`${L('এখন সাইটে আছেন', 'On the site now')} (${L('আজ মোট', 'today')} ${num(v.visitors_today)})`} />
-        <Stat tone="brand" icon={<Smartphone className="h-5 w-5" />} value={num(v.app)}
-          label={`${L('এর মধ্যে অ্যাপে', 'Of them in the app')} (${L('ব্রাউজারে', 'browser')} ${num(v.live - v.app)})`} />
         <Stat tone="blush" icon={<UserCheck className="h-5 w-5" />} value={num(v.members)}
           label={`${L('অ্যাকাউন্টধারী এখন সক্রিয়', 'Account holders active now')} (${L('আজ', 'today')} ${num(v.members_today)} · ${L('লগইন ছাড়া এখন', 'guests now')} ${num(v.guests)})`} />
       </div>
