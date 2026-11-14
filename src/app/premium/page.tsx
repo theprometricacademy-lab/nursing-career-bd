@@ -264,10 +264,10 @@ function PremiumView() {
           </div>
           {couponMsg && <p className={`mt-1 text-sm ${couponMsg.ok ? 'text-mint-700' : 'text-red-600'}`}>{couponMsg.text}</p>}
           {winterOn && (
-            <p className="mt-2 rounded-xl bg-amber-50 p-2.5 text-xs leading-relaxed text-amber-900">
+            <p className="mt-2 rounded-xl bg-mint-50 p-2.5 text-xs leading-relaxed text-mint-700">
               {lang === 'bn'
-                ? `খেয়াল করুন: কুপন বা রেফারেল কোড দিলে শীতের অফার (৳${num(winter!.price)}) প্রযোজ্য হবে না। কোডের ছাড় হিসাব হবে মূল দাম ৳${num(prices.lifetime)} থেকে।`
-                : `Note: with a coupon or referral code the winter offer (৳${winter!.price}) does not apply; the code's discount is taken off the full price ৳${prices.lifetime}.`}
+                ? `কুপন কোড থাকলে শীতের অফারের দাম (৳${num(winter!.price)}) থেকেই ছাড় পাবেন। কোনো কোড দিলে দাম কখনো বাড়ে না।`
+                : `A coupon code is taken off the winter offer price (৳${winter!.price}). A code never makes the price higher.`}
             </p>
           )}
         </div>
