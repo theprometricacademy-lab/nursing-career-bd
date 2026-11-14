@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { Activity, Clock, Eye, Globe, RefreshCw, Smartphone, Users } from 'lucide-react';
+import { Activity, Clock, Crown, Eye, RefreshCw, Users } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { Modal, PageHeader, Spinner } from '@/components/ui';
 import { bnNum } from '@/lib/circulars';
@@ -8,6 +8,7 @@ import { bnNum } from '@/lib/circulars';
 type Session = {
   session_id: string; visitor: string; visitor_id?: string; name: string | null; email: string | null; started: string; last_seen: string;
   views: number; visits?: number; seconds?: number; current_path: string; referrer: string | null; device: string | null; online: boolean;
+  user_id?: string | null; phone?: string | null; joined?: string | null; premium?: boolean; practiced?: number; practice_correct?: number; tests?: number;
 };
 type Data = {
   online: number; today_visitors: number; today_views: number; today_avg_seconds: number; week_visitors: number;
@@ -31,10 +32,15 @@ function dur(sec: number) {
   if (m < 60) return `${bnNum(m)} মি ${s ? bnNum(s) + ' সে' : ''}`.trim();
   return `${bnNum(Math.floor(m / 60))} ঘ ${bnNum(m % 60)} মি`;
 }
-const ago = (iso: string) => dur((Date.now() - new Date(iso).getTime()) / 1000) + ' আগে';
+const dhakaDay = (ms: number) => new Date(ms + 6 * 3600 * 1000).toISOString().slice(0, 10);
 const timeBn = (iso: string) => {
   const d = new Date(new Date(iso).getTime() + 6 * 3600 * 1000);
   return bnNum(`${String(d.getUTCHours() % 12 || 12)}:${String(d.getUTCMinutes()).padStart(2, '0')}`) + (d.getUTCHours() < 12 ? ' AM' : ' PM');
+};
+// 'আজ ৮:৪১ AM' / 'গতকাল ১০:০৫ PM' (Bangladesh time)
+const when = (iso: string) => {
+  const t = new Date(iso).getTime(), d = dhakaDay(t);
+  return `${d === dhakaDay(Date.now()) ? 'আজ' : d === dhakaDay(Date.now() - 86400000) ? 'গতকাল' : bnNum(d.slice(5))} ${timeBn(iso)}`;
 };
 
 export default function VisitorsAdmin() {
@@ -42,6 +48,7 @@ export default function VisitorsAdmin() {
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState('');
   const [onlyOnline, setOnlyOnline] = useState(false);
+  const [onlyMembers, setOnlyMembers] = useState(false);
   const [sel, setSel] = useState<Session | null>(null);
   const [views, setViews] = useState<View[] | null>(null);
   const [tick, setTick] = useState(0);
@@ -63,7 +70,7 @@ export default function VisitorsAdmin() {
   }
 
   if (!data) return err ? <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p> : <Spinner />;
-  const list = onlyOnline ? data.sessions.filter((s) => s.online) : data.sessions;
+  const list = data.sessions.filter((s) => (!onlyOnline || s.online) && (!onlyMembers || !!(s.name || s.email)));
 
   const stat = (icon: React.ReactNode, label: string, value: string, tone: string) => (
     <div className="card p-4">
@@ -94,30 +101,65 @@ export default function VisitorsAdmin() {
       <div className="card overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-brand-100 p-4">
           <h2 className="font-semibold text-ink">ভিজিটররা কী করছেন (গত ২৪ ঘণ্টা)</h2>
-          <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="h-4 w-4 accent-brand-600" checked={onlyOnline} onChange={(e) => setOnlyOnline(e.target.checked)} />শুধু অনলাইন</label>
+          <span className="flex flex-wrap items-center gap-4 text-sm">
+            <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4 accent-brand-600" checked={onlyOnline} onChange={(e) => setOnlyOnline(e.target.checked)} />শুধু অনলাইন</label>
+            <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4 accent-brand-600" checked={onlyMembers} onChange={(e) => setOnlyMembers(e.target.checked)} />শুধু অ্যাকাউন্টধারী</label>
+          </span>
         </div>
         {list.length === 0 ? <p className="p-6 text-center text-sm text-ink-soft">এখনো কোনো ভিজিটর নেই।</p> : (
-          <ul className="divide-y divide-brand-100">
-            {list.map((s) => (
-              <li key={s.visitor_id ?? s.session_id}>
-                <button onClick={() => open(s)} className="flex w-full flex-wrap items-center gap-3 p-4 text-left hover:bg-brand-50/60">
-                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.online ? 'bg-mint-500' : 'bg-slate-300'}`} />
-                  <span className="min-w-[10rem] flex-1">
-                    <span className="block font-semibold text-ink">{s.name || s.email || `অতিথি #${s.visitor}`}</span>
-                    <span className="block text-xs text-ink-soft">{s.online ? 'এখন: ' : 'শেষ দেখা: '}<b className="text-ink">{pageName(s.current_path)}</b>{!s.online && ` · ${ago(s.last_seen)}`}</span>
-                  </span>
-                  <span className="text-xs text-ink-soft">
-                    <span className="mr-3 inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{bnNum(s.views)} পেজ</span>
-                    <span className="mr-3 inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{dur(s.seconds ?? (new Date(s.last_seen).getTime() - new Date(s.started).getTime()) / 1000)}</span>
-                    {(s.visits ?? 1) > 1 && <span className="mr-3 inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700"><RefreshCw className="h-3 w-3" />{bnNum(s.visits ?? 1)} বার এসেছেন</span>}
-                    {s.device && <span className="mr-3 inline-flex items-center gap-1"><Smartphone className="h-3.5 w-3.5" />{s.device}</span>}
-                    <span className="inline-flex items-center gap-1"><Globe className="h-3.5 w-3.5" />{s.referrer || 'সরাসরি'}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-brand-50 text-left text-xs text-ink-soft">
+                <tr><th className="px-3 py-2">ভিজিটর</th><th className="px-3 py-2">এখন কোথায়</th><th className="px-3 py-2">কতটা ঘুরেছেন</th><th className="px-3 py-2">প্র্যাকটিস</th><th className="px-3 py-2">টেস্ট</th><th className="px-3 py-2">কোথা থেকে</th><th className="px-3 py-2">ডিভাইস</th><th className="px-3 py-2">প্রথম এসেছিলেন</th></tr>
+              </thead>
+              <tbody className="divide-y divide-brand-100">
+                {list.map((s) => {
+                  const member = !!(s.name || s.email);
+                  const contact = s.email && !s.email.includes('@phone.') ? s.email : s.phone || '';
+                  const isNew = !!s.joined && Date.now() - new Date(s.joined).getTime() < 86400000;
+                  const done = s.practiced ?? 0, right = s.practice_correct ?? 0;
+                  return (
+                    <tr key={s.visitor_id ?? s.session_id} onClick={() => open(s)} className="cursor-pointer hover:bg-brand-50/60">
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1.5 whitespace-nowrap font-medium text-ink">
+                          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.online ? 'bg-mint-500' : 'bg-slate-300'}`} />
+                          {s.name || s.email || `অতিথি #${s.visitor}`}
+                          {s.premium && <Crown className="h-4 w-4 text-blush-600" />}
+                          {isNew && <span className="chip bg-mint-100 text-mint-700">নতুন অ্যাকাউন্ট</span>}
+                        </div>
+                        <div className="pl-4 text-xs text-ink-soft">{member ? contact : 'অ্যাকাউন্ট খোলেননি'}</div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="max-w-[14rem] truncate font-semibold text-ink">{pageName(s.current_path)}</div>
+                        <div className="whitespace-nowrap text-xs text-ink-soft">{s.online ? 'এখন অনলাইনে' : `শেষ দেখা: ${when(s.last_seen)}`}</div>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-2">
+                        <div className="font-semibold text-ink">{bnNum(s.views)}টি পেজ · {dur(s.seconds ?? (new Date(s.last_seen).getTime() - new Date(s.started).getTime()) / 1000)}</div>
+                        {(s.visits ?? 1) > 1 && <div className="text-xs text-ink-soft">{bnNum(s.visits ?? 1)} বার এসেছেন</div>}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-2">
+                        {!member ? <span className="text-ink-soft">—</span> : done > 0 ? (<>
+                          <div className="font-semibold text-ink">{bnNum(done)}টি প্রশ্ন</div>
+                          <div className="text-xs">
+                            <span className="font-semibold text-mint-700">✓ {bnNum(right)} ঠিক</span>
+                            <span className="text-ink-soft"> · </span>
+                            <span className="font-semibold text-red-600">✗ {bnNum(done - right)} ভুল</span>
+                            <span className="text-ink-soft"> · {bnNum(Math.round((right / done) * 100))}%</span>
+                          </div>
+                        </>) : <span className="text-ink-soft">০</span>}
+                      </td>
+                      <td className="px-3 py-2">{member ? bnNum(s.tests ?? 0) : <span className="text-ink-soft">—</span>}</td>
+                      <td className="whitespace-nowrap px-3 py-2">{s.referrer || 'সরাসরি'}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-xs text-ink-soft">{s.device || '—'}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-xs">{when(s.started)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
+        <p className="border-t border-brand-100 p-3 text-xs text-ink-soft">কোনো সারিতে চাপ দিলে ওই মানুষ কোন কোন পেজ দেখেছেন, সব দেখা যাবে।</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
