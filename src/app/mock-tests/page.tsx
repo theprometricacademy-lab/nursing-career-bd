@@ -59,7 +59,14 @@ export default function MockTestsPage() {
                   <h3 className="font-semibold text-ink">{pick(m, 'title')}</h3>
                   {m.is_premium ? <PremiumChip /> : <span className="chip bg-mint-100 text-mint-700">{t('free')}</span>}
                 </div>
-                {pick(m, 'description') && <p className="mt-1 text-sm text-ink-soft">{pick(m, 'description')}</p>}
+                {pick(m, 'description') && (m.is_premium
+                  ? <p className="mt-1 text-sm text-ink-soft">{pick(m, 'description')}</p>
+                  : (
+                    <div className="mt-2 rounded-xl bg-mint-50 p-3 text-sm leading-relaxed text-ink">
+                      {pick(m, 'description')}
+                      {!premium && <Link href="/premium" className="mt-1 block font-semibold text-blush-700 underline">{lang === 'bn' ? 'প্রিমিয়ামে কী কী বেশি পাবেন দেখুন' : 'See what Premium adds'}</Link>}
+                    </div>
+                  ))}
                 <div className="mt-3 flex flex-wrap gap-3 text-xs text-ink-soft">
                   <span className="flex items-center gap-1"><ListChecks className="h-4 w-4 text-brand-600" />{num(qCount)} {t('questions')}</span>
                   <span className="flex items-center gap-1"><Timer className="h-4 w-4 text-brand-600" />{num(m.duration_minutes)} {t('minutes')}</span>

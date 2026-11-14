@@ -2,11 +2,12 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Check, Crown, Ticket, ShieldCheck, Snowflake, Gift, Copy } from 'lucide-react';
+import { Check, Crown, Ticket, ShieldCheck, Snowflake, Gift, Copy, MessageCircle } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
 import { SendMoneyBox, type ManualCfg } from '@/components/SendMoneyBox';
+import { SUPPORT_PHONE_INTL } from '@/components/LegalPage';
 import { ReviewForm, ReviewList } from '@/components/Reviews';
 
 type Gateways = { bkash?: boolean; nagad?: boolean; sslcommerz?: boolean };
@@ -225,20 +226,6 @@ function PremiumView() {
         )}
       </div>
 
-      {!premium && (
-        <section className="rounded-2xl border border-mint-200 bg-mint-50/60 p-4">
-          <h2 className="font-semibold text-ink">{lang === 'bn' ? '🔍 কেনার আগে ফ্রিতে নিজে যাচাই করে দেখুন' : '🔍 Try it free before you buy'}</h2>
-          <ul className="mt-2 space-y-1 text-sm text-ink">
-            <li>✅ {lang === 'bn' ? '৩০০ বাছাই করা প্রশ্ন ব্যাখ্যাসহ — ফ্রি' : '300 hand-picked questions with explanations — free'}</li>
-            <li>✅ {lang === 'bn' ? 'বিগত সালের সরকারি পরীক্ষার প্রশ্নের সমাধান পড়া — ফ্রি' : 'Read previous-year govt paper solutions — free'}</li>
-            <li>✅ {lang === 'bn' ? 'মান ভালো লাগলে তারপর প্রিমিয়াম নিন' : 'Like the quality? Then go Premium'}</li>
-          </ul>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/question-bank" className="btn-success !py-2">{lang === 'bn' ? 'ফ্রি প্রশ্ন দেখুন' : 'See free questions'}</Link>
-            <Link href="/question-solution" className="btn-ghost !py-2">{lang === 'bn' ? 'বিগত সালের প্রশ্নের সমাধান' : 'Past paper solutions'}</Link>
-          </div>
-        </section>
-      )}
       <section className="card space-y-4 p-5">
         {offer && !quote?.coupon_valid && (
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-dashed border-blush-300 bg-blush-50 p-3">
@@ -293,12 +280,32 @@ function PremiumView() {
               ))}
             </div>
             {err && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</p>}
+            <a href={`https://wa.me/${SUPPORT_PHONE_INTL.replace('+', '')}?text=${encodeURIComponent(lang === 'bn' ? 'আসসালামু আলাইকুম, প্রিমিয়াম পেমেন্ট নিয়ে সাহায্য দরকার।' : 'Hello, I need help with the Premium payment.')}`}
+              target="_blank" rel="noopener" className="btn w-full bg-[#25D366] text-white hover:brightness-95">
+              <MessageCircle className="h-4 w-4" />{lang === 'bn' ? 'পেমেন্টে সমস্যা? WhatsApp-এ জানান' : 'Trouble paying? Message us on WhatsApp'}
+            </a>
             <p className="flex items-center gap-1.5 text-xs text-ink-soft"><ShieldCheck className="h-4 w-4 text-mint-600" />
               {lang === 'bn' ? 'পেমেন্ট গেটওয়ের সার্ভার থেকে যাচাইয়ের পরই প্রিমিয়াম চালু হয়।' : 'Premium activates only after the payment is verified with the gateway server.'}
             </p>
           </div>
         )}
       </section>
+      {!premium && (
+        <section className="rounded-2xl border border-mint-200 bg-mint-50/60 p-4">
+          <h2 className="font-semibold text-ink">{lang === 'bn' ? '🔍 কেনার আগে ফ্রিতে নিজে যাচাই করে দেখুন' : '🔍 Try it free before you buy'}</h2>
+          <ul className="mt-2 space-y-1 text-sm text-ink">
+            <li>✅ {lang === 'bn' ? '৫০ প্রশ্নের একটি মডেল টেস্ট — ফ্রি, যতবার ইচ্ছা' : 'One 50-question model test — free, as often as you like'}</li>
+            <li>✅ {lang === 'bn' ? '৩০০ বাছাই করা প্রশ্ন ব্যাখ্যাসহ — ফ্রি' : '300 hand-picked questions with explanations — free'}</li>
+            <li>✅ {lang === 'bn' ? 'বিগত সালের সরকারি পরীক্ষার প্রশ্নের সমাধান পড়া — ফ্রি' : 'Read previous-year govt paper solutions — free'}</li>
+            <li>✅ {lang === 'bn' ? 'মান ভালো লাগলে তারপর প্রিমিয়াম নিন' : 'Like the quality? Then go Premium'}</li>
+          </ul>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link href="/mock-tests" className="btn-success !py-2">{lang === 'bn' ? 'ফ্রি মডেল টেস্ট দিন' : 'Take the free model test'}</Link>
+            <Link href="/question-bank" className="btn-ghost !py-2">{lang === 'bn' ? 'ফ্রি প্রশ্ন দেখুন' : 'See free questions'}</Link>
+            <Link href="/question-solution" className="btn-ghost !py-2">{lang === 'bn' ? 'বিগত সালের প্রশ্নের সমাধান' : 'Past paper solutions'}</Link>
+          </div>
+        </section>
+      )}
       <ReferralCard />
       {premium ? <ReviewForm /> : <ReviewList />}
     </div>
