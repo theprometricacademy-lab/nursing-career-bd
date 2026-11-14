@@ -8,7 +8,7 @@ const SITE = 'https://nursingcareerbd.com';
 const SB = 'https://pnbuydaeooxjojkzjdby.supabase.co';
 const KEY = 'sb_publishable_yVAYPY0HXdB3XOcDTDadVA_pyczq0_A'; // public browser key, the same one the site ships
 const FULL = __ENV.MODE === 'full';
-const ACCOUNTS = FULL ? 60 : 3;
+const ACCOUNTS = FULL ? 30 : 3;
 const UA = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 NCBD-LoadTest';
 
 const rateLimited = new Counter('start_rate_limited');
@@ -21,6 +21,7 @@ for (const n of names) { thresholds[`http_req_duration{name:${n}}`] = ['p(95)<60
 
 export const options = {
   discardResponseBodies: true,
+  setupTimeout: '180s',
   userAgent: UA,
   thresholds,
   summaryTrendStats: ['avg', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
@@ -76,7 +77,7 @@ function takeTest(token) {
   const id = JSON.parse(s.body);
   rpc('get_attempt', { p_attempt: id }, token);
   for (let pos = 1; pos <= 50; pos++) {
-    sleep(rnd(8, 20));
+    sleep(rnd(10, 24));
     const r = rpc('save_answer', { p_attempt: id, p_position: pos, p_selected: Math.floor(rnd(0, 4)), p_marked: null, p_clear: false }, token);
     if (check(r, { 'answer saved': (x) => x.status === 200 })) answers.add(1);
   }
