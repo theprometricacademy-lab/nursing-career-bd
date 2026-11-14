@@ -29,6 +29,15 @@ ${n.body ? `<p style="margin:0 0 20px;font-size:16px;line-height:1.7">${esc(n.bo
 </table></td></tr></table></body></html>`;
 }
 
+// Resend reports the emails used so far in two response headers (the daily one only on the free plan).
+type Quota = { daily_used: number | null; monthly_used: number | null };
+let lastQuota: Quota | null = null;
+function quotaFrom(h: Headers): Quota | null {
+  const d = h.get("x-resend-daily-quota"), m = h.get("x-resend-monthly-quota");
+  if (d === null && m === null) return null;
+  return { daily_used: d === null ? null : Number(d), monthly_used: m === null ? null : Number(m) };
+}
+
 type Claimed = { qid: number; to_email: string; to_name: string | null; to_token: string; n_title: string; n_body: string | null; n_url: string | null };
 
 /** Send queued emails until today's allowance (or the queue) runs out. */
@@ -59,6 +68,7 @@ async function drain(notes: string[]): Promise<number> {
         method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(batch),
       });
       ok = r.ok;
+      lastQuota = quotaFrom(r.headers) ?? lastQuota;
       if (!ok) notes.push(`email_http_${r.status}:${(await r.text()).slice(0, 120)}`);
     } catch (e) { notes.push(`email_error:${String(e).slice(0, 120)}`); }
     await sb.rpc("email_queue_done", { p_ids: rows.map((r) => r.qid), p_ok: ok });
@@ -68,15 +78,52 @@ async function drain(notes: string[]): Promise<number> {
   return sent;
 }
 
+/** Ask Resend how much of the plan is used and keep it in app_settings.resend_usage for the admin page.
+ *  Reading usage needs a full-access key (secret RESEND_USAGE_KEY); the sending key alone gets 401. */
+async function saveUsage(): Promise<Record<string, unknown>> {
+  const key = Deno.env.get("RESEND_USAGE_KEY") ?? Deno.env.get("RESEND_API_KEY");
+  const at = new Date().toISOString();
+  let value: Record<string, unknown>;
+  if (!key) value = { error: "no_key" };
+  else {
+    try {
+      const r = await fetch("https://api.resend.com/usage", { headers: { Authorization: `Bearer ${key}` } });
+      if (r.ok) {
+        const u = await r.json();
+        const d = u?.emails?.daily ?? {}, m = u?.emails?.monthly ?? {};
+        value = {
+          daily_used: d.used ?? null, daily_limit: d.limit ?? null, daily_resets_at: d.resets_at ?? null,
+          monthly_used: m.used ?? null, monthly_limit: m.limit ?? null, monthly_resets_at: m.resets_at ?? null, at,
+        };
+      } else if (lastQuota) {
+        // no permission to read usage, but a send in this run told us the numbers
+        value = { daily_used: lastQuota.daily_used, daily_limit: lastQuota.daily_used === null ? null : 100, daily_resets_at: null,
+                  monthly_used: lastQuota.monthly_used, monthly_limit: null, monthly_resets_at: null, at, source: "send" };
+      } else value = { error: `http_${r.status}` };
+    } catch (e) { value = { error: String(e).slice(0, 120) }; }
+  }
+  if (value.error) {
+    // keep the last good numbers, only note that this refresh failed
+    const { data } = await sb.from("app_settings").select("value").eq("key", "resend_usage").maybeSingle();
+    value = { ...((data?.value as Record<string, unknown>) ?? {}), error: value.error, error_at: at };
+  }
+  await sb.from("app_settings").upsert({ key: "resend_usage", value, is_public: false });
+  return value;
+}
+
 Deno.serve(async (req) => {
   const { data: cfg } = await sb.from("notify_config").select("*").eq("id", 1).single();
   if (!cfg || req.headers.get("x-notify-secret") !== cfg.secret) return json({ error: "forbidden" }, 403);
   const input = await req.json().catch(() => ({}));
 
+  // admin page / hourly call: refresh the usage numbers from Resend
+  if (input?.usage) return json({ usage: await saveUsage() });
+
   // daily call: send the emails that were left waiting
   if (input?.drain) {
     const notes: string[] = [];
     const emailSent = await drain(notes);
+    await saveUsage();
     return json({ drain: true, emailSent, notes });
   }
 
@@ -113,6 +160,7 @@ Deno.serve(async (req) => {
     const { error } = await sb.rpc("email_queue_add", { p_notification: n.id });
     if (error) notes.push(`email_queue:${error.message.slice(0, 120)}`);
     else emailSent = await drain(notes);
+    await saveUsage();
   }
 
   // email_sent is kept by the queue (email_queue_done), so it is not written here
