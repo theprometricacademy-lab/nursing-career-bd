@@ -1,5 +1,7 @@
 // Sends one row of public.notifications: web push to subscribed devices and (when send_email) email via Resend.
 // Called by the database (pg_net) right after a notification row is inserted; guarded by a shared secret.
+// Emails go through public.email_queue: the database hands out only as many as today's allowance permits
+// (the free email plan stops at 100 a day), and a daily { drain: true } call sends the ones left waiting.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 import webpush from "npm:web-push@3.6.7";
 
@@ -27,10 +29,58 @@ ${n.body ? `<p style="margin:0 0 20px;font-size:16px;line-height:1.7">${esc(n.bo
 </table></td></tr></table></body></html>`;
 }
 
+type Claimed = { qid: number; to_email: string; to_name: string | null; to_token: string; n_title: string; n_body: string | null; n_url: string | null };
+
+/** Send queued emails until today's allowance (or the queue) runs out. */
+async function drain(notes: string[]): Promise<number> {
+  const key = Deno.env.get("RESEND_API_KEY");
+  if (!key) { notes.push("email_no_key"); return 0; }
+  let sent = 0;
+  for (let round = 0; round < 12; round++) {
+    const { data, error } = await sb.rpc("email_queue_claim");
+    if (error) { notes.push(`email_claim:${error.message.slice(0, 120)}`); break; }
+    const rows = (data ?? []) as Claimed[];
+    if (!rows.length) break;
+    const batch = rows.map((r) => {
+      const n = { title: r.n_title, body: r.n_body, url: r.n_url };
+      return {
+        from: "Nursing Career BD <notify@nursingcareerbd.com>",
+        to: [r.to_email],
+        reply_to: "nursingcareerbd@gmail.com",
+        subject: n.title,
+        html: emailHtml(n, r.to_name, r.to_token),
+        text: `${n.title}\n\n${n.body ?? ""}\n\n${n.url ? SITE + n.url : SITE}\n\nআর ইমেইল না চাইলে: ${SITE}/unsubscribe?t=${r.to_token}`,
+        headers: { "List-Unsubscribe": `<${SITE}/unsubscribe?t=${r.to_token}>` },
+      };
+    });
+    let ok = false;
+    try {
+      const r = await fetch("https://api.resend.com/emails/batch", {
+        method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(batch),
+      });
+      ok = r.ok;
+      if (!ok) notes.push(`email_http_${r.status}:${(await r.text()).slice(0, 120)}`);
+    } catch (e) { notes.push(`email_error:${String(e).slice(0, 120)}`); }
+    await sb.rpc("email_queue_done", { p_ids: rows.map((r) => r.qid), p_ok: ok });
+    if (!ok) break;
+    sent += rows.length;
+  }
+  return sent;
+}
+
 Deno.serve(async (req) => {
   const { data: cfg } = await sb.from("notify_config").select("*").eq("id", 1).single();
   if (!cfg || req.headers.get("x-notify-secret") !== cfg.secret) return json({ error: "forbidden" }, 403);
-  const { id } = await req.json().catch(() => ({ id: null }));
+  const input = await req.json().catch(() => ({}));
+
+  // daily call: send the emails that were left waiting
+  if (input?.drain) {
+    const notes: string[] = [];
+    const emailSent = await drain(notes);
+    return json({ drain: true, emailSent, notes });
+  }
+
+  const id = input?.id ?? null;
   // claim the row so a retry never sends twice
   const { data: claimed } = await sb.from("notifications").update({ status: "sending" }).eq("id", id).eq("status", "pending").select("*");
   const n = claimed?.[0];
@@ -58,32 +108,14 @@ Deno.serve(async (req) => {
     } catch (e) { notes.push(`push_error:${String(e).slice(0, 120)}`); }
   }
 
-  // ---- email ----
+  // ---- email: queue every recipient, then send what today's allowance permits ----
   if (n.send_email) {
-    const key = Deno.env.get("RESEND_API_KEY");
-    if (!key) notes.push("email_no_key");
-    else {
-      const { data: rec, error } = await sb.rpc("notify_recipients", { p_only: n.only_user });
-      if (error) notes.push(`email_rcpt:${error.message}`);
-      const list = rec ?? [];
-      for (let i = 0; i < list.length; i += 100) {
-        const batch = list.slice(i, i + 100).map((r: { email: string; full_name: string | null; token: string }) => ({
-          from: "Nursing Career BD <notify@nursingcareerbd.com>",
-          to: [r.email],
-          reply_to: "nursingcareerbd@gmail.com",
-          subject: n.title,
-          html: emailHtml(n, r.full_name, r.token),
-          text: `${n.title}\n\n${n.body ?? ""}\n\n${n.url ? SITE + n.url : SITE}\n\nআর ইমেইল না চাইলে: ${SITE}/unsubscribe?t=${r.token}`,
-          headers: { "List-Unsubscribe": `<${SITE}/unsubscribe?t=${r.token}>` },
-        }));
-        const r = await fetch("https://api.resend.com/emails/batch", {
-          method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(batch),
-        });
-        if (r.ok) emailSent += batch.length; else notes.push(`email_http_${r.status}:${(await r.text()).slice(0, 120)}`);
-      }
-    }
+    const { error } = await sb.rpc("email_queue_add", { p_notification: n.id });
+    if (error) notes.push(`email_queue:${error.message.slice(0, 120)}`);
+    else emailSent = await drain(notes);
   }
 
-  await sb.from("notifications").update({ status: notes.length ? `sent (${notes.join("; ")})`.slice(0, 300) : "sent", push_sent: pushSent, email_sent: emailSent }).eq("id", n.id);
+  // email_sent is kept by the queue (email_queue_done), so it is not written here
+  await sb.from("notifications").update({ status: notes.length ? `sent (${notes.join("; ")})`.slice(0, 300) : "sent", push_sent: pushSent }).eq("id", n.id);
   return json({ id: n.id, pushSent, emailSent, notes });
 });
