@@ -7,6 +7,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useApp } from '@/components/AppProvider';
 import { PageHeader, Spinner } from '@/components/ui';
 import { ProfilePhoto } from '@/components/ProfilePhoto';
+import { MemberCard } from '@/components/MemberCard';
 import { BoardConsent } from '@/components/BoardConsent';
 import { NotifySettings } from '@/components/NotifySettings';
 
@@ -39,6 +40,7 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-xl space-y-4">
       <PageHeader title={t('profile')} />
+      <MemberCard />
       <section className="card p-5">
         <h2 className="mb-3 font-semibold text-ink">{t('language')}</h2>
         <div className="grid grid-cols-2 gap-2">

@@ -6,7 +6,7 @@ import { avatarUrl } from '@/lib/winnerCard';
 import { useApp } from './AppProvider';
 
 /** Square-crops and shrinks a picked photo to 400x400 JPEG in the browser before upload. */
-async function shrink(file: File): Promise<Blob> {
+export async function shrinkPhoto(file: File): Promise<Blob> {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
@@ -34,7 +34,7 @@ export function ProfilePhoto() {
     if (!f.type.startsWith('image/')) { setMsg(bn ? 'শুধু ছবি দেওয়া যাবে।' : 'Images only.'); return; }
     setBusy(true); setMsg('');
     try {
-      const blob = await shrink(f);
+      const blob = await shrinkPhoto(f);
       const sb = supabaseBrowser();
       const next = `${user!.id}/${Date.now()}.jpg`;
       const up = await sb.storage.from('avatars').upload(next, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
