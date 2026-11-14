@@ -57,8 +57,8 @@ function MemberCard() {
   }, [user]);
   const bn = lang === 'bn';
   const perks = bn
-    ? ['১০,০০০+ প্রশ্ন ও ব্যাখ্যা', 'সব মডেল টেস্ট', 'বিষয়ভিত্তিক ফলাফল বিশ্লেষণ', 'ভুল উত্তর অনুশীলন', 'নতুন প্রশ্ন ও টেস্ট — আজীবন']
-    : ['10,000+ questions & explanations', 'All mock tests', 'Subject-wise analysis', 'Wrong-answer practice', 'New questions & tests — for life'];
+    ? ['১১,০০০+ প্রশ্ন ও ব্যাখ্যা', 'সব মডেল টেস্ট', 'বিষয়ভিত্তিক ফলাফল বিশ্লেষণ', 'ভুল উত্তর অনুশীলন', 'নতুন প্রশ্ন ও টেস্ট — আজীবন']
+    : ['11,000+ questions & explanations', 'All mock tests', 'Subject-wise analysis', 'Wrong-answer practice', 'New questions & tests — for life'];
   return (
     <div className="space-y-3">
       <div className="gold-card p-6">

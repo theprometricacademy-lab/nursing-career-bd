@@ -62,7 +62,7 @@ export default async function PaperPage({ params }: Props) {
         {items.length > 0 ? <><McqList items={items} /><ResumeReading id={p.slug} /></> : <p>প্রশ্ন এই মুহূর্তে লোড করা যায়নি।</p>}
       </Section>
 
-      <Cta title="আরও প্রস্তুতি নিন" sub="১০,০০০+ ব্যাখ্যাসহ প্রশ্ন, PSC প্যাটার্নে মডেল টেস্ট ও সাপ্তাহিক লিডারবোর্ড।" />
+      <Cta title="আরও প্রস্তুতি নিন" sub="১১,০০০+ ব্যাখ্যাসহ প্রশ্ন, PSC প্যাটার্নে মডেল টেস্ট ও সাপ্তাহিক লিডারবোর্ড।" />
       <Section title="অন্যান্য সালের প্রশ্ন সমাধান">
         <Link href="/question-solution" className="font-semibold text-brand-700 underline">সব পরীক্ষার প্রশ্ন সমাধান দেখুন</Link>
       </Section>

@@ -124,7 +124,7 @@ export default async function CircularPage({ params }: Props) {
 
       <aside className="rounded-3xl bg-gradient-to-r from-mint-500 to-brand-600 p-5 text-white">
         <h2 className="text-lg font-bold">এই পরীক্ষার প্রস্তুতি নিন</h2>
-        <p className="mt-1 text-sm text-white/90">নার্সিং নিয়োগ পরীক্ষার ধরনে ১০,০০০+ প্রশ্ন ও PSC প্যাটার্নের মডেল টেস্ট।</p>
+        <p className="mt-1 text-sm text-white/90">নার্সিং নিয়োগ পরীক্ষার ধরনে ১১,০০০+ প্রশ্ন ও PSC প্যাটার্নের মডেল টেস্ট।</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link href="/mock-tests" className="btn bg-white text-brand-700 hover:bg-brand-50">মডেল টেস্ট দিন <ArrowRight className="h-4 w-4" /></Link>
           <Link href="/senior-staff-nurse" className="btn border border-white/50 bg-white/10 text-white hover:bg-white/20">প্রস্তুতি গাইড</Link>

@@ -83,7 +83,7 @@ export default function DailyPostPage() {
 
   const caption = q ? (answer
     ? `✅ আজকের প্রশ্নের সঠিক উত্তর: (${LET[q.correct_option]}) ${q.options_bn[q.correct_option]}\n\n${q.explanation_bn && !q.explanation_bn.startsWith('সঠিক উত্তর:') ? `ব্যাখ্যা: ${q.explanation_bn}\n\n` : ''}প্রতিদিন এমন প্রশ্ন, ব্যাখ্যা আর বিগত বছরের সরকারি পরীক্ষার প্রশ্নের সমাধান 👉 nursingcareerbd.com\n\n#সিনিয়র_স্টাফ_নার্স #নার্সিং_প্রস্তুতি #NursingCareerBD`
-    : `📝 আজকের প্রশ্ন (${today()})\n\n${q.question_bn}\n\n${q.options_bn.map((o, i) => `${LET[i]}) ${o}`).join('\n')}\n\n👇 উত্তর কমেন্টে দিন! সঠিক উত্তর ও ব্যাখ্যা আজ রাতে।\n\nআরও ১০,০০০+ প্রশ্ন ফ্রিতে অনুশীলন করুন 👉 nursingcareerbd.com\n\n#সিনিয়র_স্টাফ_নার্স #নার্সিং_চাকরি #NursingCareerBD #BPSC #DGNM`) : '';
+    : `📝 আজকের প্রশ্ন (${today()})\n\n${q.question_bn}\n\n${q.options_bn.map((o, i) => `${LET[i]}) ${o}`).join('\n')}\n\n👇 উত্তর কমেন্টে দিন! সঠিক উত্তর ও ব্যাখ্যা আজ রাতে।\n\nআরও ১১,০০০+ প্রশ্ন ফ্রিতে অনুশীলন করুন 👉 nursingcareerbd.com\n\n#সিনিয়র_স্টাফ_নার্স #নার্সিং_চাকরি #NursingCareerBD #BPSC #DGNM`) : '';
 
   async function copy(t: string, k: string) { try { await navigator.clipboard.writeText(t); setCopied(k); setTimeout(() => setCopied(''), 2000); } catch { /* ignore */ } }
   function download() {

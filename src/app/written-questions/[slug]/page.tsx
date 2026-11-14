@@ -54,7 +54,7 @@ export default async function WrittenPaperPage({ params }: Props) {
         </Section>
       ))}
       {p.source_note && <p className="text-xs text-ink-soft">সূত্র: {p.source_note}</p>}
-      <Cta title="MCQ প্রস্তুতিও নিন" sub="প্রিলিমিনারির জন্য ১০,০০০+ ব্যাখ্যাসহ প্রশ্ন আর PSC প্যাটার্নে মডেল টেস্ট।" />
+      <Cta title="MCQ প্রস্তুতিও নিন" sub="প্রিলিমিনারির জন্য ১১,০০০+ ব্যাখ্যাসহ প্রশ্ন আর PSC প্যাটার্নে মডেল টেস্ট।" />
       <Section title="অন্যান্য লিখিত প্রশ্ন"><Link href="/written-questions" className="font-semibold text-brand-700 underline">সব লিখিত পরীক্ষার প্রশ্ন দেখুন</Link></Section>
       <GuideLinks />
     </Article>

@@ -10,7 +10,7 @@ import { Tracker } from '@/components/Tracker';
 // Noto Sans Bengali: clear, standard-shaped Bangla digits (Hind Siliguri's ১, ৭ were hard to read on phones)
 const bnFont = Noto_Sans_Bengali({ subsets: ['bengali', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-bn', display: 'swap' });
 
-const DESC = 'সিনিয়র স্টাফ নার্স ও সরকারি নার্সিং চাকরির প্রস্তুতি: ১০,০০০+ প্রশ্নব্যাংক, PSC প্যাটার্নে মডেল টেস্ট, বিষয়ভিত্তিক অনুশীলন ও ফলাফল বিশ্লেষণ।';
+const DESC = 'সিনিয়র স্টাফ নার্স ও সরকারি নার্সিং চাকরির প্রস্তুতি: ১১,০০০+ প্রশ্নব্যাংক, PSC প্যাটার্নে মডেল টেস্ট, বিষয়ভিত্তিক অনুশীলন ও ফলাফল বিশ্লেষণ।';
 export const metadata: Metadata = {
   metadataBase: new URL('https://nursingcareerbd.com'),
   title: { default: 'Nursing Career BD — নার্সিং চাকরির প্রস্তুতি', template: '%s · Nursing Career BD' },

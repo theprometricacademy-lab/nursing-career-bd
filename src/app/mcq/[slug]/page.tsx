@@ -44,7 +44,7 @@ export default async function SubjectMcqPage({ params }: Props) {
         <p className="pt-2">এগুলো নমুনা মাত্র। <b>{s.bn}</b> বিষয়ের আরও শত শত প্রশ্ন টপিক ও কঠিনতা অনুযায়ী অনুশীলন করতে <Link href="/question-bank" className="font-semibold text-brand-700 underline">প্রশ্নব্যাংক</Link> খুলুন, অথবা <Link href="/mock-tests" className="font-semibold text-brand-700 underline">মডেল টেস্ট</Link> দিয়ে নিজেকে যাচাই করুন।</p>
       </Section>
 
-      <Cta title="পুরো প্রস্তুতি নিন এক জায়গায়" sub="১০,০০০+ ব্যাখ্যাসহ প্রশ্ন, PSC প্যাটার্নে ১০০ নম্বরের মডেল টেস্ট ও বিষয়ভিত্তিক ফলাফল বিশ্লেষণ।" />
+      <Cta title="পুরো প্রস্তুতি নিন এক জায়গায়" sub="১১,০০০+ ব্যাখ্যাসহ প্রশ্ন, PSC প্যাটার্নে ১০০ নম্বরের মডেল টেস্ট ও বিষয়ভিত্তিক ফলাফল বিশ্লেষণ।" />
 
       <Section title="অন্যান্য বিষয়ের MCQ">
         <div className="flex flex-wrap gap-2">

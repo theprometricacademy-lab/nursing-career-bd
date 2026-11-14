@@ -8,6 +8,7 @@ import { PageHeader, Progress, Spinner, Stat } from '@/components/ui';
 import { useL } from './AdminShell';
 import { UsageCard } from './UsageCard';
 import { AppStatsCard } from './AppStatsCard';
+import { LiveCard } from './LiveCard';
 
 type S = {
   users: number; new_users_30d: number; premium_users: number; questions: number; premium_questions: number;
@@ -37,6 +38,7 @@ export default function AdminHome() {
   return (
     <div className="space-y-4">
       <PageHeader title={L('প্ল্যাটফর্ম পরিসংখ্যান', 'Platform analytics')} />
+      <LiveCard />
       <Link href="/admin/payments?status=pending"
         className={`card flex items-center gap-3 p-4 transition hover:shadow-md ${pay && pay.pending > 0 ? 'border-amber-300 bg-amber-50' : ''}`}>
         <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${pay && pay.pending > 0 ? 'bg-amber-200 text-amber-800' : 'bg-brand-50 text-brand-700'}`}><Hourglass className="h-5 w-5" /></span>

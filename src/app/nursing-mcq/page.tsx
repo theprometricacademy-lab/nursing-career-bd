@@ -54,7 +54,7 @@ export default async function NursingMcqPage() {
         </Section>
       )}
 
-      <Cta title="১০,০০০+ প্রশ্নে অনুশীলন করুন" sub="বিষয়, টপিক ও কঠিনতা অনুযায়ী প্রশ্নব্যাংক এবং PSC প্যাটার্নে পূর্ণাঙ্গ মডেল টেস্ট।" />
+      <Cta title="১১,০০০+ প্রশ্নে অনুশীলন করুন" sub="বিষয়, টপিক ও কঠিনতা অনুযায়ী প্রশ্নব্যাংক এবং PSC প্যাটার্নে পূর্ণাঙ্গ মডেল টেস্ট।" />
       <GuideLinks current="/nursing-mcq" />
     </Article>
   );
